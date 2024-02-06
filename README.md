@@ -1,12 +1,14 @@
 # FFXIV Tools
 
-Slapping something together real quick to see if it's worthwhile to craft something in FFXIV.
-
-Uses laravel.
+Slapping something together real quick in Laravel to see if it's worthwhile to craft something in FFXIV.
 
 Spaghetti code is expected.
 
-![image](https://github.com/NekoFluff/ffxiv-tools/assets/14190780/2325e76c-dc7c-4460-adc8-d13f6b46bf93)
+Uses public facing API from Universalis and XIVAPI. 
+
+***Does not require API keys.***
+
+![image](https://github.com/NekoFluff/ffxiv-tools/assets/14190780/905cd227-b891-4973-bc2b-ccb326d3724f)
 
 
 ## License
