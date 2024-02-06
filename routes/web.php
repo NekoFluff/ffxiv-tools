@@ -238,7 +238,6 @@ class Recipe
         $this->market_cost = 0;
         $this->market_craft_cost = 0;
         $this->optimal_craft_cost = 0;
-        $this->vendor_cost = 0;
 
         $mb_item = $mb_data["items"][$this->item_id] ?? null;
         if ($mb_item !== null) {
@@ -300,6 +299,7 @@ function getVendorCost(int $item_id): int
     $vendor_data = cache()->rememberForever($cacheKey, function () use ($item_id) {
         logger("Fetching vendor data for item {$item_id}");
         $vendor_data = file_get_contents("https://xivapi.com/item/{$item_id}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
+        logger("Retrieved data {$vendor_data}");
         $vendor_data = json_decode($vendor_data, true);
         return $vendor_data["GameContentLinks"]["GilShopItem"]["Item"] ? $vendor_data["PriceMid"] : 0;
     });
