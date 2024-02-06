@@ -262,15 +262,16 @@ class Recipe
     private function calculateMarketCost(array $mb_item): int
     {
         $listings = collect($mb_item["listings"])
-            ->take(10)
-            ->map(
-                function ($listing) {
-                    return $listing["pricePerUnit"];
-                }
-            );
+            ->take(10);
 
-        $avg_cost = $listings->avg();
-        $median_cost = $listings->median();
+        $median_cost = $listings->median('pricePerUnit');
+
+        $sum = 0;
+        foreach ($listings as $listing) {
+            $sum += $listing['pricePerUnit'] * $listing['quantity'];
+        }
+        $avg_cost = $sum / max($listings->sum('quantity'), 1);
+
         logger("Market cost for item {$mb_item["itemID"]}: avg={$avg_cost}, median={$median_cost}");
         return min($avg_cost, $median_cost) ?? 0;
     }
