@@ -19,6 +19,6 @@ const handleSearch = (text) => {
     <!-- <Nav /> -->
     <div class="container mx-auto">
         <Searchbar class="pt-9" @search="handleSearch" />
-        <RecipeTree class="bg-gray-50" v-if="props.recipe !== undefined" :recipe=props.recipe></RecipeTree>
+        <RecipeTree v-if="props.recipe !== undefined" :recipe=props.recipe></RecipeTree>
     </div>
 </template>

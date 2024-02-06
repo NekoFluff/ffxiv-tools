@@ -75,7 +75,7 @@ const craftOrBuyColors = computed(() => {
 </script>
 
 <template>
-    <ul v-if="props.recipe != null" class="py-2 border border-gray-300 rounded-lg">
+    <ul v-if="props.recipe != null" class="py-2 border border-gray-300 rounded-lg bg-gray-50">
         <div class="flex items-center px-3 py-1">
             <img :src="base + props.recipe.icon" class="w-6 h-6" />&nbsp;
             <span class="text-sm font-medium text-gray-900">{{ props.recipe.name }}&nbsp;</span>
