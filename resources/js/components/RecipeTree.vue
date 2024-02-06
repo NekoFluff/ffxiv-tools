@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Ingredient } from "./Ingredient.vue"
 import { defineProps, computed } from 'vue';
+import RecipeName from "./RecipeName.vue";
 
 export type Recipe = {
     item_id: number,
@@ -78,7 +79,7 @@ const craftOrBuyColors = computed(() => {
     <ul v-if="props.recipe != null" class="py-2 border border-gray-300 rounded-lg bg-gray-50">
         <div class="flex items-center px-3 py-1">
             <img :src="base + props.recipe.icon" class="w-6 h-6" />&nbsp;
-            <span class="text-sm font-medium text-gray-900">{{ props.recipe.name }}&nbsp;</span>
+            <RecipeName :id="props.recipe.item_id" :name="props.recipe.name" />
             <span class="text-sm text-gray-500">(x{{ props.recipe.amount_result }})&nbsp;</span>
             <span class="text-sm text-gray-500">{{ props.recipe.class_job }}</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
@@ -111,7 +112,7 @@ const craftOrBuyColors = computed(() => {
             <div v-else class="flex items-center ml-3">
                 <img :src="base + ingredient.icon" class="w-6 h-6" />&nbsp;
 
-                <span class="text-sm font-medium text-gray-900">{{ ingredient.name }}&nbsp;</span>
+                <RecipeName :id="ingredient.item_id" :name="ingredient.name" />
                 <span class="text-sm text-gray-500">(x{{ ingredient.amount }})</span>
                 <span class="font-bold">&nbsp;|&nbsp;</span>
                 <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">MB Price: {{
