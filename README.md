@@ -6,6 +6,8 @@ Uses laravel.
 
 Spaghetti code is expected.
 
+![image](https://github.com/NekoFluff/ffxiv-tools/assets/14190780/2325e76c-dc7c-4460-adc8-d13f6b46bf93)
+
 
 ## License
 
