@@ -37,7 +37,7 @@ const data = {
     labels: props.history.map((item: any) => item.date),
     datasets: [
         {
-            label: 'Historical Sales',
+            label: '# Sold',
             data: props.history.map((item: any) => item.quantity),
             fill: false,
             borderColor: '#c319ee',
