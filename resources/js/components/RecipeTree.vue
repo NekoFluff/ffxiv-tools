@@ -30,11 +30,12 @@ const profit = computed(() => {
     return props.recipe.market_cost - props.recipe.optimal_craft_cost;
 })
 
-const profitMargin = computed(() => {
+const profitRatio = computed(() => {
     if (props.recipe == null) {
         return 0;
     }
-    return ((props.recipe.market_cost - props.recipe.optimal_craft_cost) / props.recipe.market_cost * 100).toFixed(2);
+
+    return (props.recipe.market_cost / props.recipe.optimal_craft_cost * 100).toFixed(2);
 })
 
 const craftOrBuyColors = computed(() => {
@@ -88,6 +89,13 @@ const craftOrBuyColors = computed(() => {
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 MB Price: {{ props.recipe.market_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
+            <span v-if="recipe.vendor_cost != 0"
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                <a :href="'http://www.garlandtools.org/db/#item/' + recipe.item_id" target="_blank">
+                    Vendor Price: {{ recipe.vendor_cost }} gil
+                </a>
+            </span>
+            <span v-if="recipe.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="craftOrBuyColors['Market Craft Cost']"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Market Craft Cost: {{ props.recipe.market_craft_cost }} gil</span>
@@ -96,13 +104,15 @@ const craftOrBuyColors = computed(() => {
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
-            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
+            <span
+                :class="{ 'text-green-500': profit > 100, 'text-red-500': profit < 100, 'text-yellow-500': profit == 100 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
-            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
+            <span
+                :class="{ 'text-green-500': profit > 100, 'text-red-500': profit < 100, 'text-yellow-500': profit == 100 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                Profit Margin: {{ profitMargin }}%&nbsp;</span>
+                Profit Ratio: {{ profitRatio }}%&nbsp;</span>
 
         </div>
         <li v-for=" ingredient  in  props.recipe.ingredients " :key="ingredient.item_id" class="px-10 py-1">
@@ -115,12 +125,15 @@ const craftOrBuyColors = computed(() => {
                 <RecipeName :id="ingredient.item_id" :name="ingredient.name" />
                 <span class="text-sm text-gray-500">(x{{ ingredient.amount }})</span>
                 <span class="font-bold">&nbsp;|&nbsp;</span>
-                <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">MB Price: {{
-                    ingredient.market_cost }} gil</span>
+                <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                    MB Price: {{ ingredient.market_cost }} gil</span>
                 <span v-if="ingredient.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
                 <span v-if="ingredient.vendor_cost != 0"
-                    class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Vendor Price: {{
-                        ingredient.vendor_cost }} gil</span>
+                    class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                    <a :href="'http://www.garlandtools.org/db/#item/' + ingredient.item_id" target="_blank">
+                        Vendor Price: {{ ingredient.vendor_cost }} gil
+                    </a>
+                </span>
             </div>
         </li>
     </ul>
