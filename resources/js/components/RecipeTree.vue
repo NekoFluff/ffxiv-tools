@@ -35,7 +35,7 @@ const profitRatio = computed(() => {
         return 0;
     }
 
-    return (props.recipe.market_cost / props.recipe.optimal_craft_cost * 100).toFixed(2);
+    return ((props.recipe.market_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
 })
 
 const craftOrBuyColors = computed(() => {
@@ -104,13 +104,11 @@ const craftOrBuyColors = computed(() => {
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
-            <span
-                :class="{ 'text-green-500': profit > 100, 'text-red-500': profit < 100, 'text-yellow-500': profit == 100 }"
+            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
-            <span
-                :class="{ 'text-green-500': profit > 100, 'text-red-500': profit < 100, 'text-yellow-500': profit == 100 }"
+            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit Ratio: {{ profitRatio }}%&nbsp;</span>
 

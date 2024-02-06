@@ -78,7 +78,7 @@ const vClickOutside = {
             class="w-full p-2 text-black bg-white rounded-md shadow-lg outline-none placeholder-slate-700 shadow-grey-900"
             type="text" placeholder="Search..." @input="handleUpdate(($event.target as HTMLInputElement).value)"
             @keydown="handleKeyDown" @focus="showOptions" autocomplete="off" />
-        <SearchResultList v-if="optionsVisible" class="w-full mt-0" :options="options"
+        <SearchResultList v-if="optionsVisible" class="mt-0 " :options="options"
             @searchResultClick="handleSearchResultClicked" />
 
     </div>
