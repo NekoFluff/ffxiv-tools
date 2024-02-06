@@ -11,7 +11,10 @@
 </head>
 
 <body>
-    @inertia
+    <div class="bg-gray-100">
+        @inertia
+
+    </div>
 </body>
 
 </html>

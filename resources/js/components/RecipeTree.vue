@@ -84,23 +84,23 @@ const craftOrBuyColors = computed(() => {
             <span class="font-bold">&nbsp;|&nbsp;</span>
 
             <span :class="craftOrBuyColors['Market Price']"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 MB Price: {{ props.recipe.market_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="craftOrBuyColors['Market Craft Cost']"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Market Craft Cost: {{ props.recipe.market_craft_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="craftOrBuyColors['Optimal Craft Cost']"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit Margin: {{ profitMargin }}%&nbsp;</span>
 
         </div>
@@ -114,11 +114,11 @@ const craftOrBuyColors = computed(() => {
                 <span class="text-sm font-medium text-gray-900">{{ ingredient.name }}&nbsp;</span>
                 <span class="text-sm text-gray-500">(x{{ ingredient.amount }})</span>
                 <span class="font-bold">&nbsp;|&nbsp;</span>
-                <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">MB Price: {{
+                <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">MB Price: {{
                     ingredient.market_cost }} gil</span>
                 <span v-if="ingredient.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
                 <span v-if="ingredient.vendor_cost != 0"
-                    class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">Vendor Price: {{
+                    class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Vendor Price: {{
                         ingredient.vendor_cost }} gil</span>
             </div>
         </li>
