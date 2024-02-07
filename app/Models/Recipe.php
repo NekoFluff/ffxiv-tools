@@ -160,7 +160,7 @@ class Recipe
     {
         $cost = 0;
         foreach ($this->ingredients as $ingredient) {
-            $min_cost = $ingredient->market_cost;
+            $min_cost = $ingredient->market_cost ?? 100000000;
             if (!$min_cost && $ingredient->recipe !== null) {
                 $min_cost = $ingredient->recipe->calculateCraftCost($optimal);
             }
