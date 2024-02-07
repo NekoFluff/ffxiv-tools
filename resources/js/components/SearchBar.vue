@@ -18,7 +18,6 @@ let optionsVisible = ref<boolean>(true)
 
 let search = debounce(() => {
     axios.get(`https://xivapi.com/search?string=${text.value}`).then((response) => {
-        console.log(response)
         options.value = response.data.Results.filter(
             (result: any) => result.UrlType === "Item"
         ).map((result: any) => {

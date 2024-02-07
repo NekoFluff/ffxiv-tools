@@ -50,8 +50,8 @@ Route::get('/{itemID}', function ($itemID) {
         'Recipes',
         [
             "recipe" => $recipe,
-            "history" => getMarketBoardHistory("Goblin", $itemID),
-            "listings" => getMarketBoardData("Goblin", [$itemID])["listings"],
+            "history" => getMarketBoardHistory("Goblin", $itemID) ?? [],
+            "listings" => getMarketBoardData("Goblin", [$itemID])["listings"] ?? [],
         ]
     );
 })->where('name', '.*');
@@ -316,7 +316,7 @@ function getMarketBoardData(string $server, array $item_ids): array
 
     logger("Fetching market board data for server {$server}." . " | Items: " . implode(",", $item_ids));
     $mb_data = file_get_contents(
-        "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids) . "?listings=10"
+        "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids)
     );
     logger("Retrieved market board data for server {$server}");
     $mb_data = json_decode($mb_data, true);

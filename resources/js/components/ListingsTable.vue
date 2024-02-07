@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 
-defineProps<{
+
+const props = defineProps<{
     listings: Array<{}>
 }>();
+
+const first10Listings = ref(props.listings.slice(0, 10))
 
 </script>
 
@@ -17,7 +21,7 @@ defineProps<{
             </tr>
         </thead>
         <tbody>
-            <tr v-for="listing in listings" :key="listing['listingID']" class="border-b">
+            <tr v-for="listing in first10Listings" :key="listing['listingID']" class="border-b">
                 <td class="px-4 py-2">{{ listing['pricePerUnit'] }}</td>
                 <td class="px-4 py-2">{{ listing['quantity'] }}</td>
                 <td class="px-4 py-2">{{ listing['retainerName'] }}</td>
