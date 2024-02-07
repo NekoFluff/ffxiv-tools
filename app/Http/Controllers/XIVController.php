@@ -7,18 +7,33 @@ use Illuminate\Http\Request;
 
 class XIVController extends Controller
 {
+    public function searchRecipeByName(string $name): ?Recipe
+    {
+        try {
+            $search = file_get_contents("https://xivapi.com/search?string={$name}&string_algo=match");
+            $search = json_decode($search);
+        } catch (\Exception $e) {
+            logger("Failed to retrieve search results for {$name}");
+            return null;
+        }
+
+        $item = collect($search->Results)->filter(
+            function ($item) {
+                return $item->UrlType === "Item";
+            }
+        )->first();
+        logger("Item Url: {$item->Url}");
+
+        if (!$item) {
+            return null;
+        }
+
+        return $this->searchRecipe($item->ID);
+    }
+
     public function searchRecipe(string $itemID): ?Recipe
     {
         logger("Searching for item {$itemID}");
-        // $search = file_get_contents("https://xivapi.com/search?string={$name}");
-        // $search = json_decode($search);
-
-        // $item = collect($search->Results)->filter(
-        //     function ($item) {
-        //         return $item->UrlType === "Item";
-        //     }
-        // )->first();
-        // logger("Item Url: {$item->Url}");
 
         $filter_columns = [
             "ID",

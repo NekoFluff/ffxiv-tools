@@ -12,12 +12,36 @@ class UniversalisController extends Controller
         sort($item_ids);
 
         logger("Fetching market board data for server {$server}." . " | Items: " . implode(",", $item_ids));
-        $mb_data = file_get_contents(
-            "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids)
-        );
+        $maxRetries = 3;
+        $retryCount = 0;
+        $mb_data = "";
+
+        while ($retryCount < $maxRetries) {
+            try {
+                $mb_data = file_get_contents(
+                    "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids)
+                );
+            } catch (\Exception $e) {
+                logger("Failed to retrieve market board data for server {$server}");
+            }
+
+            if ($mb_data !== false) {
+                break; // Request succeeded, exit the loop
+            }
+
+            $retryCount++;
+            sleep(1); // Wait for 1 second before retrying
+        }
+
+        if ($mb_data === false) {
+            // Handle the failure case here
+            logger("Failed to retrieve market board data for server {$server}");
+            return [];
+        }
+
         logger("Retrieved market board data for server {$server}");
-        $mb_data = json_decode($mb_data, true);
-        return $mb_data;
+        $mb_data_arr = json_decode($mb_data, true) ?? [];
+        return $mb_data_arr;
     }
 
 
