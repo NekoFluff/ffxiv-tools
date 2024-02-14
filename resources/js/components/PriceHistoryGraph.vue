@@ -31,6 +31,11 @@ const options = {
         mode: 'index',
         intersect: false,
     },
+    scales: {
+        y: {
+            min: 0,
+        },
+    },
 }
 
 const data = {
@@ -47,6 +52,8 @@ const data = {
         }
     ]
 }
+
+console.log(props.history)
 
 </script>
 

@@ -81,6 +81,33 @@ class UniversalisController extends Controller
                 ];
             }
         )->reverse()->values();
+
+        // Add missing days in the last week without quantity
+        $lastWeekDates = [
+            date('Y-m-d', now()->subDays(0)->timestamp),
+            date('Y-m-d', now()->subDays(1)->timestamp),
+            date('Y-m-d', now()->subDays(2)->timestamp),
+            date('Y-m-d', now()->subDays(3)->timestamp),
+            date('Y-m-d', now()->subDays(4)->timestamp),
+            date('Y-m-d', now()->subDays(5)->timestamp),
+            date('Y-m-d', now()->subDays(6)->timestamp),
+            date('Y-m-d', now()->subDays(7)->timestamp),
+        ];
+        $missingDates = collect($lastWeekDates)->diff($mb_history->pluck('date'));
+        $missingDates->each(
+            function ($date) use (&$mb_history) {
+                $mb_history->push(
+                    [
+                        "date" => $date,
+                        "quantity" => 0,
+                    ]
+                );
+            }
+        );
+
+        $mb_history = $mb_history->sortBy('date')->values();
+
+
         return $mb_history;
     }
 
