@@ -28,7 +28,7 @@ const profit = computed(() => {
     if (props.recipe == null) {
         return 0;
     }
-    return props.recipe.purchase_cost - props.recipe.optimal_craft_cost;
+    return props.recipe.market_cost - props.recipe.optimal_craft_cost;
 })
 
 const profitRatio = computed(() => {
@@ -36,7 +36,7 @@ const profitRatio = computed(() => {
         return 0;
     }
 
-    return ((props.recipe.purchase_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
+    return ((props.recipe.market_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
 })
 
 const craftOrBuyColors = computed(() => {
