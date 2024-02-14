@@ -170,14 +170,14 @@ class Recipe
         $avg_cost = $sum / max($listings->sum('quantity'), 1);
 
         logger("Market cost for item {$mb_item["itemID"]}: avg={$avg_cost}, median={$median_cost}");
-        return min($avg_cost, $median_cost) ?? 0;
+        return min($avg_cost, $median_cost) ?: Recipe::DEFAULT_MARKET_COST;
     }
 
     private function calculateCraftCost(bool $optimal): int
     {
         $cost = 0;
         foreach ($this->ingredients as $ingredient) {
-            $min_ingredient_cost = $ingredient->market_cost ?? Recipe::DEFAULT_MARKET_COST;
+            $min_ingredient_cost = $ingredient->market_cost ?: Recipe::DEFAULT_MARKET_COST;
             if (!$ingredient->market_cost && $ingredient->recipe !== null) {
                 $min_ingredient_cost = $ingredient->recipe->calculateCraftCost($optimal) / $ingredient->recipe->amount_result;
             }
