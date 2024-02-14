@@ -68,11 +68,11 @@ class XIVController extends Controller
             $recipe->populateCosts($mb_data);
             logger(json_encode($recipe));
 
-            logger("Market Profit: " . ($recipe->market_cost - $recipe->market_craft_cost) . " (" . ($recipe->market_cost / $recipe->market_craft_cost * 100) . "%) ");
-            logger("Optimal Profit: " . ($recipe->market_cost - $recipe->optimal_craft_cost) . " (" . ($recipe->market_cost / $recipe->optimal_craft_cost  * 100) . "%) ");
+            logger("Market Profit: " . ($recipe->purchase_cost - $recipe->market_craft_cost) . " (" . ($recipe->purchase_cost / $recipe->market_craft_cost * 100) . "%) ");
+            logger("Optimal Profit: " . ($recipe->purchase_cost - $recipe->optimal_craft_cost) . " (" . ($recipe->purchase_cost / $recipe->optimal_craft_cost  * 100) . "%) ");
 
-        // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
-        // logger("Last week sale count: {$last_week_sale_count}");
+            // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
+            // logger("Last week sale count: {$last_week_sale_count}");
         } else {
             $recipe = null;
         }

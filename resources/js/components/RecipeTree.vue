@@ -10,6 +10,7 @@ export type Recipe = {
     ingredients: Ingredient[],
     amount_result: number,
     market_cost: number,
+    purchase_cost: number,
     market_craft_cost: number,
     optimal_craft_cost: number,
     vendor_cost: number,
@@ -27,7 +28,7 @@ const profit = computed(() => {
     if (props.recipe == null) {
         return 0;
     }
-    return props.recipe.market_cost - props.recipe.optimal_craft_cost;
+    return props.recipe.purchase_cost - props.recipe.optimal_craft_cost;
 })
 
 const profitRatio = computed(() => {
@@ -35,7 +36,7 @@ const profitRatio = computed(() => {
         return 0;
     }
 
-    return ((props.recipe.market_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
+    return ((props.recipe.purchase_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
 })
 
 const craftOrBuyColors = computed(() => {
@@ -45,8 +46,8 @@ const craftOrBuyColors = computed(() => {
 
     const prices = [
         {
-            value: props.recipe.market_cost,
-            name: "Market Price"
+            value: props.recipe.purchase_cost,
+            name: "Purchase Cost"
         },
         {
             value: props.recipe.market_craft_cost,
@@ -83,30 +84,39 @@ const craftOrBuyColors = computed(() => {
             <RecipeName :id="props.recipe.item_id" :name="props.recipe.name" />
             <span class="text-sm text-gray-500">(x{{ props.recipe.amount_result }})&nbsp;</span>
             <span class="text-sm text-gray-500">{{ props.recipe.class_job }}</span>
-            <span class="font-bold">&nbsp;|&nbsp;</span>
 
-            <span :class="craftOrBuyColors['Market Price']"
-                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                MB Price: {{ props.recipe.market_cost }} gil</span>
             <span class="font-bold">&nbsp;|&nbsp;</span>
+            <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                MB Price: {{ props.recipe.market_cost }} gil</span>
+
+            <span v-if="recipe.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
             <span v-if="recipe.vendor_cost != 0"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 <a :href="'http://www.garlandtools.org/db/#item/' + recipe.item_id" target="_blank">
                     Vendor Price: {{ recipe.vendor_cost }} gil
                 </a>
             </span>
-            <span v-if="recipe.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
+
+            <span class="font-bold">&nbsp;|&nbsp;</span>
+            <span :class="craftOrBuyColors['Purchase Cost']"
+                class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Purchase Cost: {{ props.recipe.purchase_cost }} gil</span>
+
+            <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="craftOrBuyColors['Market Craft Cost']"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Market Craft Cost: {{ props.recipe.market_craft_cost }} gil</span>
+
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="craftOrBuyColors['Optimal Craft Cost']"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
+
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
+
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">

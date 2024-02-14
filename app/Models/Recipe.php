@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recipe
 {
+    public const DEFAULT_MARKET_COST = 100000000;
+
     public int $id;
 
     public int $item_id;
@@ -22,6 +24,8 @@ class Recipe
     public float $amount_result;
 
     public int $market_cost;
+
+    public int $purchase_cost;
 
     public int $market_craft_cost;
 
@@ -116,6 +120,7 @@ class Recipe
     public function populateCosts($mb_data)
     {
         $this->market_cost = 0;
+        $this->purchase_cost = 0;
         $this->market_craft_cost = 0;
         $this->optimal_craft_cost = 0;
 
@@ -128,6 +133,8 @@ class Recipe
             $mb_item = $mb_data["items"][$ingredient->item_id] ?? null;
             if ($mb_item !== null) {
                 $ingredient->market_cost = $this->calculateMarketCost($mb_item);
+            } else {
+                $ingredient->market_cost = Recipe::DEFAULT_MARKET_COST;
             }
 
             if ($ingredient->recipe !== null) {
@@ -137,6 +144,16 @@ class Recipe
 
         $this->market_craft_cost = $this->calculateCraftCost(false);
         $this->optimal_craft_cost = $this->calculateCraftCost(true);
+        $this->purchase_cost = $this->calculatePurchaseCost();
+    }
+
+    private function calculatePurchaseCost(): int
+    {
+        $cost = $this->market_cost;
+        if ($this->vendor_cost != 0) {
+            $cost = min($cost, $this->vendor_cost);
+        }
+        return $cost * $this->amount_result;
     }
 
     private function calculateMarketCost(array $mb_item): int
@@ -160,17 +177,17 @@ class Recipe
     {
         $cost = 0;
         foreach ($this->ingredients as $ingredient) {
-            $min_cost = $ingredient->market_cost ?? 100000000;
-            if (!$min_cost && $ingredient->recipe !== null) {
-                $min_cost = $ingredient->recipe->calculateCraftCost($optimal);
+            $min_ingredient_cost = $ingredient->market_cost ?? Recipe::DEFAULT_MARKET_COST;
+            if (!$ingredient->market_cost && $ingredient->recipe !== null) {
+                $min_ingredient_cost = $ingredient->recipe->calculateCraftCost($optimal) / $ingredient->recipe->amount_result;
             }
             if ($optimal && $ingredient->recipe !== null) {
-                $min_cost = min($min_cost, $ingredient->recipe->calculateCraftCost($optimal));
+                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->recipe->calculateCraftCost($optimal) / $ingredient->recipe->amount_result);
             }
             if ($optimal && $ingredient->vendor_cost != 0) {
-                $min_cost = min($min_cost, $ingredient->vendor_cost);
+                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->vendor_cost);
             }
-            $cost += $min_cost * $ingredient->amount;
+            $cost += $min_ingredient_cost * $ingredient->amount;
         }
 
         return $cost;

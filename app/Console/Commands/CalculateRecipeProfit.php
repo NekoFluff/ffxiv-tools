@@ -46,18 +46,20 @@ class CalculateRecipeProfit extends Command
 
                 $recipe->populateCosts($mb_data);
                 $this->info('-------------- ' . $recipe->name . ' (' . $recipe->item_id . ') --------------');
-                $this->info("Market Cost: " . $recipe->market_cost);
+                $this->info("Market Cost: " . $recipe->purchase_cost);
+                $this->info("Purchase Cost: " . $recipe->purchase_cost);
                 $this->info("Market Craft Cost: " . $recipe->market_craft_cost);
                 $this->info("Optimal Craft: " . $recipe->optimal_craft_cost);
-                $this->info("Profit Ratio: " . ($recipe->market_cost / $recipe->optimal_craft_cost  * 100) - 100 . "%");
+                $this->info("Profit Ratio: " . ($recipe->purchase_cost / $recipe->optimal_craft_cost  * 100) - 100 . "%");
 
                 $results[] = [
                     'name' => $recipe->name,
                     'item_id' => $recipe->item_id,
                     'market_cost' => $recipe->market_cost,
+                    'purchase_cost' => $recipe->purchase_cost,
                     'market_craft_cost' => $recipe->market_craft_cost,
                     'optimal_craft_cost' => $recipe->optimal_craft_cost,
-                    'profit_ratio' => ($recipe->market_cost / $recipe->optimal_craft_cost  * 100) - 100,
+                    'profit_ratio' => ($recipe->purchase_cost / $recipe->optimal_craft_cost  * 100) - 100,
                 ];
             }
 
