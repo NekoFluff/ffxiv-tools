@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\UniversalisController;
 use App\Http\Controllers\XIVController;
+use App\Models\Listing;
+use App\Models\Sale;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,12 +49,29 @@ Route::get('/{itemID}', function ($itemID) {
     $xivController = new XIVController();
 
     if ($itemID) {
+        // Recipe
+        $recipe = $xivController->searchRecipe($itemID);
+
+        // Sales
+        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->limit(10)->get();
+        if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
+            $sales = $universalisController->getMarketBoardHistory("Goblin", $itemID);
+        } else {
+            $sales = $universalisController->translateToHistory($sales);
+        }
+
+        // Listings
+        $listings = Listing::where('item_id', $itemID)->latest()->get();
+        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
+            $listings = $universalisController->getMarketBoardData("Goblin", [$itemID])[$itemID];
+        }
+
         return inertia(
             'Recipes',
             [
-                "recipe" => $xivController->searchRecipe($itemID),
-                "history" => $universalisController->getMarketBoardHistory("Goblin", $itemID) ?? [],
-                "listings" => $universalisController->getMarketBoardData("Goblin", [$itemID])["listings"] ?? [],
+                "recipe" => $recipe,
+                "history" => $sales ?? [],
+                "listings" => $listings ?? [],
             ]
         );
     }

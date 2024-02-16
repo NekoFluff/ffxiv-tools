@@ -21,10 +21,10 @@ const first10Listings = ref(props.listings.slice(0, 10))
             </tr>
         </thead>
         <tbody>
-            <tr v-for="listing in first10Listings" :key="listing['listingID']" class="border-b">
-                <td class="px-4 py-2">{{ listing['pricePerUnit'] }}</td>
+            <tr v-for="listing in first10Listings" :key="listing['listing_id']" class="border-b">
+                <td class="px-4 py-2">{{ listing['price_per_unit'] }}</td>
                 <td class="px-4 py-2">{{ listing['quantity'] }}</td>
-                <td class="px-4 py-2">{{ listing['retainerName'] }}</td>
+                <td class="px-4 py-2">{{ listing['retainer_name'] }}</td>
             </tr>
         </tbody>
     </table>

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Http\Controllers\XIVController;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Recipe extends Model
 {
@@ -138,18 +138,19 @@ class Recipe extends Model
         return $ids;
     }
 
-    public function populateCosts($mb_data)
+
+    public function populateCosts(array $mb_data)
     {
-        $mb_item = $mb_data["items"][$this->item_id] ?? null;
-        if ($mb_item !== null) {
-            $this->item->market_price = $this->calculateMarketPrice($mb_item);
+        $listings = $mb_data[$this->item_id] ?? null;
+        if ($listings !== null) {
+            $this->item->market_price = $this->calculateMarketPrice($listings);
             $this->item->save();
         }
 
         foreach ($this->ingredients as $ingredient) {
-            $mb_item = $mb_data["items"][$ingredient->item_id] ?? null;
-            if ($mb_item !== null) {
-                $ingredient->item->market_price = $this->calculateMarketPrice($mb_item);
+            $listings = $mb_data[$ingredient->item_id] ?? null;
+            if ($listings !== null) {
+                $ingredient->item->market_price = $this->calculateMarketPrice($listings);
                 $ingredient->item->save();
             } else {
                 $ingredient->item->market_price = Item::DEFAULT_MARKET_PRICE;
@@ -176,20 +177,27 @@ class Recipe extends Model
         ]);
     }
 
-    private function calculateMarketPrice(array $mb_item)
+    /**
+     * @param Collection<Listing> $listings
+     */
+    private function calculateMarketPrice(Collection $listings)
     {
-        $listings = collect($mb_item["listings"])
-            ->take(10);
+        if ($listings->isEmpty()) {
+            return Item::DEFAULT_MARKET_PRICE;
+        }
 
-        $median_cost = $listings->median('pricePerUnit');
+        $listings = collect($listings)->take(10);
+
+        $median_cost = $listings->median('price_per_unit');
 
         $sum = 0;
         foreach ($listings as $listing) {
-            $sum += $listing['pricePerUnit'] * $listing['quantity'];
+            $sum += $listing['price_per_unit'] * $listing['quantity'];
         }
         $avg_cost = $sum / max($listings->sum('quantity'), 1);
 
-        logger("Market cost for item {$mb_item["itemID"]}: avg={$avg_cost}, median={$median_cost}");
+        logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
+        logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
         return min($avg_cost, $median_cost) ?: Item::DEFAULT_MARKET_PRICE;
     }
 

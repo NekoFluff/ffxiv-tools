@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Listing;
+use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class UniversalisController extends Controller
 {
+    /** @return array<int, Collection<Listing>> */
     public function getMarketBoardData(string $server, array $item_ids): array
     {
         $item_ids = array_unique($item_ids);
@@ -41,7 +46,48 @@ class UniversalisController extends Controller
 
         logger("Retrieved market board data for server {$server}");
         $mb_data_arr = json_decode($mb_data, true) ?? [];
-        return $mb_data_arr;
+        $mb_data_arr = $mb_data_arr["items"] ?? [
+            $mb_data_arr['itemID'] => $mb_data_arr
+        ];
+
+        $result = [];
+        foreach ($mb_data_arr as $key => $item) {
+            $result[$key] = $this->updateListings($item['itemID'], $item["listings"]);
+        }
+        return $result;
+    }
+
+    /** @return Collection<Listing> */
+    private function updateListings(int $itemID, array $listings): Collection
+    {
+        if (empty($listings)) {
+            return [];
+        }
+
+        $listings = collect($listings)->map(
+            function ($entry) use ($itemID) {
+                return [
+                    "id" => $entry["listingID"],
+                    "item_id" => $itemID,
+                    "retainer_name" => $entry["retainerName"],
+                    "retainer_city" => $entry["retainerCity"],
+                    "quantity" => $entry["quantity"],
+                    "price_per_unit" => $entry["pricePerUnit"],
+                    "hq" => $entry["hq"],
+                    "total" => $entry["total"],
+                    "tax" => $entry["tax"],
+                    "last_review_time" => Carbon::createFromTimestamp($entry["lastReviewTime"]),
+                ];
+            }
+        );
+
+        $count = Listing::upsert(
+            $listings->toArray(),
+            ['id'],
+            ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+        );
+
+        return Listing::where('item_id', $itemID)->limit($count)->get();
     }
 
 
@@ -65,13 +111,47 @@ class UniversalisController extends Controller
         return $sale_count;
     }
 
-    public function getMarketBoardHistory(string $server, string $item_id)
+    /** @return Collection<array> */
+    public function getMarketBoardHistory(string $server, string $item_id): Collection
     {
-        $mb_history = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
-        $mb_history = json_decode($mb_history, true)['entries'];
-        $mb_history = collect($mb_history)->groupBy(
+        $data = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
+        $data = json_decode($data, true);
+        $item_id = $data["itemID"];
+        $mb_history = $data["entries"];
+        $mb_history = collect($mb_history)->map(
+            function ($entry) use ($item_id) {
+                return [
+                    "item_id" => $item_id,
+                    "quantity" => $entry["quantity"],
+                    "price_per_unit" => $entry["pricePerUnit"],
+                    "buyer_name" => $entry["buyerName"],
+                    "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
+                    "hq" => $entry["hq"],
+                ];
+            }
+        );
+
+        $sales_count = Sale::upsert(
+            $mb_history->toArray(),
+            ['item_id', 'timestamp', 'buyer_name'],
+            ['quantity', 'price_per_unit', 'hq']
+        );
+
+        $mb_history = Sale::where('item_id', $item_id)->latest()->limit($sales_count)->get();
+
+        return $this->translateToHistory($mb_history);
+    }
+
+    /**
+     *
+     * @param Collection<Sale> $sales
+     * @return Collection<array>
+     *  */
+    public function translateToHistory(Collection $sales): Collection
+    {
+        $mb_history = collect($sales)->groupBy(
             function ($entry) {
-                return date("Y-m-d", $entry["timestamp"]);
+                return $entry["timestamp"]->format('Y-m-d');
             }
         )->map(
             function ($entries, $date) {
@@ -106,7 +186,6 @@ class UniversalisController extends Controller
         );
 
         $mb_history = $mb_history->sortBy('date')->values();
-
 
         return $mb_history;
     }
