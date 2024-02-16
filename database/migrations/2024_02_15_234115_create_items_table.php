@@ -16,7 +16,6 @@ return new class () extends Migration {
             $table->string('icon');
             $table->integer('market_price');
             $table->integer('vendor_price');
-            $table->integer('recipe_id')->nullable();
             $table->timestamps();
         });
     }
