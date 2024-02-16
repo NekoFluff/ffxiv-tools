@@ -54,7 +54,7 @@ Route::get('/{itemID}', function ($itemID) {
         $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
         if ($recipe) {
             if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-                $xivController->reloadRecipeData($recipe);
+                $xivController->reloadRecipeData($recipe); // Updates listings
             }
             $recipe->alignAmounts(1);
         } else {
@@ -71,10 +71,6 @@ Route::get('/{itemID}', function ($itemID) {
 
         // Listings
         $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
-        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 15) {
-            Listing::where('item_id', $itemID)->delete();
-            $listings = $universalisController->getMarketBoardData("Goblin", [$itemID])[$itemID];
-        }
 
         return inertia(
             'Recipes',
