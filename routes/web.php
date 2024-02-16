@@ -54,7 +54,7 @@ Route::get('/{itemID}', function ($itemID) {
 
         // Sales
         $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
-        if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
+        if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
             $sales = $universalisController->getMarketBoardHistory("Goblin", $itemID);
         } else {
             $sales = $universalisController->translateToHistory($sales);
@@ -62,7 +62,7 @@ Route::get('/{itemID}', function ($itemID) {
 
         // Listings
         $listings = Listing::where('item_id', $itemID)->latest()->get();
-        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
+        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
             Listing::where('item_id', $itemID)->delete();
             $listings = $universalisController->getMarketBoardData("Goblin", [$itemID])[$itemID];
         }
