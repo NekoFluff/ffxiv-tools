@@ -87,7 +87,7 @@ class UniversalisController extends Controller
             ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
         );
 
-        return Listing::where('item_id', $itemID)->limit($count)->get();
+        return Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->limit($count)->get();
     }
 
 

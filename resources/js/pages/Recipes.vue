@@ -30,11 +30,11 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
             days:<span class="ml-4 text-base font-bold">{{ totalSold }}</span></div>
         <div v-if="props.recipe" class="p-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
             Currently on Market Board:<span class="ml-4 text-base font-bold">{{ totalListed }}</span></div>
-        <div class="grid grid-cols-9 gap-4 mt-6 mb-10">
-            <div class="col-span-7">
+        <div class="grid grid-cols-10 gap-4 mt-6 mb-10">
+            <div class="col-span-6">
                 <PriceHistoryGraph v-if="props.history" :history="props.history"></PriceHistoryGraph>
             </div>
-            <div class="col-span-2">
+            <div class="col-span-4">
                 <ListingsTable v-if="props.listings" class="mt-4 mb-5 bg-gray-50" :listings="props.listings">
                 </ListingsTable>
             </div>

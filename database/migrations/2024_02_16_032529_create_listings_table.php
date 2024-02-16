@@ -20,7 +20,7 @@ return new class () extends Migration {
             $table->integer('price_per_unit');
             $table->integer('total');
             $table->integer('tax');
-            $table->date('last_review_time');
+            $table->dateTime('last_review_time');
             $table->timestamps();
         });
     }

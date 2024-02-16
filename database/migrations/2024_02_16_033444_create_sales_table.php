@@ -16,7 +16,7 @@ return new class () extends Migration {
             $table->integer('quantity');
             $table->integer('price_per_unit');
             $table->string('buyer_name');
-            $table->date('timestamp');
+            $table->dateTime('timestamp');
             $table->boolean('hq');
             $table->unique(['item_id', 'timestamp', 'buyer_name']);
             $table->timestamps();

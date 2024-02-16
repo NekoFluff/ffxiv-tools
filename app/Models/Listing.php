@@ -30,7 +30,7 @@ class Listing extends Model
         'price_per_unit' => 'integer',
         'total' => 'integer',
         'tax' => 'integer',
-        'last_review_time' => 'date',
+        'last_review_time' => 'datetime',
     ];
 
     /** @return BelongsTo<Item> */

@@ -61,8 +61,8 @@ Route::get('/{itemID}', function ($itemID) {
         }
 
         // Listings
-        $listings = Listing::where('item_id', $itemID)->latest()->get();
-        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
+        $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
+        if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 15) {
             Listing::where('item_id', $itemID)->delete();
             $listings = $universalisController->getMarketBoardData("Goblin", [$itemID])[$itemID];
         }
