@@ -1,0 +1,754 @@
+[
+    {
+        "name": "Erudite's Picatrix of Casting",
+        "item_id": 2202,
+        "market_price": 500099999,
+        "market_craft_cost": 2997,
+        "optimal_craft_cost": 2997,
+        "profit_ratio": 16686586.653319988
+    },
+    {
+        "name": "Brass Wristlets of Crafting",
+        "item_id": 4095,
+        "market_price": 40000,
+        "market_craft_cost": 388,
+        "optimal_craft_cost": 388,
+        "profit_ratio": 10209.278350515464
+    },
+    {
+        "name": "Cotton Doublet Vest of Crafting",
+        "item_id": 3052,
+        "market_price": 24999,
+        "market_craft_cost": 656,
+        "optimal_craft_cost": 315,
+        "profit_ratio": 7836.190476190477
+    },
+    {
+        "name": "Sanguine Scepter",
+        "item_id": 2102,
+        "market_price": 79997,
+        "market_craft_cost": 1481,
+        "optimal_craft_cost": 1481,
+        "profit_ratio": 5301.553004726536
+    },
+    {
+        "name": "Ash Cabinet",
+        "item_id": 6548,
+        "market_price": 30000,
+        "market_craft_cost": 1952,
+        "optimal_craft_cost": 636,
+        "profit_ratio": 4616.981132075472
+    },
+    {
+        "name": "Barbarian's Bardiche",
+        "item_id": 1810,
+        "market_price": 150065,
+        "market_craft_cost": 3473,
+        "optimal_craft_cost": 3231,
+        "profit_ratio": 4544.537294955122
+    },
+    {
+        "name": "Walnut Cartonnier",
+        "item_id": 6621,
+        "market_price": 62456,
+        "market_craft_cost": 2762,
+        "optimal_craft_cost": 1795,
+        "profit_ratio": 3379.4428969359333
+    },
+    {
+        "name": "Mythril Earrings",
+        "item_id": 4232,
+        "market_price": 28666,
+        "market_craft_cost": 846,
+        "optimal_craft_cost": 846,
+        "profit_ratio": 3288.4160756501183
+    },
+    {
+        "name": "Steel Frypan",
+        "item_id": 2502,
+        "market_price": 41872,
+        "market_craft_cost": 1374,
+        "optimal_craft_cost": 1374,
+        "profit_ratio": 2947.45269286754
+    },
+    {
+        "name": "Budding Rosewood Wand",
+        "item_id": 1987,
+        "market_price": 62856,
+        "market_craft_cost": 8271,
+        "optimal_craft_cost": 2377,
+        "profit_ratio": 2544.341607067732
+    },
+    {
+        "name": "Oasis Stall",
+        "item_id": 6629,
+        "market_price": 109999,
+        "market_craft_cost": 6425,
+        "optimal_craft_cost": 4743,
+        "profit_ratio": 2219.1861690912924
+    },
+    {
+        "name": "Potted Spider Plant",
+        "item_id": 6646,
+        "market_price": 50000,
+        "market_craft_cost": 5996,
+        "optimal_craft_cost": 2166,
+        "profit_ratio": 2208.402585410896
+    },
+    {
+        "name": "Tidal Barding",
+        "item_id": 7552,
+        "market_price": 61000,
+        "market_craft_cost": 7726,
+        "optimal_craft_cost": 2695,
+        "profit_ratio": 2163.4508348794066
+    },
+    {
+        "name": "Champion's Lance",
+        "item_id": 1879,
+        "market_price": 62497,
+        "market_craft_cost": 3243,
+        "optimal_craft_cost": 3243,
+        "profit_ratio": 1827.1353684859698
+    },
+    {
+        "name": "Oaken Bench",
+        "item_id": 6487,
+        "market_price": 53499,
+        "market_craft_cost": 5455,
+        "optimal_craft_cost": 2881,
+        "profit_ratio": 1756.9593891010065
+    },
+    {
+        "name": "Aeolian Scimitar",
+        "item_id": 1670,
+        "market_price": 81517,
+        "market_craft_cost": 4647,
+        "optimal_craft_cost": 4405,
+        "profit_ratio": 1750.5561861520998
+    },
+    {
+        "name": "Horn Staff",
+        "item_id": 2125,
+        "market_price": 22071,
+        "market_craft_cost": 1398,
+        "optimal_craft_cost": 1216,
+        "profit_ratio": 1715.049342105263
+    },
+    {
+        "name": "Mythril Ear Cuffs",
+        "item_id": 4247,
+        "market_price": 31345,
+        "market_craft_cost": 2017,
+        "optimal_craft_cost": 1775,
+        "profit_ratio": 1665.9154929577464
+    },
+    {
+        "name": "Oak Composite Bow",
+        "item_id": 1925,
+        "market_price": 36000,
+        "market_craft_cost": 2563,
+        "optimal_craft_cost": 2104,
+        "profit_ratio": 1611.0266159695818
+    },
+    {
+        "name": "Jade Crook",
+        "item_id": 2039,
+        "market_price": 36752,
+        "market_craft_cost": 3245,
+        "optimal_craft_cost": 2233,
+        "profit_ratio": 1545.857590685177
+    },
+    {
+        "name": "Marble Flooring",
+        "item_id": 8014,
+        "market_price": 94484,
+        "market_craft_cost": 5814,
+        "optimal_craft_cost": 5814,
+        "profit_ratio": 1525.111799105607
+    },
+    {
+        "name": "Mythril Wristlets of Crafting",
+        "item_id": 4126,
+        "market_price": 30000,
+        "market_craft_cost": 2496,
+        "optimal_craft_cost": 1980,
+        "profit_ratio": 1415.1515151515152
+    },
+    {
+        "name": "Chirurgeon's Curtain",
+        "item_id": 15151,
+        "market_price": 105999,
+        "market_craft_cost": 9278,
+        "optimal_craft_cost": 7398,
+        "profit_ratio": 1332.8061638280615
+    },
+    {
+        "name": "Yew Longbow",
+        "item_id": 1937,
+        "market_price": 18000,
+        "market_craft_cost": 2526,
+        "optimal_craft_cost": 1317,
+        "profit_ratio": 1266.742596810934
+    },
+    {
+        "name": "Raptorskin Jerkin",
+        "item_id": 3206,
+        "market_price": 47997,
+        "market_craft_cost": 3746,
+        "optimal_craft_cost": 3550,
+        "profit_ratio": 1252.0281690140844
+    },
+    {
+        "name": "Nymian Wall Lantern",
+        "item_id": 6668,
+        "market_price": 150000,
+        "market_craft_cost": 11108,
+        "optimal_craft_cost": 11108,
+        "profit_ratio": 1250.3781058696434
+    },
+    {
+        "name": "Easel",
+        "item_id": 17971,
+        "market_price": 24000,
+        "market_craft_cost": 1813,
+        "optimal_craft_cost": 1813,
+        "profit_ratio": 1223.7727523441808
+    },
+    {
+        "name": "Ahriman Vase",
+        "item_id": 7086,
+        "market_price": 149495,
+        "market_craft_cost": 11502,
+        "optimal_craft_cost": 11502,
+        "profit_ratio": 1199.7304816553642
+    },
+    {
+        "name": "Levin Barding",
+        "item_id": 8570,
+        "market_price": 58000,
+        "market_craft_cost": 7302,
+        "optimal_craft_cost": 4493,
+        "profit_ratio": 1190.8969508123748
+    },
+    {
+        "name": "Tier 1 Aquarium",
+        "item_id": 15775,
+        "market_price": 30000,
+        "market_craft_cost": 2531,
+        "optimal_craft_cost": 2389,
+        "profit_ratio": 1155.7555462536627
+    },
+    {
+        "name": "Wolf Earrings",
+        "item_id": 4231,
+        "market_price": 18000,
+        "market_craft_cost": 1683,
+        "optimal_craft_cost": 1487,
+        "profit_ratio": 1110.4909213180902
+    },
+    {
+        "name": "Glade Wardrobe",
+        "item_id": 6550,
+        "market_price": 36000,
+        "market_craft_cost": 4348,
+        "optimal_craft_cost": 3132,
+        "profit_ratio": 1049.4252873563219
+    },
+    {
+        "name": "Mythril Choker",
+        "item_id": 4353,
+        "market_price": 28000,
+        "market_craft_cost": 2489,
+        "optimal_craft_cost": 2489,
+        "profit_ratio": 1024.949779027722
+    },
+    {
+        "name": "Belah'dian Crystal Lantern",
+        "item_id": 6670,
+        "market_price": 33399,
+        "market_craft_cost": 8044,
+        "optimal_craft_cost": 3091,
+        "profit_ratio": 980.5241022322873
+    },
+    {
+        "name": "Mythril Sollerets",
+        "item_id": 3868,
+        "market_price": 39999,
+        "market_craft_cost": 8074,
+        "optimal_craft_cost": 3715,
+        "profit_ratio": 976.6890982503364
+    },
+    {
+        "name": "Bridesmaid's Tights",
+        "item_id": 9287,
+        "market_price": 40000,
+        "market_craft_cost": 3882,
+        "optimal_craft_cost": 3882,
+        "profit_ratio": 930.3967027305512
+    },
+    {
+        "name": "Rainbow Ribbon of Fending",
+        "item_id": 10964,
+        "market_price": 48495,
+        "market_craft_cost": 4733,
+        "optimal_craft_cost": 4733,
+        "profit_ratio": 924.6144094654553
+    },
+    {
+        "name": "Mahogany Partition Door",
+        "item_id": 13078,
+        "market_price": 39499,
+        "market_craft_cost": 4304,
+        "optimal_craft_cost": 3880,
+        "profit_ratio": 918.0154639175258
+    },
+    {
+        "name": "Wyvernskin Workboots",
+        "item_id": 12007,
+        "market_price": 78905,
+        "market_craft_cost": 16915,
+        "optimal_craft_cost": 7923,
+        "profit_ratio": 895.8980184273634
+    },
+    {
+        "name": "Riviera Wardrobe",
+        "item_id": 6549,
+        "market_price": 28998,
+        "market_craft_cost": 3732,
+        "optimal_craft_cost": 2978,
+        "profit_ratio": 873.7407656145065
+    },
+    {
+        "name": "Linen Shirt",
+        "item_id": 3125,
+        "market_price": 23500,
+        "market_craft_cost": 2827,
+        "optimal_craft_cost": 2576,
+        "profit_ratio": 812.2670807453416
+    },
+    {
+        "name": "Titanium Mask of Striking",
+        "item_id": 10756,
+        "market_price": 63477,
+        "market_craft_cost": 8570,
+        "optimal_craft_cost": 7170,
+        "profit_ratio": 785.3138075313808
+    },
+    {
+        "name": "Drachen Armor Augmentation",
+        "item_id": 8046,
+        "market_price": 120000,
+        "market_craft_cost": 27351,
+        "optimal_craft_cost": 15878,
+        "profit_ratio": 655.7626905151782
+    },
+    {
+        "name": "Electrum Circlet (Spinel)",
+        "item_id": 2878,
+        "market_price": 25000,
+        "market_craft_cost": 3459,
+        "optimal_craft_cost": 3459,
+        "profit_ratio": 622.7522405319456
+    },
+    {
+        "name": "Boarskin Smithy's Gloves",
+        "item_id": 3639,
+        "market_price": 17500,
+        "market_craft_cost": 2625,
+        "optimal_craft_cost": 2485,
+        "profit_ratio": 604.2253521126761
+    },
+    {
+        "name": "Oasis Couch",
+        "item_id": 6534,
+        "market_price": 100000,
+        "market_craft_cost": 14372,
+        "optimal_craft_cost": 14372,
+        "profit_ratio": 595.797383801837
+    },
+    {
+        "name": "Wine Barrel",
+        "item_id": 8797,
+        "market_price": 19997,
+        "market_craft_cost": 4554,
+        "optimal_craft_cost": 2910,
+        "profit_ratio": 587.1821305841924
+    },
+    {
+        "name": "Ivy Pillar",
+        "item_id": 17025,
+        "market_price": 81998,
+        "market_craft_cost": 35714,
+        "optimal_craft_cost": 12143,
+        "profit_ratio": 575.2697027093799
+    },
+    {
+        "name": "Fingerless Raptorskin Gloves",
+        "item_id": 3651,
+        "market_price": 14989,
+        "market_craft_cost": 3369,
+        "optimal_craft_cost": 2255,
+        "profit_ratio": 564.7006651884701
+    },
+    {
+        "name": "Company Chest",
+        "item_id": 6559,
+        "market_price": 89166,
+        "market_craft_cost": 13688,
+        "optimal_craft_cost": 13664,
+        "profit_ratio": 552.561475409836
+    },
+    {
+        "name": "Mythril Cuirass",
+        "item_id": 3149,
+        "market_price": 35998,
+        "market_craft_cost": 11723,
+        "optimal_craft_cost": 5774,
+        "profit_ratio": 523.4499480429512
+    },
+    {
+        "name": "Glade Pillar",
+        "item_id": 6574,
+        "market_price": 30695,
+        "market_craft_cost": 4979,
+        "optimal_craft_cost": 4979,
+        "profit_ratio": 516.489254870456
+    },
+    {
+        "name": "Hardsilver Bangle of Casting",
+        "item_id": 11068,
+        "market_price": 45222,
+        "market_craft_cost": 15302,
+        "optimal_craft_cost": 7371,
+        "profit_ratio": 513.5124135124136
+    },
+    {
+        "name": "Cobalt Winglet",
+        "item_id": 1663,
+        "market_price": 21999,
+        "market_craft_cost": 4077,
+        "optimal_craft_cost": 3660,
+        "profit_ratio": 501.0655737704918
+    },
+    {
+        "name": "Masonwork Interior Wall",
+        "item_id": 8831,
+        "market_price": 38000,
+        "market_craft_cost": 6356,
+        "optimal_craft_cost": 6356,
+        "profit_ratio": 497.86028949024546
+    },
+    {
+        "name": "Double Feather Bed",
+        "item_id": 7984,
+        "market_price": 87648,
+        "market_craft_cost": 14894,
+        "optimal_craft_cost": 14894,
+        "profit_ratio": 488.47858197932055
+    },
+    {
+        "name": "Masonwork Stove",
+        "item_id": 8790,
+        "market_price": 26999,
+        "market_craft_cost": 10802,
+        "optimal_craft_cost": 4608,
+        "profit_ratio": 485.9157986111111
+    },
+    {
+        "name": "Sheep Rug",
+        "item_id": 6682,
+        "market_price": 100938,
+        "market_craft_cost": 17300,
+        "optimal_craft_cost": 17300,
+        "profit_ratio": 483.456647398844
+    },
+    {
+        "name": "Planter Box",
+        "item_id": 8002,
+        "market_price": 30000,
+        "market_craft_cost": 10025,
+        "optimal_craft_cost": 5198,
+        "profit_ratio": 477.14505579068873
+    },
+    {
+        "name": "Archaeoskin Breeches of Crafting",
+        "item_id": 11973,
+        "market_price": 38997,
+        "market_craft_cost": 6871,
+        "optimal_craft_cost": 6871,
+        "profit_ratio": 467.55930723329936
+    },
+    {
+        "name": "Highland Barding",
+        "item_id": 12081,
+        "market_price": 99997,
+        "market_craft_cost": 18841,
+        "optimal_craft_cost": 18476,
+        "profit_ratio": 441.22645594284484
+    },
+    {
+        "name": "Oasis Pillar",
+        "item_id": 6575,
+        "market_price": 34945,
+        "market_craft_cost": 7099,
+        "optimal_craft_cost": 7099,
+        "profit_ratio": 392.25242991970697
+    },
+    {
+        "name": "Corner Counter",
+        "item_id": 7978,
+        "market_price": 38975,
+        "market_craft_cost": 8011,
+        "optimal_craft_cost": 8011,
+        "profit_ratio": 386.518537011609
+    },
+    {
+        "name": "South Seas Couch",
+        "item_id": 8778,
+        "market_price": 63000,
+        "market_craft_cost": 13060,
+        "optimal_craft_cost": 13060,
+        "profit_ratio": 382.3889739663094
+    },
+    {
+        "name": "Manor Candelabra",
+        "item_id": 6586,
+        "market_price": 84100,
+        "market_craft_cost": 18588,
+        "optimal_craft_cost": 17661,
+        "profit_ratio": 376.1904761904762
+    },
+    {
+        "name": "Potted Dragon Tree",
+        "item_id": 7975,
+        "market_price": 67499,
+        "market_craft_cost": 14431,
+        "optimal_craft_cost": 14431,
+        "profit_ratio": 367.73612362275657
+    },
+    {
+        "name": "Potted Oliphant's Ear",
+        "item_id": 8782,
+        "market_price": 69897,
+        "market_craft_cost": 15610,
+        "optimal_craft_cost": 15610,
+        "profit_ratio": 347.7706598334401
+    },
+    {
+        "name": "Bathroom Floor Tiles",
+        "item_id": 23893,
+        "market_price": 49398,
+        "market_craft_cost": 12417,
+        "optimal_craft_cost": 11147,
+        "profit_ratio": 343.15062348613975
+    },
+    {
+        "name": "Straight Stepping Stones",
+        "item_id": 7998,
+        "market_price": 13450,
+        "market_craft_cost": 3558,
+        "optimal_craft_cost": 3558,
+        "profit_ratio": 278.0213603147836
+    },
+    {
+        "name": "Red Carpet",
+        "item_id": 24525,
+        "market_price": 29950,
+        "market_craft_cost": 8097,
+        "optimal_craft_cost": 8011,
+        "profit_ratio": 273.860941205842
+    },
+    {
+        "name": "Mythrite Bangle of Fending",
+        "item_id": 10970,
+        "market_price": 23332,
+        "market_craft_cost": 33961,
+        "optimal_craft_cost": 7177,
+        "profit_ratio": 225.094050438902
+    },
+    {
+        "name": "Holy Cedar Composite Bow",
+        "item_id": 10611,
+        "market_price": 35000,
+        "market_craft_cost": 15715,
+        "optimal_craft_cost": 11019,
+        "profit_ratio": 217.63317905436065
+    },
+    {
+        "name": "Mythrite Bangle of Aiming",
+        "item_id": 11018,
+        "market_price": 20598,
+        "market_craft_cost": 33961,
+        "optimal_craft_cost": 7177,
+        "profit_ratio": 187.00013933398355
+    },
+    {
+        "name": "Large Woven Rug",
+        "item_id": 8815,
+        "market_price": 196862,
+        "market_craft_cost": 69483,
+        "optimal_craft_cost": 69483,
+        "profit_ratio": 183.3239785271217
+    },
+    {
+        "name": "Tailor-made Eel Pie",
+        "item_id": 9516,
+        "market_price": 145000,
+        "market_craft_cost": 53114,
+        "optimal_craft_cost": 52420,
+        "profit_ratio": 176.61198016024417
+    },
+    {
+        "name": "Taffeta Shawl",
+        "item_id": 7548,
+        "market_price": 99998,
+        "market_craft_cost": 45241,
+        "optimal_craft_cost": 45241,
+        "profit_ratio": 121.03401781569815
+    },
+    {
+        "name": "Amdapori Wall Lantern",
+        "item_id": 6669,
+        "market_price": 145000,
+        "market_craft_cost": 69882,
+        "optimal_craft_cost": 68646,
+        "profit_ratio": 111.22862220668358
+    },
+    {
+        "name": "Tatami Mat",
+        "item_id": 7977,
+        "market_price": 35555,
+        "market_craft_cost": 19801,
+        "optimal_craft_cost": 19402,
+        "profit_ratio": 83.25430368003299
+    },
+    {
+        "name": "Taffeta Loincloth",
+        "item_id": 7549,
+        "market_price": 84232,
+        "market_craft_cost": 47040,
+        "optimal_craft_cost": 47040,
+        "profit_ratio": 79.06462585034012
+    },
+    {
+        "name": "Dhalmelskin Leggings of Scouting",
+        "item_id": 10875,
+        "market_price": 17499,
+        "market_craft_cost": 10404,
+        "optimal_craft_cost": 9928,
+        "profit_ratio": 76.25906526994359
+    },
+    {
+        "name": "Boarskin Ringbands",
+        "item_id": 3616,
+        "market_price": 2034,
+        "market_craft_cost": 1549,
+        "optimal_craft_cost": 1213,
+        "profit_ratio": 67.68342951360265
+    },
+    {
+        "name": "Moonfire Sandals",
+        "item_id": 15927,
+        "market_price": 90501,
+        "market_craft_cost": 58816,
+        "optimal_craft_cost": 56562,
+        "profit_ratio": 60.00318234857326
+    },
+    {
+        "name": "Manor Fireplace",
+        "item_id": 6634,
+        "market_price": 55995,
+        "market_craft_cost": 36186,
+        "optimal_craft_cost": 36186,
+        "profit_ratio": 54.742165478361784
+    },
+    {
+        "name": "Manor Sofa",
+        "item_id": 8806,
+        "market_price": 49999,
+        "market_craft_cost": 33561,
+        "optimal_craft_cost": 33199,
+        "profit_ratio": 50.60393385342931
+    },
+    {
+        "name": "Kotatsu Table",
+        "item_id": 9722,
+        "market_price": 38999,
+        "market_craft_cost": 29651,
+        "optimal_craft_cost": 26727,
+        "profit_ratio": 45.91611479028697
+    },
+    {
+        "name": "Manor Couch",
+        "item_id": 6535,
+        "market_price": 50000,
+        "market_craft_cost": 36085,
+        "optimal_craft_cost": 35723,
+        "profit_ratio": 39.96584833300673
+    },
+    {
+        "name": "Toadskin Jacket",
+        "item_id": 3100,
+        "market_price": 4520,
+        "market_craft_cost": 4008,
+        "optimal_craft_cost": 3984,
+        "profit_ratio": 13.45381526104417
+    },
+    {
+        "name": "Large Garden Pond",
+        "item_id": 15159,
+        "market_price": 96000,
+        "market_craft_cost": 96008,
+        "optimal_craft_cost": 96008,
+        "profit_ratio": -0.0083326389467544
+    },
+    {
+        "name": "Oak Longbow",
+        "item_id": 1917,
+        "market_price": 1000,
+        "market_craft_cost": 1505,
+        "optimal_craft_cost": 1302,
+        "profit_ratio": -23.195084485407065
+    },
+    {
+        "name": "Woolen Gaskins",
+        "item_id": 3429,
+        "market_price": 1750,
+        "market_craft_cost": 5364,
+        "optimal_craft_cost": 5187,
+        "profit_ratio": -66.26180836707152
+    },
+    {
+        "name": "Display Stand",
+        "item_id": 12098,
+        "market_price": 0,
+        "market_craft_cost": 2192,
+        "optimal_craft_cost": 1298,
+        "profit_ratio": -100
+    },
+    {
+        "name": "Initiate's Thighboots",
+        "item_id": 3795,
+        "market_price": 0,
+        "market_craft_cost": 1792,
+        "optimal_craft_cost": 1004,
+        "profit_ratio": -100
+    },
+    {
+        "name": "Madman's Whispering Rod",
+        "item_id": 2049,
+        "market_price": 0,
+        "market_craft_cost": 9464,
+        "optimal_craft_cost": 1011,
+        "profit_ratio": -100
+    },
+    {
+        "name": "Mythrite Earrings of Gathering",
+        "item_id": 12029,
+        "market_price": 0,
+        "market_craft_cost": 6857,
+        "optimal_craft_cost": 5071,
+        "profit_ratio": -100
+    }
+]

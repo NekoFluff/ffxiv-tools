@@ -5,86 +5,105 @@ namespace App\Models;
 use App\Http\Controllers\XIVController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Recipe
+class Recipe extends Model
 {
-    public const DEFAULT_MARKET_COST = 100000000;
+    use HasFactory;
 
-    public int $id;
+    protected $with = [
+        'item',
+        'ingredients',
+    ];
 
-    public int $item_id;
+    protected $fillable = [
+        'id',
+        'amount_result',
+        'purchase_cost',
+        'market_craft_cost',
+        'optimal_craft_cost',
+        'market_price',
+        'vendor_price',
+        'class_job',
+        'class_job_icon',
+        'item_id',
+    ];
 
-    public string $name;
+    protected $casts = [
+        'id' => 'integer',
+        'amount_result' => 'integer',
+        'purchase_cost' => 'integer',
+        'market_craft_cost' => 'integer',
+        'optimal_craft_cost' => 'integer',
+        'item_id' => 'integer',
+    ];
 
-    public string $icon;
-
-    /** @var Ingredient[] $ingredients */
-    public array $ingredients;
-
-    public float $amount_result;
-
-    public int $market_cost;
-
-    public int $purchase_cost;
-
-    public int $market_craft_cost;
-
-    public int $optimal_craft_cost;
-
-    public int $vendor_cost;
-
-    public string $class_job;
-
-    public string $class_job_icon;
-
-    public static function get($id): ?Recipe
+    public function ingredients(): HasMany
     {
-        $recipe = cache()->remember('recipe_' . $id, now()->addMinutes(30), function () use ($id) {
-            logger("Fetching recipe {$id}");
-            return file_get_contents("https://xivapi.com/recipe/{$id}");
-        });
+        return $this->hasMany(Ingredient::class);
+    }
 
-        if ($recipe === false) {
-            return null;
-        }
-
-        return static::parseJson(json_decode($recipe, true));
+    /** @return BelongsTo<Item> */
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
     }
 
     public static function parseJson(array $json): ?Recipe
     {
         $xivController = new XIVController();
 
-        $recipe = new Recipe();
-        $recipe->id = $json["ID"];
-        $recipe->item_id = $json["ItemResult"]["ID"];
-        $recipe->name = $json["Name"];
-        $recipe->amount_result = $json["AmountResult"];
-        $recipe->vendor_cost = $xivController->getVendorCost($recipe->item_id);
-        $recipe->icon = $json["Icon"];
-        $recipe->class_job = $json["ClassJob"]["Name"];
-        $recipe->class_job_icon = $json["ClassJob"]["Icon"];
+        $item = Item::updateOrCreate([
+            'id' => intval($json["ItemResult"]["ID"]),
+        ], [
+            'name' => $json["Name"],
+            'icon' => $json["Icon"],
+            // TODO: Market Cost
+            'market_price' => Item::DEFAULT_MARKET_PRICE,
+            'vendor_price' => $xivController->getVendorCost($json["ItemResult"]["ID"]),
+        ]);
 
-        $recipe->ingredients = [];
+        $recipe = Recipe::updateOrCreate([
+            'id' => $json["ID"],
+        ], [
+            'amount_result' => $json["AmountResult"],
+            'purchase_cost' => 0,
+            'market_craft_cost' => 0,
+            'optimal_craft_cost' => 0,
+            'class_job' => $json["ClassJob"]["Name"],
+            'class_job_icon' => $json["ClassJob"]["Icon"],
+            'item_id' => $item->id,
+        ]);
+
         for ($i = 0; $i <= 9; $i++) {
             $amount = $json["AmountIngredient{$i}"];
             if ($amount === 0) {
                 continue;
             }
 
-            $ingredient = new Ingredient();
-            $ingredient->item_id = $json["ItemIngredient{$i}"]["ID"];
-            $ingredient->name = $json["ItemIngredient{$i}"]["Name"];
-            $ingredient->amount = $amount;
-            $ingredient->vendor_cost = $xivController->getVendorCost($ingredient->item_id);
-            $ingredient->icon = $json["ItemIngredient{$i}"]["Icon"];
-            $ingredient->recipe = null;
+            $ingredient_item = Item::updateOrCreate([
+                'id' => $json["ItemIngredient{$i}"]["ID"],
+            ], [
+                'name' => $json["ItemIngredient{$i}"]["Name"],
+                'icon' => $json["ItemIngredient{$i}"]["Icon"],
+                // TODO: Market Cost
+                'market_price' => Item::DEFAULT_MARKET_PRICE,
+                'vendor_price' => $xivController->getVendorCost($json["ItemIngredient{$i}"]["ID"]),
+            ]);
+
+            Ingredient::updateOrCreate([
+                'recipe_id' => $recipe->id,
+                'item_id' => $ingredient_item->id,
+            ], [
+                'amount' => $amount,
+            ]);
 
             $ingredient_recipe = $json["ItemIngredientRecipe{$i}"];
             if ($ingredient_recipe !== null) {
-                $ingredient->recipe = static::get($ingredient_recipe[0]["ID"]);
+                $xivController->getRecipe($ingredient_recipe[0]["ID"]);
             }
-            $recipe->ingredients[] = $ingredient;
         }
 
         return $recipe;
@@ -97,10 +116,12 @@ class Recipe
 
         foreach ($this->ingredients as $ingredient) {
             $ingredient->amount = $ratio * $ingredient->amount;
-            if ($ingredient->recipe !== null) {
-                $ingredient->recipe->alignAmounts($ingredient->amount);
+            if ($ingredient->craftingRecipe !== null) {
+                $ingredient->craftingRecipe->alignAmounts($ingredient->amount);
             }
         }
+
+        $this->save();
     }
 
     public function itemIDs(): array
@@ -109,8 +130,8 @@ class Recipe
         $ids[] = $this->item_id;
         foreach ($this->ingredients as $ingredient) {
             $ids[] = $ingredient->item_id;
-            if ($ingredient->recipe !== null) {
-                $ids = array_merge($ids, $ingredient->recipe->itemIDs());
+            if ($ingredient->craftingRecipe !== null) {
+                $ids = array_merge($ids, $ingredient->craftingRecipe->itemIDs());
             }
         }
 
@@ -119,44 +140,43 @@ class Recipe
 
     public function populateCosts($mb_data)
     {
-        $this->market_cost = 0;
-        $this->purchase_cost = 0;
-        $this->market_craft_cost = 0;
-        $this->optimal_craft_cost = 0;
-
         $mb_item = $mb_data["items"][$this->item_id] ?? null;
         if ($mb_item !== null) {
-            $this->market_cost = $this->calculateMarketCost($mb_item);
+            $this->item->market_price = $this->calculateMarketPrice($mb_item);
+            $this->item->save();
         }
 
-        foreach ($this->ingredients as &$ingredient) {
+        foreach ($this->ingredients as $ingredient) {
             $mb_item = $mb_data["items"][$ingredient->item_id] ?? null;
             if ($mb_item !== null) {
-                $ingredient->market_cost = $this->calculateMarketCost($mb_item);
+                $ingredient->item->market_price = $this->calculateMarketPrice($mb_item);
+                $ingredient->item->save();
             } else {
-                $ingredient->market_cost = Recipe::DEFAULT_MARKET_COST;
+                $ingredient->item->market_price = Item::DEFAULT_MARKET_PRICE;
             }
 
-            if ($ingredient->recipe !== null) {
-                $ingredient->recipe->populateCosts($mb_data);
+            if ($ingredient->craftingRecipe !== null) {
+                $ingredient->craftingRecipe->populateCosts($mb_data);
             }
         }
 
-        $this->market_craft_cost = $this->calculateCraftCost(false);
-        $this->optimal_craft_cost = $this->calculateCraftCost(true);
-        $this->purchase_cost = $this->calculatePurchaseCost();
+        $this->calculatePurchaseCost();
+        $this->calculateCraftCost(false);
+        $this->calculateCraftCost(true);
     }
 
-    private function calculatePurchaseCost(): int
+    private function calculatePurchaseCost()
     {
-        $cost = $this->market_cost;
-        if ($this->vendor_cost != 0) {
-            $cost = min($cost, $this->vendor_cost);
+        $cost = $this->item->market_price;
+        if ($this->item->vendor_price != 0) {
+            $cost = min($cost, $this->item->vendor_price);
         }
-        return $cost * $this->amount_result;
+        $this->update([
+            'purchase_cost' => $cost * $this->amount_result
+        ]);
     }
 
-    private function calculateMarketCost(array $mb_item): int
+    private function calculateMarketPrice(array $mb_item)
     {
         $listings = collect($mb_item["listings"])
             ->take(10);
@@ -170,24 +190,35 @@ class Recipe
         $avg_cost = $sum / max($listings->sum('quantity'), 1);
 
         logger("Market cost for item {$mb_item["itemID"]}: avg={$avg_cost}, median={$median_cost}");
-        return min($avg_cost, $median_cost) ?: Recipe::DEFAULT_MARKET_COST;
+        return min($avg_cost, $median_cost) ?: Item::DEFAULT_MARKET_PRICE;
     }
 
     private function calculateCraftCost(bool $optimal): int
     {
         $cost = 0;
         foreach ($this->ingredients as $ingredient) {
-            $min_ingredient_cost = $ingredient->market_cost ?: Recipe::DEFAULT_MARKET_COST;
-            if (!$ingredient->market_cost && $ingredient->recipe !== null) {
-                $min_ingredient_cost = $ingredient->recipe->calculateCraftCost($optimal) / $ingredient->recipe->amount_result;
+            $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
+            if (!$ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
+                $min_ingredient_cost = $ingredient->craftingRecipe->calculateCraftCost($optimal) / $ingredient->craftingRecipe->amount_result;
             }
-            if ($optimal && $ingredient->recipe !== null) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->recipe->calculateCraftCost($optimal) / $ingredient->recipe->amount_result);
+            if ($optimal && $ingredient->craftingRecipe !== null) {
+                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->calculateCraftCost($optimal) / $ingredient->craftingRecipe->amount_result);
             }
-            if ($optimal && $ingredient->vendor_cost != 0) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->vendor_cost);
+            if ($optimal && $ingredient->item->vendor_price != 0) {
+                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->item->vendor_price);
             }
+
             $cost += $min_ingredient_cost * $ingredient->amount;
+        }
+
+        if ($optimal) {
+            $this->update([
+                'optimal_craft_cost' => $cost,
+            ]);
+        } else {
+            $this->update([
+                'market_craft_cost' => $cost,
+            ]);
         }
 
         return $cost;

@@ -53,8 +53,6 @@ const data = {
     ]
 }
 
-console.log(props.history)
-
 </script>
 
 

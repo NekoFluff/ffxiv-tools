@@ -1,0 +1,16 @@
+version: "3.1"
+
+services:
+    db:
+        image: mysql:5.7
+        container_name: db
+        restart: always
+        environment:
+            MYSQL_DATABASE: "ffxivtools"
+            MYSQL_USER: "ffxiv"
+            MYSQL_PASSWORD: "supersecret"
+            MYSQL_ROOT_PASSWORD: "supersecret"
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./mysql:/var/lib/mysql

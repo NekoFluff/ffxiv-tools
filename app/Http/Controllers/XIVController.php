@@ -60,24 +60,42 @@ class XIVController extends Controller
 
         $recipe = collect($item->Recipes)->first();
 
-        $universalisController = new UniversalisController();
         if ($recipe) {
-            $recipe = Recipe::get($recipe->ID);
-            $recipe->alignAmounts(1);
-            $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
-            $recipe->populateCosts($mb_data);
-            logger(json_encode($recipe));
+            $recipeObj = Recipe::where('item_id', $itemID)->first();
+            if ($recipeObj) {
+                logger('FOUND RECIPE IN DB');
+                $this->reloadRecipeData($recipeObj);
+                return $recipeObj;
+            }
+        }
 
-            logger("Market Profit: " . ($recipe->market_cost - $recipe->market_craft_cost) . " (" . ($recipe->market_cost / $recipe->market_craft_cost * 100) . "%) ");
-            logger("Optimal Profit: " . ($recipe->market_cost - $recipe->optimal_craft_cost) . " (" . ($recipe->market_cost / $recipe->optimal_craft_cost  * 100) . "%) ");
+        if ($recipe) {
+            $recipe = self::getRecipe($recipe->ID);
+            $this->reloadRecipeData($recipe);
 
-            // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
-            // logger("Last week sale count: {$last_week_sale_count}");
         } else {
             $recipe = null;
         }
 
         return $recipe;
+    }
+
+    private function reloadRecipeData(Recipe $recipe)
+    {
+        if ($recipe->updated_at->diffInSeconds(now()) < 300) {
+            return;
+        }
+
+        $universalisController = new UniversalisController();
+        $recipe->alignAmounts(1);
+        $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
+        $recipe->populateCosts($mb_data);
+        logger(json_encode($recipe));
+
+        logger("Market Profit: " . ($recipe->market_price - $recipe->market_craft_cost) . " (" . ($recipe->market_price / $recipe->market_craft_cost * 100) . "%) ");
+        logger("Optimal Profit: " . ($recipe->market_price - $recipe->optimal_craft_cost) . " (" . ($recipe->market_price / $recipe->optimal_craft_cost  * 100) . "%) ");
+        // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
+        // logger("Last week sale count: {$last_week_sale_count}");
     }
 
     public function getVendorCost(int $item_id): int
@@ -91,5 +109,19 @@ class XIVController extends Controller
             return $vendor_data["GameContentLinks"]["GilShopItem"]["Item"] ? $vendor_data["PriceMid"] : 0;
         });
         return $vendor_data;
+    }
+
+    public static function getRecipe($id): ?Recipe
+    {
+        $recipe = cache()->remember('recipe_' . $id, now()->addMinutes(30), function () use ($id) {
+            logger("Fetching recipe {$id}");
+            return file_get_contents("https://xivapi.com/recipe/{$id}");
+        });
+
+        if ($recipe === false) {
+            return null;
+        }
+
+        return Recipe::parseJson(json_decode($recipe, true));
     }
 }

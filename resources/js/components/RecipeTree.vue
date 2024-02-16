@@ -2,18 +2,15 @@
 import type { Ingredient } from "./Ingredient.vue"
 import { defineProps, computed } from 'vue';
 import RecipeName from "./RecipeName.vue";
+import { Item } from "./Item.vue";
 
 export type Recipe = {
-    item_id: number,
-    name: string,
-    icon: string,
+    item: Item,
     ingredients: Ingredient[],
     amount_result: number,
-    market_cost: number,
     purchase_cost: number,
     market_craft_cost: number,
     optimal_craft_cost: number,
-    vendor_cost: number,
     class_job: string,
     class_job_icon: string,
 }
@@ -28,7 +25,7 @@ const profit = computed(() => {
     if (props.recipe == null) {
         return 0;
     }
-    return props.recipe.market_cost - props.recipe.optimal_craft_cost;
+    return props.recipe.item.market_price - props.recipe.optimal_craft_cost;
 })
 
 const profitRatio = computed(() => {
@@ -36,7 +33,7 @@ const profitRatio = computed(() => {
         return 0;
     }
 
-    return ((props.recipe.market_cost / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
+    return ((props.recipe.item.market_price / props.recipe.optimal_craft_cost * 100) - 100).toFixed(2);
 })
 
 const craftOrBuyColors = computed(() => {
@@ -80,20 +77,20 @@ const craftOrBuyColors = computed(() => {
 <template>
     <ul v-if="props.recipe != null" class="py-2 border border-gray-300 rounded-lg bg-gray-50">
         <div class="flex items-center px-3 py-1">
-            <img :src="base + props.recipe.icon" class="w-6 h-6" />&nbsp;
-            <RecipeName :id="props.recipe.item_id" :name="props.recipe.name" />
+            <img :src="base + props.recipe.item.icon" class="w-6 h-6" />&nbsp;
+            <RecipeName :id="props.recipe.item.id" :name="props.recipe.item.name" />
             <span class="text-sm text-gray-500">(x{{ props.recipe.amount_result }})&nbsp;</span>
             <span class="text-sm text-gray-500">{{ props.recipe.class_job }}</span>
 
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                MB Price: {{ props.recipe.market_cost }} gil</span>
+                MB Price: {{ props.recipe.item.market_price }} gil</span>
 
-            <span v-if="recipe.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
-            <span v-if="recipe.vendor_cost != 0"
+            <span v-if="recipe.item.vendor_price != 0" class="font-bold">&nbsp;|&nbsp;</span>
+            <span v-if="recipe.item.vendor_price != 0"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                <a :href="'http://www.garlandtools.org/db/#item/' + recipe.item_id" target="_blank">
-                    Vendor Price: {{ recipe.vendor_cost }} gil
+                <a :href="'http://www.garlandtools.org/db/#item/' + recipe.item.id" target="_blank">
+                    Vendor Price: {{ recipe.item.vendor_price }} gil
                 </a>
             </span>
 
@@ -124,22 +121,22 @@ const craftOrBuyColors = computed(() => {
 
         </div>
         <li v-for=" ingredient  in  props.recipe.ingredients " :key="ingredient.item_id" class="px-10 py-1">
-            <div v-if="ingredient.recipe != null">
-                <RecipeTree :recipe="ingredient.recipe" />
+            <div v-if="ingredient.crafting_recipe != null">
+                <RecipeTree :recipe="ingredient.crafting_recipe" />
             </div>
             <div v-else class="flex items-center ml-3">
-                <img :src="base + ingredient.icon" class="w-6 h-6" />&nbsp;
+                <img :src="base + ingredient.item.icon" class="w-6 h-6" />&nbsp;
 
-                <RecipeName :id="ingredient.item_id" :name="ingredient.name" />
+                <RecipeName :id="ingredient.item.id" :name="ingredient.item.name" />
                 <span class="text-sm text-gray-500">(x{{ ingredient.amount }})</span>
                 <span class="font-bold">&nbsp;|&nbsp;</span>
                 <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                    MB Price: {{ ingredient.market_cost }} gil</span>
-                <span v-if="ingredient.vendor_cost != 0" class="font-bold">&nbsp;|&nbsp;</span>
-                <span v-if="ingredient.vendor_cost != 0"
+                    MB Price: {{ ingredient.item.market_price }} gil</span>
+                <span v-if="ingredient.item.vendor_price != 0" class="font-bold">&nbsp;|&nbsp;</span>
+                <span v-if="ingredient.item.vendor_price != 0"
                     class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                    <a :href="'http://www.garlandtools.org/db/#item/' + ingredient.item_id" target="_blank">
-                        Vendor Price: {{ ingredient.vendor_cost }} gil
+                    <a :href="'http://www.garlandtools.org/db/#item/' + ingredient.item.id" target="_blank">
+                        Vendor Price: {{ ingredient.item.vendor_price }} gil
                     </a>
                 </span>
             </div>

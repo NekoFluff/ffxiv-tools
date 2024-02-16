@@ -4,20 +4,45 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
-class Ingredient
+class Ingredient extends Model
 {
-    public int $item_id;
+    use HasFactory;
 
-    public string $name;
+    protected $with = [
+        'craftingRecipe',
+        'item',
+    ];
 
-    public float $amount;
+    protected $fillable = [
+        'amount',
+        'recipe_id',
+        'item_id',
+    ];
 
-    public int $market_cost;
+    protected $casts = [
+        'amount' => 'integer',
+        'recipe_id' => 'integer',
+        'item_id' => 'integer',
+    ];
 
-    public int $vendor_cost;
+    /** @return BelongsTo<Recipe> */
+    public function recipe(): BelongsTo
+    {
+        return $this->belongsTo(Recipe::class);
+    }
 
-    public string $icon;
+    /** @return BelongsTo<Item> */
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
 
-    public ?Recipe $recipe;
+    /** @return HasOneThrough<Recipe> */
+    public function craftingRecipe(): HasOneThrough
+    {
+        return $this->hasOneThrough(Recipe::class, Item::class, 'id', 'item_id', 'item_id', 'id');
+    }
 }
