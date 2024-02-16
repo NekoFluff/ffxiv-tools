@@ -74,7 +74,7 @@ class XIVController extends Controller
         return $recipe;
     }
 
-    private function reloadRecipeData(Recipe $recipe)
+    public function reloadRecipeData(Recipe $recipe)
     {
         $universalisController = new UniversalisController();
         $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
