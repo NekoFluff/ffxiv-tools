@@ -64,9 +64,7 @@ class XIVController extends Controller
         if ($recipe) {
             $recipeObj = Recipe::where('item_id', $itemID)->first();
             if ($recipeObj) {
-                logger("USING CACHED RECIPE");
                 if ($recipeObj->updated_at->diffInSeconds(now()) > 300) {
-                    logger("RELOADING RECIPE DATA");
                     $this->reloadRecipeData($recipeObj);
                 }
 
@@ -76,8 +74,6 @@ class XIVController extends Controller
 
         // Fetch from XIVAPI
         if ($recipe) {
-            logger("FETCHING RECIPE FROM XIVAPI");
-
             $recipe = self::getRecipe($recipe->ID);
             $this->reloadRecipeData($recipe);
 
@@ -85,9 +81,9 @@ class XIVController extends Controller
             $recipe = null;
         }
 
-        logger("Recipe: " . json_encode($recipe->fresh()));
+        logger("Recipe: " . json_encode($recipe));
 
-        return $recipe->fresh();
+        return $recipe;
     }
 
     private function reloadRecipeData(Recipe $recipe)
