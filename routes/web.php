@@ -3,6 +3,7 @@
 use App\Http\Controllers\UniversalisController;
 use App\Http\Controllers\XIVController;
 use App\Models\Listing;
+use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -50,7 +51,15 @@ Route::get('/{itemID}', function ($itemID) {
 
     if ($itemID) {
         // Recipe
-        $recipe = $xivController->searchRecipe($itemID);
+        $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
+        if ($recipe) {
+            if ($recipe->updated_at->diffInMinutes(now()) > 15) {
+                $xivController->reloadRecipeData($recipe);
+            }
+            $recipe->alignAmounts(1);
+        } else {
+            $recipe = $xivController->searchRecipe($itemID);
+        }
 
         // Sales
         $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();

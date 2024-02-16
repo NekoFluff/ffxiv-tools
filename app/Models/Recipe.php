@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Http\Controllers\XIVController;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Recipe extends Model
 {
@@ -15,7 +15,6 @@ class Recipe extends Model
 
     protected $with = [
         'item',
-        'ingredients',
     ];
 
     protected $fillable = [
@@ -33,7 +32,6 @@ class Recipe extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'amount_result' => 'integer',
         'purchase_cost' => 'integer',
         'market_craft_cost' => 'integer',
         'optimal_craft_cost' => 'integer',
@@ -114,14 +112,15 @@ class Recipe extends Model
         $ratio = $target_amount / $this->amount_result;
         $this->amount_result = $target_amount;
 
+        $this->purchase_cost = $this->purchase_cost * $ratio;
+        $this->market_craft_cost = $this->market_craft_cost * $ratio;
+        $this->optimal_craft_cost = $this->optimal_craft_cost * $ratio;
         foreach ($this->ingredients as $ingredient) {
             $ingredient->amount = $ratio * $ingredient->amount;
             if ($ingredient->craftingRecipe !== null) {
                 $ingredient->craftingRecipe->alignAmounts($ingredient->amount);
             }
         }
-
-        $this->save();
     }
 
     public function itemIDs(): array
@@ -139,21 +138,28 @@ class Recipe extends Model
     }
 
 
+    /**
+     *  @param array<int, Collection<Listing>> $mb_data
+    */
     public function populateCosts(array $mb_data)
     {
         $listings = $mb_data[$this->item_id] ?? null;
         if ($listings !== null) {
-            $this->item->market_price = $this->calculateMarketPrice($listings);
-            $this->item->save();
+            $this->item->update([
+                'market_price' => $this->calculateMarketPrice($listings),
+            ]);
         }
 
         foreach ($this->ingredients as $ingredient) {
-            $listings = $mb_data[$ingredient->item_id] ?? null;
+            $listings = $mb_data[$ingredient->item_id] ?? collect([]);
             if ($listings !== null) {
-                $ingredient->item->market_price = $this->calculateMarketPrice($listings);
-                $ingredient->item->save();
+                $ingredient->item->update([
+                    'market_price' => $this->calculateMarketPrice($listings),
+                ]);
             } else {
-                $ingredient->item->market_price = Item::DEFAULT_MARKET_PRICE;
+                $ingredient->item->update([
+                    'market_price' => Item::DEFAULT_MARKET_PRICE,
+                ]);
             }
 
             if ($ingredient->craftingRecipe !== null) {
@@ -204,13 +210,14 @@ class Recipe extends Model
     private function calculateCraftCost(bool $optimal): int
     {
         $cost = 0;
+
         foreach ($this->ingredients as $ingredient) {
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
             if (!$ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = $ingredient->craftingRecipe->calculateCraftCost($optimal) / $ingredient->craftingRecipe->amount_result;
+                $min_ingredient_cost = $ingredient->craftingRecipe->calculateCraftCost($optimal, $ingredient->amount) / $ingredient->craftingRecipe->amount_result;
             }
             if ($optimal && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->calculateCraftCost($optimal) / $ingredient->craftingRecipe->amount_result);
+                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->calculateCraftCost($optimal, $ingredient->amount) / $ingredient->craftingRecipe->amount_result);
             }
             if ($optimal && $ingredient->item->vendor_price != 0) {
                 $min_ingredient_cost = min($min_ingredient_cost, $ingredient->item->vendor_price);

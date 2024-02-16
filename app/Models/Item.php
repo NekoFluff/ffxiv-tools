@@ -11,7 +11,7 @@ class Item extends Model
 {
     use HasFactory;
 
-    public const DEFAULT_MARKET_PRICE = 100000000;
+    public const DEFAULT_MARKET_PRICE = 10000000;
 
     protected $fillable = [
         'id',

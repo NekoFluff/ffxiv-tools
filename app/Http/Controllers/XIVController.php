@@ -59,27 +59,15 @@ class XIVController extends Controller
         logger("<img src=\"https://xivapi.com/{$item->IconHD}\">");
 
         $recipe = collect($item->Recipes)->first();
-
-        // Load from DB if available
-        if ($recipe) {
-            $recipeObj = Recipe::where('item_id', $itemID)->first();
-            if ($recipeObj) {
-                if ($recipeObj->updated_at->diffInSeconds(now()) > 300) {
-                    $this->reloadRecipeData($recipeObj);
-                }
-
-                return $recipeObj;
-            }
+        $recipeID = $recipe?->ID;
+        if (!$recipe) {
+            return null;
         }
 
         // Fetch from XIVAPI
-        if ($recipe) {
-            $recipe = self::getRecipe($recipe->ID);
-            $this->reloadRecipeData($recipe);
-
-        } else {
-            $recipe = null;
-        }
+        $recipe = self::getRecipe($recipeID);
+        $this->reloadRecipeData($recipe);
+        $recipe->alignAmounts(1);
 
         logger("Recipe: " . json_encode($recipe));
 
@@ -89,9 +77,9 @@ class XIVController extends Controller
     private function reloadRecipeData(Recipe $recipe)
     {
         $universalisController = new UniversalisController();
-        $recipe->alignAmounts(1);
         $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
         $recipe->populateCosts($mb_data);
+
         logger(json_encode($recipe));
 
         logger("Market Profit: " . ($recipe->market_price - $recipe->market_craft_cost) . " (" . ($recipe->market_price / $recipe->market_craft_cost * 100) . "%) ");

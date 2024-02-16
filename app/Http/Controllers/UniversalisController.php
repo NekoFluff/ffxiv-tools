@@ -46,9 +46,13 @@ class UniversalisController extends Controller
 
         logger("Retrieved market board data for server {$server}");
         $mb_data_arr = json_decode($mb_data, true) ?? [];
-        $mb_data_arr = $mb_data_arr["items"] ?? [
-            $mb_data_arr['itemID'] => $mb_data_arr
-        ];
+        if (isset($mb_data_arr["itemID"])) {
+            $mb_data_arr = [
+                $mb_data_arr['itemID'] => $mb_data_arr
+            ];
+        } else {
+            $mb_data_arr = $mb_data_arr["items"] ?? [];
+        }
 
         $result = [];
         foreach ($mb_data_arr as $key => $item) {
@@ -61,7 +65,7 @@ class UniversalisController extends Controller
     private function updateListings(int $itemID, array $listings): Collection
     {
         if (empty($listings)) {
-            return [];
+            return collect([]);
         }
 
         $listings = collect($listings)->map(

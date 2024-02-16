@@ -23,7 +23,6 @@ class Ingredient extends Model
     ];
 
     protected $casts = [
-        'amount' => 'integer',
         'recipe_id' => 'integer',
         'item_id' => 'integer',
     ];

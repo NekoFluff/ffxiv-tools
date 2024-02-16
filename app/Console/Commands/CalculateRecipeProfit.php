@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Http\Controllers\UniversalisController;
 use App\Http\Controllers\XIVController;
+use App\Models\Recipe;
 use Illuminate\Console\Command;
 
 class CalculateRecipeProfit extends Command
@@ -20,7 +21,7 @@ class CalculateRecipeProfit extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Calculate the profit of a list of recipes.';
 
     /**
      * Execute the console command.
@@ -36,36 +37,48 @@ class CalculateRecipeProfit extends Command
         $results = [];
 
         foreach ($itemNames as $itemName) {
-            $recipe = $xivController->searchRecipeByName($itemName);
+            $recipe = Recipe::whereRelation('item', 'name', $itemName)->first();
+            if (!$recipe) {
+                $recipe = $xivController->searchRecipeByName($itemName);
+                sleep(1);
+            } else {
+                // Refresh the market board data for the recipe
+                if ($recipe->updated_at->diffInHours(now()) > 24) {
+                    $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
+                    if (!$mb_data) {
+                        continue;
+                    }
+                    $recipe->populateCosts($mb_data);
+                }
+            }
+
             if ($recipe) {
-                $recipe->alignAmounts(1);
-                $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
-                if (!$mb_data) {
+                if ($recipe->optimal_craft_cost == 0) {
                     continue;
                 }
 
-                $recipe->populateCosts($mb_data);
-                $this->info('-------------- ' . $recipe->name . ' (' . $recipe->item_id . ') --------------');
-                $this->info("Market Cost: " . $recipe->market_price);
+                $recipe->alignAmounts(1);
+
+                $this->info('-------------- ' . $recipe->item->name . ' (' . $recipe->item_id . ') --------------');
+                $this->info("Market Cost: " . $recipe->item->market_price);
                 $this->info("Purchase Cost: " . $recipe->purchase_cost);
                 $this->info("Market Craft Cost: " . $recipe->market_craft_cost);
                 $this->info("Optimal Craft: " . $recipe->optimal_craft_cost);
-                $this->info("Profit: " . $recipe->market_price - $recipe->optimal_craft_cost);
-                $this->info("Profit Ratio: " . ($recipe->market_price / $recipe->optimal_craft_cost  * 100) - 100 . "%");
+                $this->info("Profit: " . $recipe->item->market_price * $recipe->amount_result - $recipe->optimal_craft_cost);
+                $this->info("Profit Ratio: " . ($recipe->item->market_price * $recipe->amount_result / $recipe->optimal_craft_cost  * 100) - 100 . "%");
 
                 $results[] = [
-                    'name' => $recipe->name,
+                    'name' => $recipe->item->name,
                     'item_id' => $recipe->item_id,
-                    'market_price' => $recipe->market_price,
+                    'market_price' => $recipe->item->market_price,
                     'purchase_cost' => $recipe->purchase_cost,
                     'market_craft_cost' => $recipe->market_craft_cost,
                     'optimal_craft_cost' => $recipe->optimal_craft_cost,
-                    'profit' => $recipe->market_price - $recipe->optimal_craft_cost,
-                    'profit_ratio' => ($recipe->market_price / $recipe->optimal_craft_cost  * 100) - 100,
+                    'profit' => $recipe->item->market_price * $recipe->amount_result - $recipe->optimal_craft_cost,
+                    'profit_ratio' => ($recipe->item->market_price * $recipe->amount_result / $recipe->optimal_craft_cost  * 100) - 100,
                 ];
             }
 
-            sleep(1);
         }
 
         usort($results, function ($a, $b) {
