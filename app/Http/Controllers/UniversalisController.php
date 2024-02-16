@@ -7,6 +7,7 @@ use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class UniversalisController extends Controller
 {
@@ -118,29 +119,34 @@ class UniversalisController extends Controller
     /** @return Collection<array> */
     public function getMarketBoardHistory(string $server, string $item_id): Collection
     {
-        $data = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
-        $data = json_decode($data, true);
-        $item_id = $data["itemID"];
-        $mb_history = $data["entries"];
-        $mb_history = collect($mb_history)->map(
-            function ($entry) use ($item_id) {
-                return [
-                    "item_id" => $item_id,
-                    "quantity" => $entry["quantity"],
-                    "price_per_unit" => $entry["pricePerUnit"],
-                    "buyer_name" => $entry["buyerName"],
-                    "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
-                    "hq" => $entry["hq"],
-                ];
-            }
-        );
+        try {
+            $data = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
+            $data = json_decode($data, true);
+            $item_id = $data["itemID"];
+            $mb_history = $data["entries"];
+            $mb_history = collect($mb_history)->map(
+                function ($entry) use ($item_id) {
+                    return [
+                        "item_id" => $item_id,
+                        "quantity" => $entry["quantity"],
+                        "price_per_unit" => $entry["pricePerUnit"],
+                        "buyer_name" => $entry["buyerName"],
+                        "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
+                        "hq" => $entry["hq"],
+                    ];
+                }
+            );
 
-        $sales_count = Sale::upsert(
-            $mb_history->toArray(),
-            ['item_id', 'timestamp', 'buyer_name'],
-            ['quantity', 'price_per_unit', 'hq']
-        );
+            $sales_count = Sale::upsert(
+                $mb_history->toArray(),
+                ['item_id', 'timestamp', 'buyer_name'],
+                ['quantity', 'price_per_unit', 'hq']
+            );
+        } catch (\Exception) {
+            Log::error("Failed to retrieve market board history for item {$item_id}");
+        }
 
+        $sales_count = $sales_count ?? 0;
         $mb_history = Sale::where('item_id', $item_id)->latest()->limit($sales_count)->get();
 
         return $this->translateToHistory($mb_history);
