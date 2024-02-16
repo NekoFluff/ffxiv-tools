@@ -24,7 +24,7 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
     <!-- <Nav /> -->
     <div class="container mx-auto">
         <Searchbar class="pt-9" @search="handleSearch" />
-        <RecipeTree v-if="props.recipe" :recipe="props.recipe"></RecipeTree>
+        <RecipeTree v-if="props.recipe" :recipe="props.recipe" />
         <div v-if="props.recipe" class="p-2 mt-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
             sold in The last 7
             days:<span class="ml-4 text-base font-bold">{{ totalSold }}</span></div>
@@ -32,11 +32,10 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
             Currently on Market Board:<span class="ml-4 text-base font-bold">{{ totalListed }}</span></div>
         <div class="grid grid-cols-10 gap-4 mt-6 mb-10">
             <div class="col-span-6">
-                <PriceHistoryGraph v-if="props.history" :history="props.history"></PriceHistoryGraph>
+                <PriceHistoryGraph v-if="props.history" :history="props.history" />
             </div>
             <div class="col-span-4">
-                <ListingsTable v-if="props.listings" class="mt-4 mb-5 bg-gray-50" :listings="props.listings">
-                </ListingsTable>
+                <ListingsTable v-if="props.listings" class="mt-4 mb-5 bg-gray-50" :listings="props.listings" />
             </div>
         </div>
     </div>

@@ -6,7 +6,7 @@ const props = defineProps<{
     listings: Array<{}>
 }>();
 
-const first10Listings = ref(props.listings.slice(0, 10))
+const first10Listings = ref(props.listings.slice(0, 20))
 </script>
 
 

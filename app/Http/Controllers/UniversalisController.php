@@ -162,6 +162,10 @@ class UniversalisController extends Controller
                 return [
                     "date" => $date,
                     "quantity" => collect($entries)->sum("quantity"),
+                    "avg_price" => collect($entries)->avg("price_per_unit"),
+                    "median_price" => collect($entries)->median("price_per_unit"),
+                    "min_price" => collect($entries)->min("price_per_unit"),
+                    "max_price" => collect($entries)->max("price_per_unit"),
                 ];
             }
         )->reverse()->values();
@@ -184,6 +188,10 @@ class UniversalisController extends Controller
                     [
                         "date" => $date,
                         "quantity" => 0,
+                        "median_price" => 0,
+                        "avg_price" => 0,
+                        "min_price" => 0,
+                        "max_price" => 0,
                     ]
                 );
             }

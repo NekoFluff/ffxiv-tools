@@ -26,6 +26,11 @@ const props = defineProps<{
 }>();
 
 const options = {
+    plugins: {
+        legend: {
+            display: false,
+        },
+    },
     responsive: true,
     interaction: {
         mode: 'index',
@@ -38,7 +43,33 @@ const options = {
     },
 }
 
-const data = {
+const quantityGraphOptions = {
+    ...options,
+    plugins: {
+        title: {
+            display: true,
+            text: 'Quantity Sold',
+            font: {
+                size: 20,
+            },
+        },
+    },
+}
+
+const priceGraphOptions = {
+    ...options,
+    plugins: {
+        title: {
+            display: true,
+            text: 'Price History',
+            font: {
+                size: 20,
+            },
+        },
+    },
+}
+
+const quantityData = {
     labels: props.history.map((item: any) => item.date),
     datasets: [
         {
@@ -53,9 +84,52 @@ const data = {
     ]
 }
 
+const priceData = {
+    labels: props.history.map((item: any) => item.date),
+    datasets: [
+        {
+            label: 'Avg Price',
+            data: props.history.map((item: any) => item.avg_price),
+            fill: false,
+            borderColor: '#ffd700',
+            backgroundColor: '#ffd700',
+            tension: 0.3,
+            pointRadius: 0,
+        },
+        {
+            label: 'Median Price',
+            data: props.history.map((item: any) => item.median_price),
+            fill: false,
+            borderColor: 'orange',
+            backgroundColor: 'orange',
+            tension: 0.3,
+            pointRadius: 0,
+        },
+        {
+            label: 'Min Price',
+            data: props.history.map((item: any) => item.min_price),
+            fill: false,
+            borderColor: '#80ff80',
+            backgroundColor: '#80ff80',
+            tension: 0.3,
+            pointRadius: 0,
+        },
+        {
+            label: 'Max Price',
+            data: props.history.map((item: any) => item.max_price),
+            fill: false,
+            borderColor: '#ff0000',
+            backgroundColor: '#ff0000',
+            tension: 0.3,
+            pointRadius: 0,
+        }
+    ]
+}
+
 </script>
 
 
 <template>
-    <Line :data="data" :options="options" />
+    <Line :data="quantityData" :options="quantityGraphOptions" />
+    <Line class="mt-10" :data="priceData" :options="priceGraphOptions" />
 </template>
