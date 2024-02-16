@@ -53,7 +53,7 @@ Route::get('/{itemID}', function ($itemID) {
         $recipe = $xivController->searchRecipe($itemID);
 
         // Sales
-        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->limit(10)->get();
+        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
             $sales = $universalisController->getMarketBoardHistory("Goblin", $itemID);
         } else {
@@ -63,6 +63,7 @@ Route::get('/{itemID}', function ($itemID) {
         // Listings
         $listings = Listing::where('item_id', $itemID)->latest()->get();
         if ($listings->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 300) {
+            Listing::where('item_id', $itemID)->delete();
             $listings = $universalisController->getMarketBoardData("Goblin", [$itemID])[$itemID];
         }
 
