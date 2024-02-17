@@ -12,6 +12,7 @@ export type Recipe = {
     market_craft_cost: number,
     optimal_craft_cost: number,
     class_job: string,
+    class_job_level: number,
     class_job_icon: string,
 }
 
@@ -80,7 +81,7 @@ const craftOrBuyColors = computed(() => {
             <img :src="base + props.recipe.item.icon" class="w-6 h-6" />&nbsp;
             <RecipeName :id="props.recipe.item.id" :name="props.recipe.item.name" />
             <span class="text-sm text-gray-500">(x{{ props.recipe.amount_result }})&nbsp;</span>
-            <span class="text-sm text-gray-500">{{ props.recipe.class_job }}</span>
+            <span class="text-sm text-gray-500">{{ props.recipe.class_job }} lvl.{{ props.recipe.class_job_level }}</span>
 
             <span class="font-bold">&nbsp;|&nbsp;</span>
             <span class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">

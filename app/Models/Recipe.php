@@ -26,6 +26,7 @@ class Recipe extends Model
         'market_price',
         'vendor_price',
         'class_job',
+        'class_job_level',
         'class_job_icon',
         'item_id',
     ];
@@ -68,7 +69,8 @@ class Recipe extends Model
             'purchase_cost' => 0,
             'market_craft_cost' => 0,
             'optimal_craft_cost' => 0,
-            'class_job' => $json["ClassJob"]["Name"],
+            'class_job' => $json["ClassJob"]["NameEnglish"],
+            'class_job_level' => $json["RecipeLevelTable"]["ClassJobLevel"],
             'class_job_icon' => $json["ClassJob"]["Icon"],
             'item_id' => $item->id,
         ]);
