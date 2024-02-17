@@ -19,7 +19,7 @@ class RefreshRecipes extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the class job level for all recipes';
+    protected $description = 'Refreshes the class job data for all recipes';
 
     /**
      * Execute the console command.
@@ -42,7 +42,9 @@ class RefreshRecipes extends Command
                 $recipeData = json_decode($recipeData, true);
 
                 $recipe->update([
+                    'class_job' => $recipeData["ClassJob"]["NameEnglish"],
                     'class_job_level' => $recipeData["RecipeLevelTable"]["ClassJobLevel"],
+                    'class_job_icon' => $recipeData["ClassJob"]["Icon"],
                 ]);
 
                 sleep(1);
