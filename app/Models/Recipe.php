@@ -152,10 +152,6 @@ class Recipe extends Model
                 $ingredient->item->update([
                     'market_price' => $this->calculateMarketPrice($listings),
                 ]);
-            } else {
-                $ingredient->item->update([
-                    'market_price' => Item::DEFAULT_MARKET_PRICE,
-                ]);
             }
 
             if ($ingredient->craftingRecipe !== null) {
