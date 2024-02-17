@@ -96,9 +96,12 @@ class Recipe extends Model
                 'amount' => $amount,
             ]);
 
-            $ingredient_recipe = $json["ItemIngredientRecipe{$i}"];
-            if ($ingredient_recipe !== null) {
-                $xivController->getRecipe($ingredient_recipe[0]["ID"]);
+            $ingredient_recipe_id = $json["ItemIngredientRecipe{$i}"][0]["ID"] ?? null;
+            if ($ingredient_recipe_id !== null) {
+                $ingredient_recipe = Recipe::where('id', $ingredient_recipe_id)->first();
+                if ($ingredient_recipe === null) {
+                    $xivController->getRecipe($ingredient_recipe_id);
+                }
             }
         }
 

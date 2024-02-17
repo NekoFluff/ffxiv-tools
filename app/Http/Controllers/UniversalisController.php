@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\Sale;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class UniversalisController extends Controller
 {
     /** @return array<int, Collection<Listing>> */
-    public function getMarketBoardData(string $server, array $item_ids): array
+    public function getMarketBoardListings(string $server, array $item_ids): array
     {
         $item_ids = array_unique($item_ids);
         sort($item_ids);

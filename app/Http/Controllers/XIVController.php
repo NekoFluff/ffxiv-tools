@@ -33,7 +33,7 @@ class XIVController extends Controller
 
     public function searchRecipe(string $itemID): ?Recipe
     {
-        logger("Searching for item {$itemID}");
+        logger("Searching for item ID {$itemID}");
 
         $filter_columns = [
             "ID",
@@ -77,13 +77,13 @@ class XIVController extends Controller
     public function reloadRecipeData(Recipe $recipe)
     {
         $universalisController = new UniversalisController();
-        $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
+        $mb_data = $universalisController->getMarketBoardListings("Goblin", $recipe->itemIDs());
         $recipe->populateCosts($mb_data);
 
         logger(json_encode($recipe));
 
-        logger("Market Profit: " . ($recipe->market_price - $recipe->market_craft_cost) . " (" . ($recipe->market_price / $recipe->market_craft_cost * 100) . "%) ");
-        logger("Optimal Profit: " . ($recipe->market_price - $recipe->optimal_craft_cost) . " (" . ($recipe->market_price / $recipe->optimal_craft_cost  * 100) . "%) ");
+        logger("Market Profit: " . ($recipe->item->market_price - $recipe->market_craft_cost) . " (" . ($recipe->item->market_price / $recipe->market_craft_cost * 100) . "%) ");
+        logger("Optimal Profit: " . ($recipe->item->market_price - $recipe->optimal_craft_cost) . " (" . ($recipe->item->market_price / $recipe->optimal_craft_cost  * 100) . "%) ");
         // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
         // logger("Last week sale count: {$last_week_sale_count}");
     }
@@ -112,6 +112,11 @@ class XIVController extends Controller
             return null;
         }
 
-        return Recipe::parseJson(json_decode($recipe, true));
+        $recipe = json_decode($recipe, true);
+        if (!isset($recipe["ItemResult"])) {
+            return null;
+        }
+
+        return Recipe::parseJson($recipe);
     }
 }

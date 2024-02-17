@@ -44,7 +44,7 @@ class CalculateRecipeProfit extends Command
             } else {
                 // Refresh the market board data for the recipe
                 if ($recipe->updated_at->diffInHours(now()) > 24) {
-                    $mb_data = $universalisController->getMarketBoardData("Goblin", $recipe->itemIDs());
+                    $mb_data = $universalisController->getMarketBoardListings("Goblin", $recipe->itemIDs());
                     if (!$mb_data) {
                         continue;
                     }

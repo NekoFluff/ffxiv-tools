@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\XIVController;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RefreshRecipes extends Command
 {
@@ -19,37 +21,49 @@ class RefreshRecipes extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the class job data for all recipes';
+    protected $description = 'Refreshes all recipes';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $recipes = Recipe::all();
-        $recipes->each(
-            function (Recipe $recipe) {
-                $id = $recipe->id;
-                $recipeData = cache()->remember('recipe_' . $id, now()->addMinutes(30), function () use ($id) {
-                    logger("Fetching recipe {$id}");
-                    return file_get_contents("https://xivapi.com/recipe/{$id}");
-                });
+        $xivController = new XIVController();
+        $page = 3;
+        $recipesJson = "";
+        do {
+            Log::info("Fetching recipes page " . $page);
 
-                if ($recipeData === false) {
-                    return;
+            $recipesJson = file_get_contents("https://xivapi.com/recipe?page=" . $page);
+
+            $recipesObjs = json_decode($recipesJson, true)["Results"] ?? [];
+            foreach ($recipesObjs as $recipeObj) {
+                Log::info("Processing recipe " . $recipeObj["Name"] . " (" . $recipeObj["ID"] . ")");
+                $recipe = Recipe::find($recipeObj["ID"]);
+
+                if ($recipe !== null) {
+                    Log::info("Recipe already exists, skipping");
+                    continue;
                 }
 
-                $recipeData = json_decode($recipeData, true);
-
-                $recipe->update([
-                    'class_job' => $recipeData["ClassJob"]["NameEnglish"],
-                    'class_job_level' => $recipeData["RecipeLevelTable"]["ClassJobLevel"],
-                    'class_job_icon' => $recipeData["ClassJob"]["Icon"],
-                ]);
-
-                sleep(1);
+                $recipe = $xivController->getRecipe($recipeObj["ID"]);
+                if ($recipe) {
+                    $xivController->reloadRecipeData($recipe);
+                    Log::info("Recipe #" . $recipe->id . " for " . $recipe->item->name . " (" . $recipe->item->id . ") created");
+                } else {
+                    Log::error("Failed to retrieve recipe, skipping");
+                }
+                Log::info("Sleeping for 10 seconds");
+                sleep(10);
             }
-        );
 
+            $page += 1;
+            sleep(10);
+
+            if ($page > 120) {
+                break;
+            }
+        } while (!empty($recipesObjs));
     }
+
 }
