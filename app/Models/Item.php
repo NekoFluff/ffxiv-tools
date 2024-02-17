@@ -21,6 +21,11 @@ class Item extends Model
         'vendor_price',
     ];
 
+    protected $attributes = [
+        'market_price' => self::DEFAULT_MARKET_PRICE,
+        'vendor_price' => 0,
+    ];
+
     protected $casts = [
         'id' => 'integer',
         'market_price' => 'integer',

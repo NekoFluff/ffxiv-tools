@@ -58,8 +58,6 @@ class Recipe extends Model
         ], [
             'name' => $json["Name"],
             'icon' => $json["Icon"],
-            // TODO: Market Cost
-            'market_price' => Item::DEFAULT_MARKET_PRICE,
             'vendor_price' => $xivController->getVendorCost($json["ItemResult"]["ID"]),
         ]);
 
@@ -86,8 +84,6 @@ class Recipe extends Model
             ], [
                 'name' => $json["ItemIngredient{$i}"]["Name"],
                 'icon' => $json["ItemIngredient{$i}"]["Icon"],
-                // TODO: Market Cost
-                'market_price' => Item::DEFAULT_MARKET_PRICE,
                 'vendor_price' => $xivController->getVendorCost($json["ItemIngredient{$i}"]["ID"]),
             ]);
 
