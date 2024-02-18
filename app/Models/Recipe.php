@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
 class Recipe extends Model
@@ -39,6 +40,7 @@ class Recipe extends Model
         'item_id' => 'integer',
     ];
 
+    /** @return HasMany<Ingredient> */
     public function ingredients(): HasMany
     {
         return $this->hasMany(Ingredient::class);
@@ -199,8 +201,8 @@ class Recipe extends Model
         }
         $avg_cost = $sum / max($listings->sum('quantity'), 1);
 
-        logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
-        logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
+        // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
+        // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
         return min($avg_cost, $median_cost) ?: Item::DEFAULT_MARKET_PRICE;
     }
 

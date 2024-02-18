@@ -16,8 +16,8 @@ class UniversalisController extends Controller
         $item_ids = array_unique($item_ids);
         sort($item_ids);
 
-        logger("Fetching market board data for server {$server}." . " | Items: " . implode(",", $item_ids));
-        $maxRetries = 3;
+        logger("Fetching market board listings for server {$server}." . " | Items: " . implode(",", $item_ids));
+        $maxRetries = 85;
         $retryCount = 0;
         $mb_data = "";
 
@@ -27,7 +27,7 @@ class UniversalisController extends Controller
                     "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids)
                 );
             } catch (\Exception $e) {
-                logger("Failed to retrieve market board data for server {$server}");
+                logger("Failed to retrieve market board listings for server {$server}");
             }
 
             if ($mb_data !== false) {
@@ -40,11 +40,11 @@ class UniversalisController extends Controller
 
         if ($mb_data === false) {
             // Handle the failure case here
-            logger("Failed to retrieve market board data for server {$server}");
+            logger("Failed to retrieve market board listings for server {$server}");
             return [];
         }
 
-        logger("Retrieved market board data for server {$server}");
+        logger("Retrieved market board listings for server {$server}");
         $mb_data_arr = json_decode($mb_data, true) ?? [];
         if (isset($mb_data_arr["itemID"])) {
             $mb_data_arr = [
@@ -57,6 +57,7 @@ class UniversalisController extends Controller
         $result = [];
         foreach ($mb_data_arr as $key => $item) {
             $result[$key] = $this->updateListings($item['itemID'], $item["listings"]);
+            $this->processMarketBoardSaleHistory($item['itemID'], $item["recentHistory"]);
         }
         return $result;
     }
@@ -123,24 +124,7 @@ class UniversalisController extends Controller
             $data = json_decode($data, true);
             $item_id = $data["itemID"];
             $mb_history = $data["entries"];
-            $mb_history = collect($mb_history)->map(
-                function ($entry) use ($item_id) {
-                    return [
-                        "item_id" => $item_id,
-                        "quantity" => $entry["quantity"],
-                        "price_per_unit" => $entry["pricePerUnit"],
-                        "buyer_name" => $entry["buyerName"],
-                        "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
-                        "hq" => $entry["hq"],
-                    ];
-                }
-            );
-
-            $sales_count = Sale::upsert(
-                $mb_history->toArray(),
-                ['item_id', 'timestamp', 'buyer_name'],
-                ['quantity', 'price_per_unit', 'hq']
-            );
+            $this->processMarketBoardSaleHistory($item_id, $mb_history);
         } catch (\Exception) {
             Log::error("Failed to retrieve market board history for item {$item_id}");
         }
@@ -149,6 +133,30 @@ class UniversalisController extends Controller
         $mb_history = Sale::where('item_id', $item_id)->latest()->limit($sales_count)->get();
 
         return $this->translateToHistory($mb_history);
+    }
+
+    private function processMarketBoardSaleHistory(string $item_id, array $mb_history)
+    {
+        $mb_history = collect($mb_history)->map(
+            function ($entry) use ($item_id) {
+                return [
+                    "item_id" => $item_id,
+                    "quantity" => $entry["quantity"],
+                    "price_per_unit" => $entry["pricePerUnit"],
+                    "buyer_name" => $entry["buyerName"],
+                    "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
+                    "hq" => $entry["hq"],
+                ];
+            }
+        );
+
+        $sales_count = Sale::upsert(
+            $mb_history->toArray(),
+            ['item_id', 'timestamp', 'buyer_name'],
+            ['quantity', 'price_per_unit', 'hq']
+        );
+
+        Log::info("Upserted {$sales_count} sales for item {$item_id}");
     }
 
     /**

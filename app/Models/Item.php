@@ -38,6 +38,12 @@ class Item extends Model
         return $this->hasMany(Ingredient::class);
     }
 
+    /** @return HasMany<Sale> */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     /** @return HasOne<Recipe> */
     public function recipe(): HasOne
     {

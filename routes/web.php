@@ -54,7 +54,7 @@ Route::get('/{itemID}', function ($itemID) {
         $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
         if ($recipe) {
             if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-                $xivController->reloadRecipeData($recipe); // Updates listings
+                $xivController->reloadRecipeListings($recipe); // Updates listings
             }
             $recipe->alignAmounts(1);
         } else {

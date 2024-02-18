@@ -66,7 +66,7 @@ class XIVController extends Controller
 
         // Fetch from XIVAPI
         $recipe = self::getRecipe($recipeID);
-        $this->reloadRecipeData($recipe);
+        $this->reloadRecipeListings($recipe);
         $recipe->alignAmounts(1);
 
         logger("Recipe: " . json_encode($recipe));
@@ -74,13 +74,13 @@ class XIVController extends Controller
         return $recipe;
     }
 
-    public function reloadRecipeData(Recipe $recipe)
+    public function reloadRecipeListings(Recipe $recipe)
     {
         $universalisController = new UniversalisController();
         $mb_data = $universalisController->getMarketBoardListings("Goblin", $recipe->itemIDs());
         $recipe->populateCosts($mb_data);
 
-        logger(json_encode($recipe));
+        // logger("Recipe after reloading costs: ".json_encode($recipe));
 
         logger("Market Profit: " . ($recipe->item->market_price - $recipe->market_craft_cost) . " (" . ($recipe->item->market_price / $recipe->market_craft_cost * 100) . "%) ");
         logger("Optimal Profit: " . ($recipe->item->market_price - $recipe->optimal_craft_cost) . " (" . ($recipe->item->market_price / $recipe->optimal_craft_cost  * 100) . "%) ");
