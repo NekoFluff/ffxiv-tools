@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\UniversalisController;
+use App\Models\Item;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +38,8 @@ class RefreshProfitableRecipes extends Command
             ->join('sales', 'items.id', '=', 'sales.item_id')
             ->select('recipes.*')
             ->where('items.market_price', '>', 'recipes.optimal_craft_cost')
+            ->where('items.market_price', '!=', Item::DEFAULT_MARKET_PRICE)
+            ->whereRaw('DATE(sales.timestamp) > (NOW() - INTERVAL 7 DAY)')
             ->groupBy('recipes.id')
             ->orderByRaw('(market_price - optimal_craft_cost) * SUM(sales.quantity) desc')
             ->limit(3000)->get();
