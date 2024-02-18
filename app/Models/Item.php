@@ -44,6 +44,12 @@ class Item extends Model
         return $this->hasMany(Sale::class);
     }
 
+    /** @return HasMany<Listing> */
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class);
+    }
+
     /** @return HasOne<Recipe> */
     public function recipe(): HasOne
     {

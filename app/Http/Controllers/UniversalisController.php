@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Listing;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
@@ -65,6 +66,8 @@ class UniversalisController extends Controller
     /** @return Collection<Listing> */
     private function updateListings(int $itemID, array $listings): Collection
     {
+        Item::where('id', $itemID)->first()?->listings()->delete();
+
         if (empty($listings)) {
             return collect([]);
         }
