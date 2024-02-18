@@ -31,8 +31,8 @@ class RefreshRecipes extends Command
     {
         $xivController = new XIVController();
         $universalisController = new UniversalisController();
-        $page = 85;
-        $recipesJson = ""; // pages 1  - 33 (inclusive) need to be refreshed
+        $page = 1;
+        $recipesJson = "";
         $server = "Goblin";
         do {
             Log::info("Fetching recipes page " . $page);
@@ -48,41 +48,24 @@ class RefreshRecipes extends Command
                 Log::info("Processing recipe " . $recipeObj["Name"] . " (" . $recipeObj["ID"] . ")");
                 $recipe = Recipe::find($recipeObj["ID"]);
 
-                if ($recipe !== null) {
-                    Log::info("Recipe already exists, skipping");
-                    // Update history if necessary
-                    if ($recipe->item->sales->isEmpty()) {
-                        Log::info("Fetching market board history for " . $recipe->item->name . " (" . $recipe->item->id . ")");
-                        $universalisController->getMarketBoardHistory($server, $recipe->item->id);
-                    }
-                    sleep(1);
-                    continue;
+                if ($recipe === null) {
+                    $recipe = $xivController->getRecipe($recipeObj["ID"]);
                 }
 
-                $recipe = $xivController->getRecipe($recipeObj["ID"]);
                 if ($recipe) {
-                    $xivController->reloadRecipeListings($recipe);
-                    Log::info("Recipe #" . $recipe->id . " for " . $recipe->item->name . " (" . $recipe->item->id . ") created");
-
-                    // Update history if necessary
-                    if ($recipe->item->sales->isEmpty()) {
-                        Log::info("Fetching market board history for " . $recipe->item->name . " (" . $recipe->item->id . ")");
-                        $universalisController->getMarketBoardHistory($server, $recipe->item->id);
-                    }
+                    $mb_data = $universalisController->getMarketBoardListings($server, $recipe->itemIDs());
+                    $recipe->populateCosts($mb_data);
+                    $universalisController->getMarketBoardHistory($server, $recipe->item->id);
                 } else {
-                    Log::error("Failed to retrieve recipe, skipping");
+                    Log::error("Failed to retrieve recipe ID " . $recipeObj["ID"]);
                 }
 
-                Log::info("Sleeping for 5 seconds");
-                sleep(5);
+                Log::info("Sleeping for 3 seconds");
+                sleep(3);
             }
 
             $page += 1;
-            sleep(10);
-
-            if ($page > 120) {
-                break;
-            }
+            sleep(5);
         } while (!empty($recipesObjs));
     }
 

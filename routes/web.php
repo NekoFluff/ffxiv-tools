@@ -48,13 +48,15 @@ Route::get('/', function () {
 Route::get('/{itemID}', function ($itemID) {
     $universalisController = new UniversalisController();
     $xivController = new XIVController();
+    $server = "Goblin";
 
     if ($itemID) {
         // Recipe
         $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
         if ($recipe) {
             if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-                $xivController->reloadRecipeListings($recipe); // Updates listings
+                $mb_data = $universalisController->getMarketBoardListings($server, $recipe->itemIDs());
+                $recipe->populateCosts($mb_data);
             }
             $recipe->alignAmounts(1);
         } else {
@@ -64,7 +66,7 @@ Route::get('/{itemID}', function ($itemID) {
         // Sales
         $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
-            $sales = $universalisController->getMarketBoardHistory("Goblin", $itemID);
+            $sales = $universalisController->getMarketBoardHistory($server, $itemID);
         } else {
             $sales = $universalisController->translateToHistory($sales);
         }

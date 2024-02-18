@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -128,6 +129,7 @@ class UniversalisController extends Controller
             $item_id = $data["itemID"];
             $mb_history = $data["entries"];
             $this->processMarketBoardSaleHistory($item_id, $mb_history);
+            Log::debug("Retrieved market board history for item {$item_id}");
         } catch (\Exception) {
             Log::error("Failed to retrieve market board history for item {$item_id}");
         }
@@ -159,7 +161,7 @@ class UniversalisController extends Controller
             ['quantity', 'price_per_unit', 'hq']
         );
 
-        Log::info("Upserted {$sales_count} sales for item {$item_id}");
+        // Log::info("Upserted {$sales_count} sales for item {$item_id}");
     }
 
     /**

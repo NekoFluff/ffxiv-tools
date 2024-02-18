@@ -74,19 +74,7 @@ class XIVController extends Controller
         return $recipe;
     }
 
-    public function reloadRecipeListings(Recipe $recipe)
-    {
-        $universalisController = new UniversalisController();
-        $mb_data = $universalisController->getMarketBoardListings("Goblin", $recipe->itemIDs());
-        $recipe->populateCosts($mb_data);
 
-        // logger("Recipe after reloading costs: ".json_encode($recipe));
-
-        logger("Market Profit: " . ($recipe->item->market_price - $recipe->market_craft_cost) . " (" . ($recipe->item->market_price / $recipe->market_craft_cost * 100) . "%) ");
-        logger("Optimal Profit: " . ($recipe->item->market_price - $recipe->optimal_craft_cost) . " (" . ($recipe->item->market_price / $recipe->optimal_craft_cost  * 100) . "%) ");
-        // $last_week_sale_count = getLastWeekSaleCount("Goblin", $recipe->item_id);
-        // logger("Last week sale count: {$last_week_sale_count}");
-    }
 
     public function getVendorCost(int $item_id): int
     {

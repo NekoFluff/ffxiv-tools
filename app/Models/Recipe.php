@@ -146,8 +146,8 @@ class Recipe extends Model
     */
     public function populateCosts(array $mb_data)
     {
-        $listings = $mb_data[$this->item_id] ?? null;
-        if ($listings !== null) {
+        $listings = $mb_data[$this->item_id] ?? collect([]);
+        if (!$listings->isEmpty()) {
             $this->item->update([
                 'market_price' => $this->calculateMarketPrice($listings),
             ]);
@@ -155,7 +155,7 @@ class Recipe extends Model
 
         foreach ($this->ingredients as $ingredient) {
             $listings = $mb_data[$ingredient->item_id] ?? collect([]);
-            if ($listings !== null) {
+            if (!$listings->isEmpty()) {
                 $ingredient->item->update([
                     'market_price' => $this->calculateMarketPrice($listings),
                 ]);
