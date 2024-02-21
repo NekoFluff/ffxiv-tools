@@ -32,6 +32,7 @@ let search = debounce(() => {
 
 const handleUpdate = (updatedText: string) => {
     search()
+    showOptions()
     text.value = updatedText
 }
 
