@@ -27,13 +27,13 @@ class Ingredient extends Model
         'item_id' => 'integer',
     ];
 
-    /** @return BelongsTo<Recipe> */
+    /** @return BelongsTo<Recipe, Ingredient> */
     public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
 
-    /** @return BelongsTo<Item> */
+    /** @return BelongsTo<Item, Ingredient> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);

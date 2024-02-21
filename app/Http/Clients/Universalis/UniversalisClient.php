@@ -55,7 +55,7 @@ class UniversalisClient implements UniversalisClientInterface
         return $mbDataArr;
     }
 
-    public function fetchMarketBoardSales(string $server, string $itemID): array
+    public function fetchMarketBoardSales(string $server, int $itemID): array
     {
         try {
             $response = $this->client->get("history/{$server}/{$itemID}");
@@ -68,7 +68,7 @@ class UniversalisClient implements UniversalisClientInterface
         return [];
     }
 
-    public function fetchLastWeekSaleCount(string $server, string $itemID): int
+    public function fetchLastWeekSaleCount(string $server, int $itemID): int
     {
         try {
             $response = $this->client->get("history/{$server}/{$itemID}");

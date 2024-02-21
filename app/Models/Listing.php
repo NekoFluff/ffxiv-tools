@@ -33,7 +33,7 @@ class Listing extends Model
         'last_review_time' => 'datetime',
     ];
 
-    /** @return BelongsTo<Item> */
+    /** @return BelongsTo<Item, Listing> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);

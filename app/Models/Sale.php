@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sale extends Model
 {
@@ -25,8 +26,8 @@ class Sale extends Model
         'hq' => 'boolean',
     ];
 
-    /** @return BelongsTo<Item> */
-    public function item()
+    /** @return BelongsTo<Item, Sale> */
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }

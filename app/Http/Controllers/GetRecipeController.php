@@ -16,7 +16,7 @@ class GetRecipeController extends Controller
         $this->service = $service;
     }
 
-    public function __invoke(string $itemID)
+    public function __invoke(int $itemID)
     {
         $server = "Goblin";
 
@@ -50,7 +50,7 @@ class GetRecipeController extends Controller
         }
 
         // Sales
-        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get() ?? collect([]);
+        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
             $sales = $this->service->getMarketBoardSales($server, $itemID);
         }
@@ -63,8 +63,8 @@ class GetRecipeController extends Controller
             'Recipes',
             [
                 "recipe" => $recipe,
-                "history" => $aggregatedSales ?? [],
-                "listings" => $listings ?? [],
+                "history" => $aggregatedSales,
+                "listings" => $listings,
             ]
         );
     }

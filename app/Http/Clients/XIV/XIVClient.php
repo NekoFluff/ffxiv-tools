@@ -71,7 +71,7 @@ class XIVClient implements XIVClientInterface
             Log::error("Failed to retrieve item data for item {$itemID}");
         }
 
-        return [];
+        return (object) [];
     }
 
     public function fetchVendorPrice(int $itemID): int
