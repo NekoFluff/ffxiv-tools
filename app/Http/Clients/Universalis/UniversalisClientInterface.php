@@ -11,7 +11,7 @@ interface UniversalisClientInterface
      * @param array $item_ids
      * @return array
      */
-    public function fetchMarketBoardListingsWithRetries(string $server, array $item_ids): array;
+    public function fetchMarketBoardListings(string $server, array $item_ids): array;
 
     /**
      * Fetch market board history for a specific item

@@ -29,7 +29,7 @@ class UniversalisClient implements UniversalisClientInterface
         ]);
     }
 
-    public function fetchMarketBoardListingsWithRetries(string $server, array $item_ids): array
+    public function fetchMarketBoardListings(string $server, array $item_ids): array
     {
         $item_ids = array_unique($item_ids);
         sort($item_ids);

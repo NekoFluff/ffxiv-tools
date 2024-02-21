@@ -73,7 +73,7 @@ class GetRecipeController extends Controller
     /** @return array<int, Collection<Listing>> */
     public function getMarketBoardListings(string $server, array $item_ids): array
     {
-        $mb_data_arr = $this->universalisClient->fetchMarketBoardListingsWithRetries($server, $item_ids);
+        $mb_data_arr = $this->universalisClient->fetchMarketBoardListings($server, $item_ids);
 
         $result = [];
         foreach ($mb_data_arr as $key => $item) {
