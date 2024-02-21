@@ -28,23 +28,29 @@ class GetRecipeController extends Controller
 
         if ($itemID) {
             // Recipe
-            $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
-            if ($recipe) {
-                if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-                    $mb_data = $this->getMarketBoardListings($server, $recipe->itemIDs());
-                    $recipe->populateCosts($mb_data);
-                }
-                $recipe->alignAmounts(1);
-            } else {
-                $recipe = $this->searchRecipe($itemID);
+            $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first() ?? $this->searchRecipe($itemID);
+            if (!$recipe) {
+                return inertia(
+                    'Recipes',
+                    [
+                        "recipe" => [],
+                        "history" => [],
+                        "listings" => [],
+                    ]
+                );
+            }
+
+            $recipe->alignAmounts(1);
+            if ($recipe->updated_at->diffInMinutes(now()) > 15) {
+                $mb_data = $this->getMarketBoardListings($server, $recipe->itemIDs());
+                $recipe->populateCosts($mb_data);
             }
 
             // Sales
-            $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+            $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get() ?? collect([]);
+            $sales = $this->translateToHistory($sales);
             if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
                 $sales = $this->getMarketBoardHistory($server, $itemID);
-            } else {
-                $sales = $this->translateToHistory($sales);
             }
 
             // Listings
