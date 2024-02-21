@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GetRecipeController;
 use App\Http\Controllers\UniversalisController;
 use App\Http\Controllers\XIVController;
 use App\Models\Listing;
@@ -45,51 +46,4 @@ Route::get('/', function () {
     );
 });
 
-Route::get('/{itemID}', function ($itemID) {
-    $universalisController = new UniversalisController();
-    $xivController = new XIVController();
-    $server = "Goblin";
-
-    if ($itemID) {
-        // Recipe
-        $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
-        if ($recipe) {
-            if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-                $mb_data = $universalisController->getMarketBoardListings($server, $recipe->itemIDs());
-                $recipe->populateCosts($mb_data);
-            }
-            $recipe->alignAmounts(1);
-        } else {
-            $recipe = $xivController->searchRecipe($itemID);
-        }
-
-        // Sales
-        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
-        if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
-            $sales = $universalisController->getMarketBoardHistory($server, $itemID);
-        } else {
-            $sales = $universalisController->translateToHistory($sales);
-        }
-
-        // Listings
-        $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
-
-        return inertia(
-            'Recipes',
-            [
-                "recipe" => $recipe,
-                "history" => $sales ?? [],
-                "listings" => $listings ?? [],
-            ]
-        );
-    }
-
-    return inertia(
-        'Recipes',
-        [
-            "recipe" => [],
-            "history" => [],
-            "listings" => [],
-        ]
-    );
-})->where('name', '.*');
+Route::get('/{itemID}', GetRecipeController::class)->where('name', '.*');

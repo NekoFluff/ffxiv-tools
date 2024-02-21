@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\UniversalisController;
-use App\Http\Controllers\XIVController;
+use App\Http\Clients\Universalis\UniversalisClient;
+use App\Http\Clients\XIV\XIVClient;
+use App\Http\Controllers\GetRecipeController;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -29,8 +30,7 @@ class RefreshRecipes extends Command
      */
     public function handle()
     {
-        $xivController = new XIVController();
-        $universalisController = new UniversalisController();
+        $getRecipeController = new GetRecipeController(new UniversalisClient(), new XIVClient());
         $page = 1;
         $recipesJson = "";
         $server = "Goblin";
@@ -49,13 +49,13 @@ class RefreshRecipes extends Command
                 $recipe = Recipe::find($recipeObj["ID"]);
 
                 if ($recipe === null) {
-                    $recipe = $xivController->getRecipe($recipeObj["ID"]);
+                    $recipe = $getRecipeController->getRecipe($recipeObj["ID"]);
                 }
 
                 if ($recipe) {
-                    $mb_data = $universalisController->getMarketBoardListings($server, $recipe->itemIDs());
+                    $mb_data = $getRecipeController->getMarketBoardListings($server, $recipe->itemIDs());
                     $recipe->populateCosts($mb_data);
-                    $universalisController->getMarketBoardHistory($server, $recipe->item->id);
+                    $getRecipeController->getMarketBoardHistory($server, $recipe->item->id);
                 } else {
                     Log::error("Failed to retrieve recipe ID " . $recipeObj["ID"]);
                 }

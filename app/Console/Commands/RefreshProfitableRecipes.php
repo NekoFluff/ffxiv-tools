@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Clients\Universalis\UniversalisClient;
+use App\Http\Clients\XIV\XIVClient;
+use App\Http\Controllers\GetRecipeController;
 use App\Http\Controllers\UniversalisController;
 use App\Models\Item;
 use App\Models\Recipe;
@@ -30,7 +33,7 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle()
     {
-        $universalisController = new UniversalisController();
+        $getRecipeController = new GetRecipeController(new UniversalisClient(), new XIVClient());
         $server = "Goblin";
 
         $recipes = Recipe::with('item')
@@ -46,9 +49,9 @@ class RefreshProfitableRecipes extends Command
 
         foreach ($recipes as $recipe) {
             Log::info("Processing recipe " . $recipe->item->name . " (" . $recipe->id . ") | Item ID: " . $recipe->item_id);
-            $mb_data = $universalisController->getMarketBoardListings($server, $recipe->itemIDs());
+            $mb_data = $getRecipeController->getMarketBoardListings($server, $recipe->itemIDs());
             $recipe->populateCosts($mb_data);
-            $universalisController->getMarketBoardHistory($server, $recipe->item_id);
+            $getRecipeController->getMarketBoardHistory($server, $recipe->item_id);
             sleep(1);
         }
     }

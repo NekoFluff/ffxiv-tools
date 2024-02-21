@@ -2,20 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Clients\Universalis\UniversalisClient;
+use App\Http\Clients\Universalis\UniversalisClientInterface;
+use App\Http\Clients\XIV\XIVClientInterface;
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-class UniversalisController extends Controller
+class GetRecipeController extends Controller
 {
-    private UniversalisClient $universalisClient;
+    private UniversalisClientInterface $universalisClient;
+    private XIVClientInterface $xivClient;
 
-    public function __construct()
+    public function __construct(UniversalisClientInterface $universalisClientInterface, XIVClientInterface $xivClientInterface)
     {
-        $this->universalisClient = new UniversalisClient();
+        $this->universalisClient = $universalisClientInterface;
+        $this->xivClient = $xivClientInterface;
+    }
+
+    public function __invoke(string $itemID)
+    {
+        $server = "Goblin";
+
+        if ($itemID) {
+            // Recipe
+            $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
+            if ($recipe) {
+                if ($recipe->updated_at->diffInMinutes(now()) > 15) {
+                    $mb_data = $this->getMarketBoardListings($server, $recipe->itemIDs());
+                    $recipe->populateCosts($mb_data);
+                }
+                $recipe->alignAmounts(1);
+            } else {
+                $recipe = $this->searchRecipe($itemID);
+            }
+
+            // Sales
+            $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+            if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
+                $sales = $this->getMarketBoardHistory($server, $itemID);
+            } else {
+                $sales = $this->translateToHistory($sales);
+            }
+
+            // Listings
+            $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
+
+            return inertia(
+                'Recipes',
+                [
+                    "recipe" => $recipe,
+                    "history" => $sales ?? [],
+                    "listings" => $listings ?? [],
+                ]
+            );
+        }
+
+        return inertia(
+            'Recipes',
+            [
+                "recipe" => [],
+                "history" => [],
+                "listings" => [],
+            ]
+        );
     }
 
     /** @return array<int, Collection<Listing>> */
@@ -171,4 +223,99 @@ class UniversalisController extends Controller
         return $mb_history;
     }
 
+    public function searchRecipeByName(string $name): ?Recipe
+    {
+        try {
+            $search = file_get_contents("https://xivapi.com/search?string={$name}&string_algo=match");
+            $search = json_decode($search);
+        } catch (\Exception $e) {
+            logger("Failed to retrieve search results for {$name}");
+            return null;
+        }
+
+        $item = collect($search->Results)->filter(
+            function ($item) {
+                return $item->UrlType === "Item";
+            }
+        )->first();
+        logger("Item Url: {$item->Url}");
+
+        if (!$item) {
+            return null;
+        }
+
+        return $this->searchRecipe($item->ID);
+    }
+
+    public function searchRecipe(string $itemID): ?Recipe
+    {
+        logger("Searching for item ID {$itemID}");
+
+        $filter_columns = [
+            "ID",
+            "Name",
+            "Description",
+            "LevelItem",
+            "ClassJobCategory.Name",
+            "GameContentLinks.GilShopItem",
+            "Icon",
+            "IconHD",
+            "Recipes",
+            "PriceLow",
+            "PriceMid"
+        ];
+        $item = file_get_contents(
+            // "https://xivapi.com{$item->Url}?columns=" . implode(",", $filter_columns)
+            "https://xivapi.com/Item/{$itemID}?columns=" . implode(",", $filter_columns)
+        );
+        $item = json_decode($item);
+
+        logger("<strong>{$item->Name} ({$item->ID})</strong>");
+        logger("Item Lvl: {$item->LevelItem}");
+        logger("<img src=\"https://xivapi.com/{$item->IconHD}\">");
+
+        $recipe = collect($item->Recipes)->first();
+        $recipeID = $recipe?->ID;
+        if (!$recipe) {
+            return null;
+        }
+
+        // Fetch from XIVAPI
+        $recipe = self::getRecipe($recipeID);
+        $this->reloadRecipeListings($recipe);
+        $recipe->alignAmounts(1);
+
+        logger("Recipe: " . json_encode($recipe));
+
+        return $recipe;
+    }
+
+
+
+    public function getVendorCost(int $item_id): int
+    {
+        $cacheKey = "vendor_gil_price_{$item_id}";
+        $vendor_data = cache()->rememberForever($cacheKey, function () use ($item_id) {
+            return $this->xivClient->fetchVendorCost($item_id);
+        });
+        return $vendor_data;
+    }
+
+    public static function getRecipe($recipeID): ?Recipe
+    {
+        $recipe = cache()->remember('recipe_' . $recipeID, now()->addMinutes(30), function () use ($recipeID) {
+            return $this->xivClient->fetchRecipe($recipeID);
+        });
+
+        if ($recipe === false) {
+            return null;
+        }
+
+        $recipe = json_decode($recipe, true);
+        if (!isset($recipe["ItemResult"])) {
+            return null;
+        }
+
+        return Recipe::parseJson($recipe);
+    }
 }
