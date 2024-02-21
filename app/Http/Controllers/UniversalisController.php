@@ -2,64 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Clients\Universalis\UniversalisClient;
 use App\Models\Item;
 use App\Models\Listing;
-use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class UniversalisController extends Controller
 {
+    private UniversalisClient $universalisClient;
+
+    public function __construct()
+    {
+        $this->universalisClient = new UniversalisClient();
+    }
+
     /** @return array<int, Collection<Listing>> */
     public function getMarketBoardListings(string $server, array $item_ids): array
     {
-        $item_ids = array_unique($item_ids);
-        sort($item_ids);
-
-        logger("Fetching market board listings for server {$server}." . " | Items: " . implode(",", $item_ids));
-        $maxRetries = 85;
-        $retryCount = 0;
-        $mb_data = "";
-
-        while ($retryCount < $maxRetries) {
-            try {
-                $mb_data = file_get_contents(
-                    "https://universalis.app/api/v2/{$server}/" . implode(",", $item_ids)
-                );
-            } catch (\Exception $e) {
-                logger("Failed to retrieve market board listings for server {$server}");
-            }
-
-            if ($mb_data !== false) {
-                break; // Request succeeded, exit the loop
-            }
-
-            $retryCount++;
-            sleep(1); // Wait for 1 second before retrying
-        }
-
-        if ($mb_data === false) {
-            // Handle the failure case here
-            logger("Failed to retrieve market board listings for server {$server}");
-            return [];
-        }
-
-        logger("Retrieved market board listings for server {$server}");
-        $mb_data_arr = json_decode($mb_data, true) ?? [];
-        if (isset($mb_data_arr["itemID"])) {
-            $mb_data_arr = [
-                $mb_data_arr['itemID'] => $mb_data_arr
-            ];
-        } else {
-            $mb_data_arr = $mb_data_arr["items"] ?? [];
-        }
+        $mb_data_arr = $this->universalisClient->fetchMarketBoardListingsWithRetries($server, $item_ids);
 
         $result = [];
         foreach ($mb_data_arr as $key => $item) {
-            $result[$key] = $this->updateListings($item['itemID'], $item["listings"]);
-            $this->processMarketBoardSaleHistory($item['itemID'], $item["recentHistory"]);
+            $result[$key] = $this->updateListings($item->itemID, $item->listings);
+            $this->processMarketBoardSaleHistory($item->itemID, $item->recentHistory);
         }
         return $result;
     }
@@ -76,16 +43,16 @@ class UniversalisController extends Controller
         $listings = collect($listings)->map(
             function ($entry) use ($itemID) {
                 return [
-                    "id" => $entry["listingID"],
+                    "id" => $entry->listingID,
                     "item_id" => $itemID,
-                    "retainer_name" => $entry["retainerName"],
-                    "retainer_city" => $entry["retainerCity"],
-                    "quantity" => $entry["quantity"],
-                    "price_per_unit" => $entry["pricePerUnit"],
-                    "hq" => $entry["hq"],
-                    "total" => $entry["total"],
-                    "tax" => $entry["tax"],
-                    "last_review_time" => Carbon::createFromTimestamp($entry["lastReviewTime"]),
+                    "retainer_name" => $entry->retainerName,
+                    "retainer_city" => $entry->retainerCity,
+                    "quantity" => $entry->quantity,
+                    "price_per_unit" => $entry->pricePerUnit,
+                    "hq" => $entry->hq,
+                    "total" => $entry->total,
+                    "tax" => $entry->tax,
+                    "last_review_time" => Carbon::createFromTimestamp($entry->lastReviewTime),
                 ];
             }
         );
@@ -107,14 +74,7 @@ class UniversalisController extends Controller
             $cacheKey,
             now()->addMinutes(60),
             function () use ($item_id, $server) {
-                logger("Fetching last week sale count for item {$item_id}");
-                $mb_history = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
-                $mb_history = json_decode($mb_history, true);
-                return collect($mb_history["entries"])->map(
-                    function ($entry) {
-                        return $entry["quantity"];
-                    }
-                )->sum();
+                return $this->universalisClient->fetchLastWeekSaleCount($server, $item_id);
             }
         );
         return $sale_count;
@@ -123,16 +83,9 @@ class UniversalisController extends Controller
     /** @return Collection<array> */
     public function getMarketBoardHistory(string $server, string $item_id): Collection
     {
-        try {
-            $data = file_get_contents("https://universalis.app/api/v2/history/{$server}/{$item_id}");
-            $data = json_decode($data, true);
-            $item_id = $data["itemID"];
-            $mb_history = $data["entries"];
-            $this->processMarketBoardSaleHistory($item_id, $mb_history);
-            Log::debug("Retrieved market board history for item {$item_id}");
-        } catch (\Exception) {
-            Log::error("Failed to retrieve market board history for item {$item_id}");
-        }
+        $mb_history = $this->universalisClient->fetchMarketBoardHistory($server, $item_id);
+
+        $this->processMarketBoardSaleHistory($item_id, $mb_history);
 
         $sales_count = $sales_count ?? 0;
         $mb_history = Sale::where('item_id', $item_id)->latest()->limit($sales_count)->get();
@@ -146,22 +99,20 @@ class UniversalisController extends Controller
             function ($entry) use ($item_id) {
                 return [
                     "item_id" => $item_id,
-                    "quantity" => $entry["quantity"],
-                    "price_per_unit" => $entry["pricePerUnit"],
-                    "buyer_name" => $entry["buyerName"],
-                    "timestamp" => Carbon::createFromTimestamp($entry["timestamp"]),
-                    "hq" => $entry["hq"],
+                    "quantity" => $entry->quantity,
+                    "price_per_unit" => $entry->pricePerUnit,
+                    "buyer_name" => $entry->buyerName,
+                    "timestamp" => Carbon::createFromTimestamp($entry->timestamp),
+                    "hq" => $entry->hq,
                 ];
             }
         );
 
-        $sales_count = Sale::upsert(
+        Sale::upsert(
             $mb_history->toArray(),
             ['item_id', 'timestamp', 'buyer_name'],
             ['quantity', 'price_per_unit', 'hq']
         );
-
-        // Log::info("Upserted {$sales_count} sales for item {$item_id}");
     }
 
     /**
