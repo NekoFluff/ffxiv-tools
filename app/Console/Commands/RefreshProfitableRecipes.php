@@ -5,11 +5,10 @@ namespace App\Console\Commands;
 use App\Http\Clients\Universalis\UniversalisClient;
 use App\Http\Clients\XIV\XIVClient;
 use App\Http\Controllers\GetRecipeController;
-use App\Http\Controllers\UniversalisController;
 use App\Models\Item;
 use App\Models\Recipe;
+use App\Services\FFXIVService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RefreshProfitableRecipes extends Command
@@ -28,12 +27,26 @@ class RefreshProfitableRecipes extends Command
      */
     protected $description = 'Refreshes profitable recipes';
 
+    protected FFXIVService $ffxivService;
+
+    /**
+     * Create a new command instance.
+     *
+     * @param  FFXIVService  $ffxivService
+     * @return void
+     */
+    public function __construct(FFXIVService $ffxivService)
+    {
+        parent::__construct();
+
+        $this->ffxivService = $ffxivService;
+    }
+
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $getRecipeController = new GetRecipeController(new UniversalisClient(), new XIVClient());
         $server = "Goblin";
 
         $recipes = Recipe::with('item')
@@ -48,10 +61,10 @@ class RefreshProfitableRecipes extends Command
             ->limit(3000)->get();
 
         foreach ($recipes as $recipe) {
-            Log::info("Processing recipe " . $recipe->item->name . " (" . $recipe->id . ") | Item ID: " . $recipe->item_id);
-            $mb_data = $getRecipeController->getMarketBoardListings($server, $recipe->itemIDs());
-            $recipe->populateCosts($mb_data);
-            $getRecipeController->getMarketBoardHistory($server, $recipe->item_id);
+            Log::info("Processing recipe " . $recipe->item->name . " (" . $recipe->id . ") | Item ID: " . $recipe->itemID);
+            $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
+            $this->ffxivService->updateRecipeCosts($recipe, $mbListings);
+            $this->ffxivService->getMarketBoardSales($server, $recipe->itemID);
             sleep(1);
         }
     }

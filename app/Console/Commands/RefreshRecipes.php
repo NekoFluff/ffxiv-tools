@@ -6,6 +6,7 @@ use App\Http\Clients\Universalis\UniversalisClient;
 use App\Http\Clients\XIV\XIVClient;
 use App\Http\Controllers\GetRecipeController;
 use App\Models\Recipe;
+use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -25,12 +26,26 @@ class RefreshRecipes extends Command
      */
     protected $description = 'Refreshes all recipes';
 
+    protected FFXIVService $ffxivService;
+
+    /**
+     * Create a new command instance.
+     *
+     * @param  FFXIVService  $ffxivService
+     * @return void
+     */
+    public function __construct(FFXIVService $ffxivService)
+    {
+        parent::__construct();
+
+        $this->ffxivService = $ffxivService;
+    }
+
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $getRecipeController = new GetRecipeController(new UniversalisClient(), new XIVClient());
         $page = 1;
         $recipesJson = "";
         $server = "Goblin";
@@ -49,13 +64,13 @@ class RefreshRecipes extends Command
                 $recipe = Recipe::find($recipeObj["ID"]);
 
                 if ($recipe === null) {
-                    $recipe = $getRecipeController->getRecipe($recipeObj["ID"]);
+                    $recipe = $this->ffxivService->getRecipe($recipeObj["ID"]);
                 }
 
                 if ($recipe) {
-                    $mb_data = $getRecipeController->getMarketBoardListings($server, $recipe->itemIDs());
-                    $recipe->populateCosts($mb_data);
-                    $getRecipeController->getMarketBoardHistory($server, $recipe->item->id);
+                    $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
+                    $this->ffxivService->updateRecipeCosts($recipe, $mbListings);
+                    $this->ffxivService->getMarketBoardSales($server, $recipe->item->id);
                 } else {
                     Log::error("Failed to retrieve recipe ID " . $recipeObj["ID"]);
                 }

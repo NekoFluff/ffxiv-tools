@@ -18,5 +18,13 @@ interface XIVClientInterface
      * @param int $item_id The ID of the item.
      * @return int The vendor cost of the item.
      */
-    public function fetchVendorCost(int $item_id): int;
+    public function fetchVendorPrice(int $item_id): int;
+
+    /**
+     * Fetches an item by its ID.
+     *
+     * @param int $itemID The ID of the item to fetch.
+     * @return object The fetched item.
+     */
+    public function fetchItem(int $itemID): object;
 }

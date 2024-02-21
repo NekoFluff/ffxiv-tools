@@ -29,58 +29,58 @@ class UniversalisClient implements UniversalisClientInterface
         ]);
     }
 
-    public function fetchMarketBoardListings(string $server, array $item_ids): array
+    public function fetchMarketBoardListings(string $server, array $itemIDs): array
     {
-        $item_ids = array_unique($item_ids);
-        sort($item_ids);
+        $itemIDs = array_unique($itemIDs);
+        sort($itemIDs);
 
-        Log::debug("Fetching market board listings for server {$server}." . " | Items: " . implode(",", $item_ids));
+        Log::debug("Fetching market board listings for server {$server}." . " | Items: " . implode(",", $itemIDs));
         try {
-            $mb_data = $this->client->get("{$server}/" . implode(",", $item_ids));
+            $mbListings = $this->client->get("{$server}/" . implode(",", $itemIDs));
         } catch (\Exception) {
             Log::error("Failed to retrieve market board listings for server {$server}");
             return [];
         }
 
-        Log::debug("Retrieved market board listings for server {$server} | Items: " . implode(",", $item_ids));
-        $mb_data_arr = json_decode($mb_data->getBody()) ?? [];
-        if (isset($mb_data_arr->itemID)) {
-            $mb_data_arr = [
-                $mb_data_arr->itemID => $mb_data_arr
+        Log::debug("Retrieved market board listings for server {$server} | Items: " . implode(",", $itemIDs));
+        $mbDataArr = json_decode($mbListings->getBody()) ?? [];
+        if (isset($mbDataArr->itemID)) {
+            $mbDataArr = [
+                $mbDataArr->itemID => $mbDataArr
             ];
         } else {
-            $mb_data_arr = $mb_data_arr->items ?? [];
+            $mbDataArr = $mbDataArr->items ?? [];
         }
 
-        return $mb_data_arr;
+        return $mbDataArr;
     }
 
-    public function fetchMarketBoardHistory(string $server, string $item_id): array
+    public function fetchMarketBoardSales(string $server, string $itemID): array
     {
         try {
-            $response = $this->client->get("history/{$server}/{$item_id}");
-            Log::debug("Retrieved market board history for item {$item_id}");
+            $response = $this->client->get("history/{$server}/{$itemID}");
+            Log::debug("Retrieved market board history for item {$itemID}");
             return json_decode($response->getBody());
         } catch (\Exception) {
-            Log::error("Failed to retrieve market board history for item {$item_id}");
+            Log::error("Failed to retrieve market board history for item {$itemID}");
         }
 
         return [];
     }
 
-    public function fetchLastWeekSaleCount(string $server, string $item_id): int
+    public function fetchLastWeekSaleCount(string $server, string $itemID): int
     {
         try {
-            $response = $this->client->get("history/{$server}/{$item_id}");
-            Log::debug("Retrieved market board history for item {$item_id}");
-            $mb_history = json_decode($response->getBody());
-            return collect($mb_history->entries)->map(
+            $response = $this->client->get("history/{$server}/{$itemID}");
+            Log::debug("Retrieved market board history for item {$itemID}");
+            $mbSales = json_decode($response->getBody());
+            return collect($mbSales->entries)->map(
                 function ($entry) {
                     return $entry->quantity;
                 }
             )->sum();
         } catch (\Exception) {
-            Log::error("Failed to retrieve last week sale count for item {$item_id}");
+            Log::error("Failed to retrieve last week sale count for item {$itemID}");
         }
 
         return 0;

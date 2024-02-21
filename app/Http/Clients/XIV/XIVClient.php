@@ -35,9 +35,9 @@ class XIVClient implements XIVClientInterface
         Log::debug("Fetching recipe data for recipe {$recipeID}");
         try {
             $response = $this->client->get("recipe/{$recipeID}");
-            $recipe_data = json_decode($response->getBody(), true);
-            Log::debug("Retrieved data {$recipe_data}");
-            return $recipe_data;
+            $recipeData = json_decode($response->getBody(), true);
+            Log::debug("Retrieved data {$recipeData}");
+            return $recipeData;
         } catch (Exception) {
             Log::error("Failed to retrieve recipe data for recipe {$recipeID}");
         }
@@ -45,16 +45,45 @@ class XIVClient implements XIVClientInterface
         return [];
     }
 
-    public function fetchVendorCost(int $item_id): int
+    public function fetchItem(int $itemID): object
     {
-        Log::debug("Fetching vendor data for item {$item_id}");
+        Log::debug("Fetching item data for item {$itemID}");
         try {
-            $response = $this->client->get("item/{$item_id}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
-            $vendor_data = json_decode($response->getBody(), true);
-            Log::debug("Retrieved data {$vendor_data}");
-            return $vendor_data["GameContentLinks"]["GilShopItem"]["Item"] ? $vendor_data["PriceMid"] : 0;
+            $filterColumns = [
+                "ID",
+                "Name",
+                "Description",
+                "LevelItem",
+                "ClassJobCategory.Name",
+                "GameContentLinks.GilShopItem",
+                "Icon",
+                "IconHD",
+                "Recipes",
+                "PriceLow",
+                "PriceMid"
+            ];
+
+            $response = $this->client->get("item/{$itemID}?columns=" . implode(",", $filterColumns));
+            $itemData = json_decode($response->getBody());
+            Log::debug("Retrieved data {$itemData}");
+            return $itemData;
         } catch (Exception) {
-            Log::error("Failed to retrieve vendor data for item {$item_id}");
+            Log::error("Failed to retrieve item data for item {$itemID}");
+        }
+
+        return [];
+    }
+
+    public function fetchVendorPrice(int $itemID): int
+    {
+        Log::debug("Fetching vendor data for item {$itemID}");
+        try {
+            $response = $this->client->get("item/{$itemID}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
+            $vendorData = json_decode($response->getBody(), true);
+            Log::debug("Retrieved data {$vendorData}");
+            return $vendorData["GameContentLinks"]["GilShopItem"]["Item"] ? $vendorData["PriceMid"] : 0;
+        } catch (Exception) {
+            Log::error("Failed to retrieve vendor data for item {$itemID}");
         }
 
         return 0;

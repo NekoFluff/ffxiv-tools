@@ -52,16 +52,13 @@ class Recipe extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public static function parseJson(array $json): ?Recipe
+    public static function fromXIVRecipeJson(array $json): ?Recipe
     {
-        $xivController = new XIVController();
-
         $item = Item::updateOrCreate([
             'id' => intval($json["ItemResult"]["ID"]),
         ], [
             'name' => $json["Name"],
             'icon' => $json["Icon"],
-            'vendor_price' => $xivController->getVendorCost($json["ItemResult"]["ID"]),
         ]);
 
         $recipe = Recipe::updateOrCreate([
@@ -88,7 +85,6 @@ class Recipe extends Model
             ], [
                 'name' => $json["ItemIngredient{$i}"]["Name"],
                 'icon' => $json["ItemIngredient{$i}"]["Icon"],
-                'vendor_price' => $xivController->getVendorCost($json["ItemIngredient{$i}"]["ID"]),
             ]);
 
             Ingredient::updateOrCreate([
@@ -129,112 +125,14 @@ class Recipe extends Model
     public function itemIDs(): array
     {
         $ids = [];
-        $ids[] = $this->item_id;
+        $ids[] = $this->itemID;
         foreach ($this->ingredients as $ingredient) {
-            $ids[] = $ingredient->item_id;
+            $ids[] = $ingredient->itemID;
             if ($ingredient->craftingRecipe !== null) {
                 $ids = array_merge($ids, $ingredient->craftingRecipe->itemIDs());
             }
         }
 
         return $ids;
-    }
-
-
-    /**
-     *  @param array<int, Collection<Listing>> $mb_data
-    */
-    public function populateCosts(array $mb_data)
-    {
-        $listings = $mb_data[$this->item_id] ?? collect([]);
-        if (!$listings->isEmpty()) {
-            $this->item->update([
-                'market_price' => $this->calculateMarketPrice($listings),
-            ]);
-        }
-
-        foreach ($this->ingredients as $ingredient) {
-            $listings = $mb_data[$ingredient->item_id] ?? collect([]);
-            if (!$listings->isEmpty()) {
-                $ingredient->item->update([
-                    'market_price' => $this->calculateMarketPrice($listings),
-                ]);
-            }
-
-            if ($ingredient->craftingRecipe !== null) {
-                $ingredient->craftingRecipe->populateCosts($mb_data);
-            }
-        }
-
-        $this->calculatePurchaseCost();
-        $this->calculateCraftCost(false);
-        $this->calculateCraftCost(true);
-    }
-
-    private function calculatePurchaseCost()
-    {
-        $cost = $this->item->market_price;
-        if ($this->item->vendor_price != 0) {
-            $cost = min($cost, $this->item->vendor_price);
-        }
-        $this->update([
-            'purchase_cost' => $cost * $this->amount_result
-        ]);
-    }
-
-    /**
-     * @param Collection<Listing> $listings
-     */
-    private function calculateMarketPrice(Collection $listings)
-    {
-        if ($listings->isEmpty()) {
-            return Item::DEFAULT_MARKET_PRICE;
-        }
-
-        $listings = collect($listings)->take(10);
-
-        $median_cost = $listings->median('price_per_unit');
-
-        $sum = 0;
-        foreach ($listings as $listing) {
-            $sum += $listing['price_per_unit'] * $listing['quantity'];
-        }
-        $avg_cost = $sum / max($listings->sum('quantity'), 1);
-
-        // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
-        // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
-        return min($avg_cost, $median_cost) ?: Item::DEFAULT_MARKET_PRICE;
-    }
-
-    private function calculateCraftCost(bool $optimal): int
-    {
-        $cost = 0;
-
-        foreach ($this->ingredients as $ingredient) {
-            $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
-            if (!$ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = $ingredient->craftingRecipe->calculateCraftCost($optimal, $ingredient->amount) / $ingredient->craftingRecipe->amount_result;
-            }
-            if ($optimal && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->calculateCraftCost($optimal, $ingredient->amount) / $ingredient->craftingRecipe->amount_result);
-            }
-            if ($optimal && $ingredient->item->vendor_price != 0) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->item->vendor_price);
-            }
-
-            $cost += $min_ingredient_cost * $ingredient->amount;
-        }
-
-        if ($optimal) {
-            $this->update([
-                'optimal_craft_cost' => $cost,
-            ]);
-        } else {
-            $this->update([
-                'market_craft_cost' => $cost,
-            ]);
-        }
-
-        return $cost;
     }
 }

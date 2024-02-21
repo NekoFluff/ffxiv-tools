@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Recipe;
+use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 
 class RefreshJobsForRecipes extends Command
