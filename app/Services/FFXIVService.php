@@ -11,6 +11,7 @@ use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FFXIVService
@@ -64,9 +65,12 @@ class FFXIVService
         $this->updateVendorPrices($recipe);
 
         $server = "Goblin";
-        $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
-        $this->updateRecipeCosts($recipe, $mbListings);
-        $this->getMarketBoardSales($server, $recipe->item_id);
+        DB::transaction(function () use ($recipe, $server) {
+            $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
+            $this->updateRecipeCosts($recipe, $mbListings);
+            $this->getMarketBoardSales($server, $recipe->item_id);
+        });
+
         return $recipe;
     }
 

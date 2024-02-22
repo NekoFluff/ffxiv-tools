@@ -34,11 +34,6 @@ class Ingredient extends Model
 {
     use HasFactory;
 
-    protected $with = [
-        'craftingRecipe',
-        'item',
-    ];
-
     protected $fillable = [
         'amount',
         'recipe_id',

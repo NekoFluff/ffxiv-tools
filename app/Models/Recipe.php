@@ -49,6 +49,9 @@ class Recipe extends Model
 
     protected $with = [
         'item',
+        'ingredients',
+        'ingredients.item',
+        'ingredients.craftingRecipe',
     ];
 
     protected $fillable = [

@@ -6,6 +6,7 @@ use App\Models\Listing;
 use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class GetRecipeController extends Controller
 {
@@ -45,9 +46,11 @@ class GetRecipeController extends Controller
 
         $recipe->alignAmounts(1);
         if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-            $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
-            $this->service->updateRecipeCosts($recipe, $mbListings);
-            $this->service->getMarketBoardSales($server, $itemID);
+            DB::transaction(function () use ($recipe, $server) {
+                $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
+                $this->service->updateRecipeCosts($recipe, $mbListings);
+                $this->service->getMarketBoardSales($server, $recipe->item_id);
+            });
         }
 
         // Sales
