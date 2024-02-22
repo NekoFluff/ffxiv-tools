@@ -10,6 +10,39 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
+/**
+ * App\Models\Recipe
+ *
+ * @property int $id
+ * @property float $amount_result
+ * @property int $purchase_cost
+ * @property int $market_craft_cost
+ * @property int $optimal_craft_cost
+ * @property string $class_job
+ * @property int $class_job_level
+ * @property string $class_job_icon
+ * @property int $item_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ingredient> $ingredients
+ * @property-read int|null $ingredients_count
+ * @property-read \App\Models\Item $item
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereAmountResult($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereClassJob($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereClassJobIcon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereClassJobLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereMarketCraftCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereOptimalCraftCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe wherePurchaseCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Recipe extends Model
 {
     use HasFactory;

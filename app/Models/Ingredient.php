@@ -7,6 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
+/**
+ * App\Models\Ingredient
+ *
+ * @property int $id
+ * @property float $amount
+ * @property int $recipe_id
+ * @property int $item_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Recipe|null $craftingRecipe
+ * @property-read \App\Models\Item $item
+ * @property-read \App\Models\Recipe $recipe
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereRecipeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Ingredient extends Model
 {
     use HasFactory;
