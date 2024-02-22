@@ -3,8 +3,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
-        "postinstall": "npm run prod"
+        "build": "vite build"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.0.3",
