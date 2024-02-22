@@ -39,8 +39,6 @@ class FFXIVService
         }
 
         $recipe = $this->getRecipe($recipeObj->ID);
-        // TODO: MOve this to whereever this is called
-        // $this->reloadRecipeListings($recipe);
 
         Log::debug("Recipe: " . json_encode($recipe));
 
@@ -54,20 +52,16 @@ class FFXIVService
             return $recipe;
         }
 
-        $recipeData = cache()->remember('recipe_' . $recipeID, now()->addMinutes(30), function () use ($recipeID) {
-            return $this->xivClient->fetchRecipe($recipeID);
-        });
-
+        $recipeData = $this->xivClient->fetchRecipe($recipeID);
         if (empty($recipeData)) {
             return null;
         }
 
-        $recipeJson = json_decode($recipeData, true);
-        if (!isset($recipeJson["ItemResult"])) {
+        if (!isset($recipeData["ItemResult"])) {
             return null;
         }
 
-        $recipe = $this->parseRecipeJson($recipeJson);
+        $recipe = $this->parseRecipeJson($recipeData);
         $this->updateVendorPrices($recipe);
         return $recipe;
     }
@@ -124,13 +118,6 @@ class FFXIVService
         }
 
         return $recipe;
-    }
-
-    public function reloadRecipeListings(Recipe $recipe, $server = "Goblin")
-    {
-        $mbListings = $this->universalisClient->fetchMarketBoardListings($server, $recipe->itemIDs());
-
-        $this->updateRecipeCosts($recipe, $mbListings);
     }
 
     public function updateVendorPrices(Recipe $recipe)
@@ -294,8 +281,8 @@ class FFXIVService
 
         $result = [];
         foreach ($mbDataArr as $key => $item) {
-            $result[$key] = $this->processMarketBoardListings($item->itemID, $item->listings);
-            $this->processMarketBoardSales($item->itemID, $item->recentHistory);
+            $result[$key] = $this->processMarketBoardListings($item['itemID'], $item['listings']);
+            $this->processMarketBoardSales($item['itemID'], $item['recentHistory']);
         }
         return $result;
     }
@@ -318,16 +305,16 @@ class FFXIVService
         $listings = collect($listings)->map(
             function ($entry) use ($itemID) {
                 return [
-                    "id" => $entry->listingID,
+                    "id" => $entry['listingID'],
                     "item_id" => $itemID,
-                    "retainer_name" => $entry->retainerName,
-                    "retainer_city" => $entry->retainerCity,
-                    "quantity" => $entry->quantity,
-                    "price_per_unit" => $entry->pricePerUnit,
-                    "hq" => $entry->hq,
-                    "total" => $entry->total,
-                    "tax" => $entry->tax,
-                    "last_review_time" => Carbon::createFromTimestamp($entry->lastReviewTime),
+                    "retainer_name" => $entry['retainerName'],
+                    "retainer_city" => $entry['retainerCity'],
+                    "quantity" => $entry['quantity'],
+                    "price_per_unit" => $entry['pricePerUnit'],
+                    "hq" => $entry['hq'],
+                    "total" => $entry['total'],
+                    "tax" => $entry['tax'],
+                    "last_review_time" => Carbon::createFromTimestamp($entry['lastReviewTime']),
                 ];
             }
         );
@@ -347,7 +334,7 @@ class FFXIVService
      *
      * @param string $server The server name.
      * @param int $itemID The ID of the item.
-     * @return Collection The collection of market board sales.
+     * @return Collection<Sale> The collection of market board sales.
      */
     public function getMarketBoardSales(string $server, int $itemID): Collection
     {
@@ -369,11 +356,11 @@ class FFXIVService
             function ($entry) use ($itemID) {
                 return [
                     "item_id" => $itemID,
-                    "quantity" => $entry->quantity,
-                    "price_per_unit" => $entry->pricePerUnit,
-                    "buyer_name" => $entry->buyerName,
-                    "timestamp" => Carbon::createFromTimestamp($entry->timestamp),
-                    "hq" => $entry->hq,
+                    "quantity" => $entry['quantity'],
+                    "price_per_unit" => $entry['pricePerUnit'],
+                    "buyer_name" => $entry['buyerName'],
+                    "timestamp" => Carbon::createFromTimestamp($entry['timestamp']),
+                    "hq" => $entry['hq'],
                 ];
             }
         );

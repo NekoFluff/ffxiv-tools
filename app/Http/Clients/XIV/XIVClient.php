@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\Facades\Log;
+use stdClass;
 
 class XIVClient implements XIVClientInterface
 {
@@ -35,8 +36,8 @@ class XIVClient implements XIVClientInterface
         Log::debug("Fetching recipe data for recipe {$recipeID}");
         try {
             $response = $this->client->get("recipe/{$recipeID}");
+            Log::debug("Retrieved recipe data {$response->getBody()}");
             $recipeData = json_decode($response->getBody(), true);
-            Log::debug("Retrieved data {$recipeData}");
             return $recipeData;
         } catch (Exception) {
             Log::error("Failed to retrieve recipe data for recipe {$recipeID}");
@@ -45,7 +46,7 @@ class XIVClient implements XIVClientInterface
         return [];
     }
 
-    public function fetchItem(int $itemID): object
+    public function fetchItem(int $itemID): stdClass
     {
         Log::debug("Fetching item data for item {$itemID}");
         try {
@@ -64,8 +65,8 @@ class XIVClient implements XIVClientInterface
             ];
 
             $response = $this->client->get("item/{$itemID}?columns=" . implode(",", $filterColumns));
+            Log::debug("Retrieved item data {$response->getBody()}");
             $itemData = json_decode($response->getBody());
-            Log::debug("Retrieved data {$itemData}");
             return $itemData;
         } catch (Exception) {
             Log::error("Failed to retrieve item data for item {$itemID}");
@@ -79,8 +80,8 @@ class XIVClient implements XIVClientInterface
         Log::debug("Fetching vendor data for item {$itemID}");
         try {
             $response = $this->client->get("item/{$itemID}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
+            Log::debug("Retrieved vendor price data {$response->getBody()}");
             $vendorData = json_decode($response->getBody(), true);
-            Log::debug("Retrieved data {$vendorData}");
             return $vendorData["GameContentLinks"]["GilShopItem"]["Item"] ? $vendorData["PriceMid"] : 0;
         } catch (Exception) {
             Log::error("Failed to retrieve vendor data for item {$itemID}");
