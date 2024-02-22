@@ -31,7 +31,6 @@ class FFXIVService
             return $recipe;
         }
 
-        //
         $item =  $this->xivClient->fetchItem($itemID);
         $recipeObj = collect($item->Recipes)->first();
         if (!$recipeObj) {

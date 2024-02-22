@@ -1,7 +1,7 @@
 version: "3.1"
 
 services:
-  db:
+  pgsql-db:
     image: postgres:13
     container_name: db
     restart: always
@@ -13,3 +13,16 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres:/var/lib/postgresql/data
+  mysql-db:
+      image: mysql:8.3
+      container_name: db
+      restart: always
+      environment:
+          MYSQL_DATABASE: "ffxivtools"
+          MYSQL_USER: "ffxiv"
+          MYSQL_PASSWORD: "supersecret"
+          MYSQL_ROOT_PASSWORD: "supersecret"
+      ports:
+          - "3306:3306"
+      volumes:
+          - ./mysql:/var/lib/mysql
