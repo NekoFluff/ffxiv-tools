@@ -47,21 +47,21 @@ class RefreshRecipes extends Command
     public function handle()
     {
         $page = 1;
-        $recipesJson = "";
+        $recipesStr = "";
         $server = "Goblin";
         do {
             Log::info("Fetching recipes page " . $page);
 
-            $recipesJson = file_get_contents("https://xivapi.com/recipe?page=" . $page);
+            $recipesStr = file_get_contents("https://xivapi.com/recipe?page=" . $page);
 
-            $recipesObjs = json_decode($recipesJson, true)["Results"] ?? [];
-            foreach ($recipesObjs as $recipeObj) {
+            $recipeJsonObjs = json_decode($recipesStr, true)["Results"] ?? [];
+            foreach ($recipeJsonObjs as $recipeObj) {
                 if (empty($recipeObj["ID"])) {
                     continue;
                 }
 
                 Log::info("Processing recipe " . $recipeObj["Name"] . " (" . $recipeObj["ID"] . ")");
-                $recipe = Recipe::find($recipeObj["ID"]);
+                $recipe = Recipe::where('id', $recipeObj["ID"])->first();
 
                 if ($recipe === null) {
                     $recipe = $this->ffxivService->getRecipe($recipeObj["ID"]);
@@ -81,7 +81,7 @@ class RefreshRecipes extends Command
 
             $page += 1;
             sleep(5);
-        } while (!empty($recipesObjs));
+        } while (!empty($recipeJsonObjs));
     }
 
 }
