@@ -96,8 +96,6 @@ const craftOrBuyColors = computed(() => {
             </span>
 
             <section class="flex flex-row items-center px-2 m-1 bg-gray-100 border border-gray-500 rounded">
-
-                <!-- <span class="font-bold">&nbsp;|&nbsp;</span> -->
                 <span :class="craftOrBuyColors['Purchase Cost']"
                     class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                     Purchase Cost: {{ props.recipe.purchase_cost }} gil</span>
@@ -113,7 +111,6 @@ const craftOrBuyColors = computed(() => {
                     Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
             </section>
 
-            <!-- <span class="font-bold">&nbsp;|&nbsp;</span> -->
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
