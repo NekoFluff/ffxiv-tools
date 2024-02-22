@@ -36,7 +36,8 @@ class XIVClient implements XIVClientInterface
         Log::debug("Fetching recipe data for recipe {$recipeID}");
         try {
             $response = $this->client->get("recipe/{$recipeID}");
-            Log::debug("Retrieved recipe data {$response->getBody()}");
+            // Log::debug("Retrieved recipe data {$response->getBody()}");
+            Log::debug("Retrieved recipe data");
             $recipeData = json_decode($response->getBody(), true);
             return $recipeData;
         } catch (Exception) {

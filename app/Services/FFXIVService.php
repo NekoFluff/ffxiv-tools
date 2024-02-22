@@ -63,6 +63,11 @@ class FFXIVService
 
         $recipe = $this->parseRecipeJson($recipeData);
         $this->updateVendorPrices($recipe);
+
+        $server = "Goblin";
+        $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
+        $this->updateRecipeCosts($recipe, $mbListings);
+        $this->getMarketBoardSales($server, $recipe->item_id);
         return $recipe;
     }
 
@@ -215,7 +220,7 @@ class FFXIVService
         // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
         // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
         $item->update([
-            'market_price' => min($avg_cost, $median_cost) ?: Item::DEFAULT_MARKET_PRICE,
+            'market_price' => intval(min($avg_cost, $median_cost)) ?: Item::DEFAULT_MARKET_PRICE,
         ]);
     }
 
@@ -245,7 +250,7 @@ class FFXIVService
         }
 
         $recipe->update([
-            'optimal_craft_cost' => $cost,
+            'optimal_craft_cost' => intval($cost),
         ]);
     }
 
@@ -270,7 +275,7 @@ class FFXIVService
         }
 
         $recipe->update([
-            'market_craft_cost' => $cost,
+            'market_craft_cost' => intval($cost),
         ]);
     }
 
