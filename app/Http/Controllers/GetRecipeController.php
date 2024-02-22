@@ -25,7 +25,7 @@ class GetRecipeController extends Controller
             return inertia(
                 'Recipes',
                 [
-                    "recipe" => [],
+                    "recipe" => null,
                     "history" => [],
                     "listings" => [],
                 ]
@@ -37,7 +37,7 @@ class GetRecipeController extends Controller
             return inertia(
                 'Recipes',
                 [
-                    "recipe" => [],
+                    "recipe" => null,
                     "history" => [],
                     "listings" => [],
                 ]
