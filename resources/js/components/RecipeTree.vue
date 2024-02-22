@@ -143,6 +143,7 @@ const craftOrBuyColors = computed(() => {
             </div>
         </li>
     </ul>
+
     <div v-else class="flex items-center justify-center h-full mt-7">
         <span class="text-lg font-medium text-gray-900">No recipes found</span>
 
