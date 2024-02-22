@@ -47,13 +47,11 @@ class GetRecipeController extends Controller
         if ($recipe->updated_at->diffInMinutes(now()) > 15) {
             $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
             $this->service->updateRecipeCosts($recipe, $mbListings);
+            $this->service->getMarketBoardSales($server, $itemID);
         }
 
         // Sales
         $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
-        if ($sales->isEmpty() || $recipe->updated_at->diffInMinutes(now()) > 60) {
-            $sales = $this->service->getMarketBoardSales($server, $itemID);
-        }
         $aggregatedSales = $this->service->aggregateSales($sales);
 
         // Listings
