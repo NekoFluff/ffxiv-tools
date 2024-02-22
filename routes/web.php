@@ -1,12 +1,6 @@
 <?php
 
 use App\Http\Controllers\GetRecipeController;
-use App\Http\Controllers\UniversalisController;
-use App\Http\Controllers\XIVController;
-use App\Models\Listing;
-use App\Models\Recipe;
-use App\Models\Sale;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 /*
