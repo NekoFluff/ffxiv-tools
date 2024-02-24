@@ -1,9 +1,42 @@
 version: "3.1"
 
 services:
+  # # Application
+  # app:
+  #   image: ffxivtools/app:dev
+  #   container_name: ffxivtools
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   working_dir: /var/www/
+  #   volumes:
+  #     - .:/var/www
+  #   networks:
+  #     - ffxivnet
+  #   depends_on:
+  #     - pgsql-db
+  #     - mysql-db
+
+  # npm:
+  #   image: ffxivtools/app:dev
+  #   container_name: ffxivtools-npm
+  #   # restart: unless-stopped
+  #   working_dir: /var/www/
+  #   volumes:
+  #     - .:/var/www
+  #   networks:
+  #     - ffxivnet
+  #   command: "npm run dev"
+  #   depends_on:
+  #     - app
+
+  # Database
   pgsql-db:
     image: postgres:13
-    container_name: db
+    container_name: pgsql-db
     restart: always
     environment:
       POSTGRES_DB: "ffxivtools"
@@ -12,17 +45,28 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ffxivnet
   mysql-db:
-      image: mysql:8.3
-      container_name: db
-      restart: always
-      environment:
-          MYSQL_DATABASE: "ffxivtools"
-          MYSQL_USER: "ffxiv"
-          MYSQL_PASSWORD: "supersecret"
-          MYSQL_ROOT_PASSWORD: "supersecret"
-      ports:
-          - "3306:3306"
-      volumes:
-          - ./mysql:/var/lib/mysql
+    image: mysql:8.3
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: "ffxivtools"
+      MYSQL_USER: "ffxiv"
+      MYSQL_PASSWORD: "supersecret"
+      MYSQL_ROOT_PASSWORD: "supersecret"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ffxivnet
+
+volumes:
+  postgres-data: {}
+  mysql-data: {}
+networks:
+  ffxivnet:
+    driver: bridge
