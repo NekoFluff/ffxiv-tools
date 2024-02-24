@@ -32,6 +32,11 @@ class FFXIVService
             return $recipe;
         }
 
+        $item = Item::find($itemID);
+        if ($item) { // There are no recipes for this item
+            return null;
+        }
+
         $item =  $this->xivClient->fetchItem($itemID);
         $recipeObj = collect($item->Recipes)->first();
         if (!$recipeObj) {
@@ -161,7 +166,7 @@ class FFXIVService
      * @param array $mbListings The market board listings to use for updating the costs.
      * @return void
      */
-    public function updateRecipeCosts(Recipe $recipe, array $mbListings)
+    public function updateRecipeCosts(Recipe $recipe, array $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
         if (!$listings->isEmpty()) {
@@ -206,7 +211,7 @@ class FFXIVService
      * @param Collection<Listing> $listings
      * @return void
      */
-    private function updateMarketPrice(Item $item, Collection $listings): void
+    public function updateMarketPrice(Item $item, Collection $listings): void
     {
         if ($listings->isEmpty()) {
             return;

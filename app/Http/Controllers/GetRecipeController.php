@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Listing;
 use App\Models\Sale;
 use App\Services\FFXIVService;
@@ -21,49 +22,58 @@ class GetRecipeController extends Controller
     {
         $server = "Goblin";
 
-        if (empty($itemID)) {
+        $item = Item::find($itemID);
+        if (empty($item)) {
             return inertia(
                 'Recipes',
                 [
                     "recipe" => null,
+                    "item" => null,
                     "history" => [],
                     "listings" => [],
                 ]
             );
         }
 
-        $recipe = $this->service->getRecipeByItemID($itemID);
-        if (!$recipe) {
-            return inertia(
-                'Recipes',
-                [
-                    "recipe" => null,
-                    "history" => [],
-                    "listings" => [],
-                ]
-            );
+        $recipe = $this->service->getRecipeByItemID($item->id);
+        if ($recipe) {
+            if ($recipe->updated_at?->diffInMinutes(now()) > 15) {
+                DB::transaction(function () use ($recipe, $server) {
+                    $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
+                    $this->service->updateRecipeCosts($recipe, $mbListings);
+                    $this->service->getMarketBoardSales($server, $recipe->item_id);
+                });
+            }
+        } else {
+            if ($item->updated_at?->diffInMinutes(now()) > 15) {
+                DB::transaction(function () use ($item, $server) {
+                    $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
+                    $listings = $mbListings[$item->id] ?? collect([]);
+                    if (!$listings->isEmpty()) {
+                        $this->service->updateMarketPrice($item, $listings);
+                    }
+                    $this->service->getMarketBoardSales($server, $item->id);
+                });
+            }
         }
 
-        if ($recipe->updated_at->diffInMinutes(now()) > 15) {
-            DB::transaction(function () use ($recipe, $server) {
-                $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
-                $this->service->updateRecipeCosts($recipe, $mbListings);
-                $this->service->getMarketBoardSales($server, $recipe->item_id);
-            });
-        }
 
         // Sales
-        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+        $sales = Sale::where('item_id', $item->id)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         $aggregatedSales = $this->service->aggregateSales($sales);
 
         // Listings
-        $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
-        $recipe->alignAmounts(1);
+        $listings = Listing::where('item_id', $item->id)->orderBy('price_per_unit', 'asc')->get();
+
+        if ($recipe) {
+            $recipe->alignAmounts(1);
+        }
 
         return inertia(
             'Recipes',
             [
                 "recipe" => $recipe,
+                "item" => $item,
                 "history" => $aggregatedSales,
                 "listings" => $listings,
             ]
