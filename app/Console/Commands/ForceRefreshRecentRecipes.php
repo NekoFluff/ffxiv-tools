@@ -7,7 +7,7 @@ use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Log;
 
-class RefreshJobsForRecipes extends Command
+class ForceRefreshRecentRecipes extends Command
 {
     /**
      * The name and signature of the console command.

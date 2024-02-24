@@ -9,7 +9,7 @@ interface UniversalisClientInterface
      *
      * @param string $server
      * @param array<int> $itemIDs
-     * @return array<string, array>
+     * @return array<int, array>
      */
     public function fetchMarketBoardListings(string $server, array $itemIDs): array;
 
