@@ -45,11 +45,13 @@ class FFXIVService
         return $recipe;
     }
 
-    public function getRecipe($recipeID): ?Recipe
+    public function getRecipe(int $recipeID, bool $forceRefresh = false): ?Recipe
     {
-        $recipe = Recipe::with('ingredients')->where('id', $recipeID)->first();
-        if ($recipe) {
-            return $recipe;
+        if (!$forceRefresh) {
+            $recipe = Recipe::with('ingredients')->where('id', $recipeID)->first();
+            if ($recipe) {
+                return $recipe;
+            }
         }
 
         $recipeData = $this->xivClient->fetchRecipe($recipeID);

@@ -44,7 +44,6 @@ class GetRecipeController extends Controller
             );
         }
 
-        $recipe->alignAmounts(1);
         if ($recipe->updated_at->diffInMinutes(now()) > 15) {
             DB::transaction(function () use ($recipe, $server) {
                 $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
@@ -59,6 +58,7 @@ class GetRecipeController extends Controller
 
         // Listings
         $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
+        $recipe->alignAmounts(1);
 
         return inertia(
             'Recipes',
