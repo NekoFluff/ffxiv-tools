@@ -9,6 +9,7 @@ use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Log;
 
 class GetRecipeController extends Controller
 {
@@ -23,6 +24,8 @@ class GetRecipeController extends Controller
     {
         $server = "Goblin";
 
+        Log::info("GetRecipeController: " . $itemID);
+
         $item = Item::find($itemID);
         if (empty($item)) {
             return inertia(
@@ -35,6 +38,9 @@ class GetRecipeController extends Controller
                 ]
             );
         }
+
+        Log::info("GetRecipeController2: " . $itemID);
+
 
         $recipe = $this->service->getRecipeByItemID($item->id);
         if ($recipe) {
@@ -57,6 +63,7 @@ class GetRecipeController extends Controller
                 });
             }
         }
+        Log::info("GetRecipeController3: " . $itemID);
 
 
         // Sales
@@ -70,7 +77,7 @@ class GetRecipeController extends Controller
             $recipe->alignAmounts(1);
         }
 
-        return Inertia::render(
+        return inertia(
             'Recipes',
             [
                 "recipe" => $recipe,
