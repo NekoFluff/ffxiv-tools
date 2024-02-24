@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import Searchbar from '../components/searchbar.vue';
-import type { Recipe } from '../components/RecipeTree.vue';
-import RecipeTree from '../components/RecipeTree.vue';
-import ListingsTable from '../components/ListingsTable.vue';
-import PriceHistoryGraph from '../components/PriceHistoryGraph.vue';
+import Searchbar from '@/Components/searchbar.vue';
+import type { Recipe } from '@/Components/RecipeTree.vue';
+import RecipeTree from '@/Components/RecipeTree.vue';
+import ListingsTable from '@/Components/ListingsTable.vue';
+import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
 import { router } from "@inertiajs/vue3"
-import { Item } from '../components/Item.vue';
+import { Item } from '@/Components/Item.vue';
 
 const props = defineProps<{
     item: Item | undefined

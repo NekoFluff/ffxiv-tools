@@ -1,6 +1,6 @@
 <script setup>
-import Searchbar from '../components/searchbar.vue';
-import Nav from '../components/Nav.vue';
+import Searchbar from '@/Components/searchbar.vue';
+import Nav from '@/Components/Nav.vue';
 
 import { Link, router } from "@inertiajs/vue3"
 const props = defineProps({
