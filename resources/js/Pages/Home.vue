@@ -1,5 +1,5 @@
 <script setup>
-import Searchbar from '@/Components/searchbar.vue';
+import Searchbar from '@/Components/SearchBar.vue';
 import Nav from '@/Components/Nav.vue';
 
 import { Link, router } from "@inertiajs/vue3"

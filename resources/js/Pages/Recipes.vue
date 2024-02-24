@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Searchbar from '@/Components/searchbar.vue';
+import Searchbar from '@/Components/SearchBar.vue';
 import type { Recipe } from '@/Components/RecipeTree.vue';
 import RecipeTree from '@/Components/RecipeTree.vue';
 import ListingsTable from '@/Components/ListingsTable.vue';
