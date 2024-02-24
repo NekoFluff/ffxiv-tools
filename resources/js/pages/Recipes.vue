@@ -27,8 +27,9 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
     <div class="container mx-auto">
         <Searchbar class="pt-9" @search="handleSearch" />
         <RecipeTree v-if="props.recipe" :recipe="props.recipe" />
-        <h1 v-else class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span class="font-bold"> {{
-            props.item.name }}</span>.</h1>
+        <h1 v-if="!props.recipe && props.item" class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span
+                class="font-bold"> {{
+                    props.item.name }}</span>.</h1>
         <div v-if="props.recipe" class="p-2 mt-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
             sold in The last 7
             days:<span class="ml-4 text-base font-bold">{{ totalSold }}</span></div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-export type Item {
+export type Item = {
     id: number,
     name: string,
     icon: string,
