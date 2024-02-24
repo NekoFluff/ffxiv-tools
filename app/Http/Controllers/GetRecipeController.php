@@ -24,7 +24,7 @@ class GetRecipeController extends Controller
     {
         $server = "Goblin";
 
-        $recipe = $this->service->getRecipeByItemID($item->id);
+        $recipe = $this->service->getRecipeByItemID($itemID);
         if ($recipe) {
             if ($recipe->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($recipe, $server) {
@@ -34,24 +34,25 @@ class GetRecipeController extends Controller
                 });
             }
         } else {
-            if ($item->updated_at?->diffInMinutes(now()) > 15) {
+            $item = Item::find($itemID);
+            if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($item, $server) {
-                    $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
-                    $listings = $mbListings[$item->id] ?? collect([]);
+                    $mbListings = $this->service->getMarketBoardListings($server, [$itemID]);
+                    $listings = $mbListings[$itemID] ?? collect([]);
                     if (!$listings->isEmpty()) {
                         $this->service->updateMarketPrice($item, $listings);
                     }
-                    $this->service->getMarketBoardSales($server, $item->id);
+                    $this->service->getMarketBoardSales($server, $itemID);
                 });
             }
         }
 
         // Sales
-        $sales = Sale::where('item_id', $item->id)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         $aggregatedSales = $this->service->aggregateSales($sales);
 
         // Listings
-        $listings = Listing::where('item_id', $item->id)->orderBy('price_per_unit', 'asc')->get();
+        $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
 
         if ($recipe) {
             $recipe->alignAmounts(1);
@@ -61,7 +62,7 @@ class GetRecipeController extends Controller
             'Recipes',
             [
                 "recipe" => $recipe,
-                "item" => $item,
+                "item" => $recipe?->item ?? $item ?? null,
                 "history" => $aggregatedSales,
                 "listings" => $listings,
             ]
