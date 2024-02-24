@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class GetRecipeController extends Controller
 {
@@ -69,7 +70,7 @@ class GetRecipeController extends Controller
             $recipe->alignAmounts(1);
         }
 
-        return inertia(
+        return Inertia::render(
             'Recipes',
             [
                 "recipe" => $recipe,
