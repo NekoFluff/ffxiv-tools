@@ -98,17 +98,30 @@ const craftOrBuyColors = computed(() => {
             <section class="flex flex-row items-center px-2 m-1 bg-gray-100 border border-gray-500 rounded">
                 <span :class="craftOrBuyColors['Purchase Cost']"
                     class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                    Purchase Cost: {{ props.recipe.purchase_cost }} gil</span>
+                    Purchase Cost: {{ props.recipe.purchase_cost }} gil
+                    <span v-if="props.recipe.amount_result > 1">
+                        ({{ props.recipe.purchase_cost / props.recipe.amount_result }} ea.)
+                    </span>
+                </span>
+
 
                 <span class="font-bold">&nbsp;|&nbsp;</span>
                 <span :class="craftOrBuyColors['Market Craft Cost']"
                     class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                    Market Craft Cost: {{ props.recipe.market_craft_cost }} gil</span>
+                    Market Craft Cost: {{ props.recipe.market_craft_cost }}
+                    <span v-if="props.recipe.amount_result > 1">
+                        ({{ props.recipe.market_craft_cost / props.recipe.amount_result }} ea.)
+                    </span>
+                </span>
 
                 <span class="font-bold">&nbsp;|&nbsp;</span>
                 <span :class="craftOrBuyColors['Optimal Craft Cost']"
                     class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                    Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil</span>
+                    Optimal Craft Cost: {{ props.recipe.optimal_craft_cost }} gil
+                    <span v-if="props.recipe.amount_result > 1">
+                        ({{ props.recipe.optimal_craft_cost / props.recipe.amount_result }} ea.)
+                    </span>
+                </span>
             </section>
 
             <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
