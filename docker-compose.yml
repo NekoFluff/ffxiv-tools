@@ -39,8 +39,8 @@ services:
     container_name: pgsql-db
     restart: always
     environment:
-      POSTGRES_DB: "ffxivtools"
-      POSTGRES_USER: "ffxiv"
+      POSTGRES_DB: "forge"
+      POSTGRES_USER: "forge"
       POSTGRES_PASSWORD: "supersecret"
     ports:
       - "5432:5432"
