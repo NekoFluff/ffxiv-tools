@@ -24,24 +24,6 @@ class GetRecipeController extends Controller
     {
         $server = "Goblin";
 
-        Log::info("GetRecipeController: " . $itemID);
-
-        $item = Item::find($itemID);
-        if (empty($item)) {
-            return inertia(
-                'Recipes',
-                [
-                    "recipe" => null,
-                    "item" => null,
-                    "history" => [],
-                    "listings" => [],
-                ]
-            );
-        }
-
-        Log::info("GetRecipeController2: " . $itemID);
-
-
         $recipe = $this->service->getRecipeByItemID($item->id);
         if ($recipe) {
             if ($recipe->updated_at?->diffInMinutes(now()) > 15) {
@@ -63,8 +45,6 @@ class GetRecipeController extends Controller
                 });
             }
         }
-        Log::info("GetRecipeController3: " . $itemID);
-
 
         // Sales
         $sales = Sale::where('item_id', $item->id)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
