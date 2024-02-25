@@ -74,7 +74,8 @@ class FFXIVService
         $server = "Goblin";
         DB::transaction(function () use ($recipe, $server) {
             $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
-            $this->updateRecipeCosts($recipe, $mbListings);
+            $this->updateMarketPrices($recipe, $mbListings);
+            $this->updateRecipeCosts($recipe);
             $this->getMarketBoardSales($server, $recipe->item_id);
         });
 
@@ -160,13 +161,13 @@ class FFXIVService
     }
 
     /**
-     * Update the costs of a recipe based on the given market board listings.
+     * Update the market prices for a recipe and its ingredients.
      *
      * @param Recipe $recipe The recipe to update.
-     * @param array $mbListings The market board listings to use for updating the costs.
+     * @param array<int, Collection<Listing>> $mbListings The market board listings.
      * @return void
      */
-    public function updateRecipeCosts(Recipe $recipe, array $mbListings): void
+    public function updateMarketPrices(Recipe $recipe, array $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
         if (!$listings->isEmpty()) {
@@ -180,10 +181,19 @@ class FFXIVService
             }
 
             if ($ingredient->craftingRecipe !== null) {
-                $this->updateRecipeCosts($ingredient->craftingRecipe, $mbListings);
+                $this->updateMarketPrices($ingredient->craftingRecipe, $mbListings);
             }
         }
+    }
 
+    /**
+     * Update the costs of a recipe
+     *
+     * @param Recipe $recipe The recipe to update.
+     * @return void
+     */
+    public function updateRecipeCosts(Recipe $recipe): void
+    {
         $this->updatePurchaseCost($recipe);
         $this->updateMarketCraftCost($recipe);
         $this->updateOptimalCraftCost($recipe);

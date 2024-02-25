@@ -63,7 +63,8 @@ class RefreshProfitableRecipes extends Command
         foreach ($recipes as $recipe) {
             Log::info("Processing recipe " . $recipe->item->name . " (" . $recipe->id . ") | Item ID: " . $recipe->item_id);
             $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
-            $this->ffxivService->updateRecipeCosts($recipe, $mbListings);
+            $this->ffxivService->updateMarketPrices($recipe, $mbListings);
+            $this->ffxivService->updateRecipeCosts($recipe);
             $this->ffxivService->getMarketBoardSales($server, $recipe->item_id);
             sleep(1);
         }

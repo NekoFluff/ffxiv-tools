@@ -29,7 +29,8 @@ class GetRecipeController extends Controller
             if ($recipe->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($recipe, $server) {
                     $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
-                    $this->service->updateRecipeCosts($recipe, $mbListings);
+                    $this->service->updateMarketPrices($recipe, $mbListings);
+                    $this->service->updateRecipeCosts($recipe);
                     $this->service->getMarketBoardSales($server, $recipe->item_id);
                 });
             }

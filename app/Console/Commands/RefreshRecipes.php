@@ -69,7 +69,8 @@ class RefreshRecipes extends Command
 
                 if ($recipe) {
                     $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
-                    $this->ffxivService->updateRecipeCosts($recipe, $mbListings);
+                    $this->ffxivService->updateMarketPrices($recipe, $mbListings);
+                    $this->ffxivService->updateRecipeCosts($recipe);
                     $this->ffxivService->getMarketBoardSales($server, $recipe->item_id);
                 } else {
                     Log::error("Failed to retrieve recipe ID " . $recipeObj["ID"]);
