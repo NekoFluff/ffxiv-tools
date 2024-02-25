@@ -12,6 +12,7 @@ const props = defineProps<{
     recipe: Recipe | undefined
     history: Array<{}>
     listings: Array<{}>
+    lastUpdated: string
 }>();
 
 const handleSearch = (text) => {
@@ -26,21 +27,24 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
     <!-- <Nav /> -->
     <div class="container mx-auto">
         <Searchbar class="pt-9" @search="handleSearch" />
-        <RecipeTree v-if="props.recipe" :recipe="props.recipe" />
-        <h1 v-if="!props.recipe && props.item" class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span
+        <div v-if="lastUpdated" class="flex justify-end">
+            <h2 class="text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
+        </div>
+        <RecipeTree v-if="recipe" :recipe="recipe" />
+        <h1 v-if="!recipe && item" class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span
                 class="font-bold"> {{
-                    props.item.name }}</span>.</h1>
-        <div v-if="props.recipe" class="p-2 mt-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
+                    item.name }}</span>.</h1>
+        <div v-if="recipe" class="p-2 mt-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
             sold in The last 7
             days:<span class="ml-4 text-base font-bold">{{ totalSold }}</span></div>
-        <div v-if="props.recipe" class="p-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
+        <div v-if="recipe" class="p-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">#
             Currently on Market Board:<span class="ml-4 text-base font-bold">{{ totalListed }}</span></div>
         <div class="grid grid-cols-10 gap-4 mt-6 mb-10">
             <div class="col-span-6">
-                <PriceHistoryGraph v-if="props.history" :history="props.history" />
+                <PriceHistoryGraph v-if="history" :history="history" />
             </div>
             <div class="col-span-4">
-                <ListingsTable v-if="props.listings" class="mt-4 mb-5 bg-gray-50" :listings="props.listings" />
+                <ListingsTable v-if="listings" class="mt-4 mb-5 bg-gray-50" :listings="listings" />
             </div>
         </div>
     </div>

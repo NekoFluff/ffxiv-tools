@@ -59,13 +59,16 @@ class GetRecipeController extends Controller
             $recipe->alignAmounts(1);
         }
 
+        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? null;
+
         return inertia(
-            'Recipes',
+            'Recipe',
             [
                 "recipe" => $recipe,
                 "item" => $recipe?->item ?? $item ?? null,
                 "history" => $aggregatedSales,
                 "listings" => $listings,
+                "lastUpdated" => $lastUpdated,
             ]
         );
     }

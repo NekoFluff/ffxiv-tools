@@ -19,7 +19,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return inertia(
-        'Recipes',
+        'Recipe',
         [
             "recipe" => null,
         ]
