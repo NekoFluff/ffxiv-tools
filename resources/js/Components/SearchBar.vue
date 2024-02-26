@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import { debounce } from "lodash"
 import axios from "axios";
 import SearchResultList from "./SearchResultList.vue";
@@ -42,12 +42,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
     }
 }
 
-const handleSearchResultClicked = (result: string) => {
-    text.value = ""
-    emit('search', result)
-}
-
-
 const hideOptions = () => {
     optionsVisible.value = false
 }
@@ -78,8 +72,7 @@ const vClickOutside = {
             class="w-full p-2 text-black bg-white rounded-md shadow-lg outline-none placeholder-slate-700 shadow-grey-900"
             type="text" placeholder="Search..." @input="handleUpdate(($event.target as HTMLInputElement).value)"
             @keydown="handleKeyDown" @focus="showOptions" autocomplete="off" />
-        <SearchResultList v-if="optionsVisible" class="mt-0 " :options="options"
-            @searchResultClick="handleSearchResultClicked" />
+        <SearchResultList v-if="optionsVisible" class="mt-0 " :options="options" />
 
     </div>
 </template>

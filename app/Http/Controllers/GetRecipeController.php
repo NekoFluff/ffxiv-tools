@@ -27,6 +27,7 @@ class GetRecipeController extends Controller
         $itemID = intval($itemID);
 
         $recipe = $this->service->getRecipeByItemID($itemID);
+        $item = $recipe->item ?? Item::find($itemID);
         if ($recipe) {
             if ($recalculate || $recipe->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($recipe, $server) {
@@ -37,7 +38,6 @@ class GetRecipeController extends Controller
                 });
             }
         } else {
-            $item = Item::find($itemID);
             if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($item, $server) {
                     $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
@@ -61,7 +61,7 @@ class GetRecipeController extends Controller
             $recipe->alignAmounts(1);
         }
 
-        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? null;
+        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? "";
 
         return inertia(
             'Recipe',

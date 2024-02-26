@@ -38,6 +38,12 @@ class FFXIVService
         }
 
         $item =  $this->xivClient->fetchItem($itemID);
+        Item::updateOrCreate([
+            'id' => intval($item->ID),
+        ], [
+            'name' => $item->Name,
+            'icon' => $item->Icon,
+        ]);
         $recipeObj = collect($item->Recipes)->first();
         if (!$recipeObj) {
             return null;

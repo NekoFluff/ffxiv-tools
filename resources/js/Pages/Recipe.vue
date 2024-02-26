@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Searchbar from '@/Components/SearchBar.vue';
+import SearchBar from '@/Components/SearchBar.vue';
 import type { Recipe } from '@/Components/RecipeTree.vue';
 import RecipeTree from '@/Components/RecipeTree.vue';
 import ListingsTable from '@/Components/ListingsTable.vue';
 import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
-import { Link, router } from "@inertiajs/vue3"
+import { Link } from "@inertiajs/vue3"
 import { Item } from '@/Components/Item.vue';
 
 const props = defineProps<{
@@ -15,18 +15,18 @@ const props = defineProps<{
     lastUpdated: string
 }>();
 
-const handleSearch = (text) => {
-    router.visit(`/${text}`)
-}
 
 const totalSold = props.history != null ? props.history.reduce((acc, item) => acc + item['quantity'], 0) : 0
 const totalListed = props.listings != null ? props.listings.reduce((acc, item) => acc + item['quantity'], 0) : 0
+
+console.log(props.item)
+console.log(props.recipe)
 </script>
 
 <template>
     <!-- <Nav /> -->
     <div class="container mx-auto">
-        <Searchbar class="pt-9" @search="handleSearch" />
+        <SearchBar class="pt-9" />
         <div v-if="lastUpdated" class="flex justify-end text-sm">
             <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
             (
