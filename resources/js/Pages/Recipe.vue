@@ -23,7 +23,7 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
 <template>
     <!-- <Nav /> -->
 
-    <Head :title="props.item?.name || '404'" />
+    <Head :title="props.item?.name || 'Recipe Search'" />
     <div class="container mx-auto">
         <SearchBar class="pt-9" />
         <div v-if="lastUpdated" class="flex justify-end text-sm">
