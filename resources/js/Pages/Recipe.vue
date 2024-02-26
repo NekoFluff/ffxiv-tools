@@ -4,7 +4,6 @@ import type { Recipe } from '@/Components/RecipeTree.vue';
 import RecipeTree from '@/Components/RecipeTree.vue';
 import ListingsTable from '@/Components/ListingsTable.vue';
 import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
-import { Link } from "@inertiajs/vue3"
 import { Item } from '@/Components/Item.vue';
 
 const props = defineProps<{
@@ -23,6 +22,8 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
 
 <template>
     <!-- <Nav /> -->
+
+    <Head :title="props.item?.name || '404'" />
     <div class="container mx-auto">
         <SearchBar class="pt-9" />
         <div v-if="lastUpdated" class="flex justify-end text-sm">

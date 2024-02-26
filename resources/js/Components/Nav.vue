@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import { Link } from "@inertiajs/vue3"
-
-</script>
-
 <template>
     <nav class="bg-gray-800">
         <ul class="flex">
