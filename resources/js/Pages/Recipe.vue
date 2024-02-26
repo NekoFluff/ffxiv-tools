@@ -28,7 +28,7 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
         <div v-if="lastUpdated" class="flex justify-end text-sm">
             <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
             (
-            <Link class="text-sm" :href="route('recipe.get', { id: item.id },)" :data="{ recalculate: 1 }">
+            <Link class="text-sm" :href="route('recipe.get', { id: item.id })" :data="{ recalculate: 1 }">
             Refresh</Link>
             )
         </div>
