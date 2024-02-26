@@ -4,7 +4,7 @@ import type { Recipe } from '@/Components/RecipeTree.vue';
 import RecipeTree from '@/Components/RecipeTree.vue';
 import ListingsTable from '@/Components/ListingsTable.vue';
 import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
-import { router } from "@inertiajs/vue3"
+import { Link, router } from "@inertiajs/vue3"
 import { Item } from '@/Components/Item.vue';
 
 const props = defineProps<{
@@ -27,8 +27,12 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item) =
     <!-- <Nav /> -->
     <div class="container mx-auto">
         <Searchbar class="pt-9" @search="handleSearch" />
-        <div v-if="lastUpdated" class="flex justify-end">
-            <h2 class="text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
+        <div v-if="lastUpdated" class="flex justify-end text-sm">
+            <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
+            (
+            <Link class="text-sm" :href="route('recipe.get', { id: item.id },)" :data="{ recalculate: 1 }">
+            Refresh</Link>
+            )
         </div>
         <RecipeTree v-if="recipe" :recipe="recipe" />
         <h1 v-if="!recipe && item" class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span

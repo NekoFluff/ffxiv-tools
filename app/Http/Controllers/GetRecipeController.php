@@ -8,8 +8,8 @@ use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Log;
 
 class GetRecipeController extends Controller
 {
@@ -22,11 +22,13 @@ class GetRecipeController extends Controller
 
     public function __invoke(int $itemID)
     {
+        $recalculate = boolval(request()->query('recalculate', 0));
         $server = "Goblin";
+        $itemID = intval($itemID);
 
         $recipe = $this->service->getRecipeByItemID($itemID);
         if ($recipe) {
-            if ($recipe->updated_at?->diffInMinutes(now()) > 15) {
+            if ($recalculate || $recipe->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($recipe, $server) {
                     $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
                     $this->service->updateMarketPrices($recipe, $mbListings);
@@ -38,12 +40,12 @@ class GetRecipeController extends Controller
             $item = Item::find($itemID);
             if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($item, $server) {
-                    $mbListings = $this->service->getMarketBoardListings($server, [$itemID]);
-                    $listings = $mbListings[$itemID] ?? collect([]);
+                    $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
+                    $listings = $mbListings[$item->id] ?? collect([]);
                     if (!$listings->isEmpty()) {
                         $this->service->updateMarketPrice($item, $listings);
                     }
-                    $this->service->getMarketBoardSales($server, $itemID);
+                    $this->service->getMarketBoardSales($server, $item->id);
                 });
             }
         }

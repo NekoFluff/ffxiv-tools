@@ -24,9 +24,9 @@ Route::get('/', function () {
             "recipe" => null,
         ]
     );
-});
+})->name('home');
 
-Route::get('/{itemID}', GetRecipeController::class)->where('name', '.*');
+Route::get('/{itemID}', GetRecipeController::class)->where('itemID', '.*')->name('recipe.get');
 
 // Route::get('/home', function () {
 //     return Inertia::render('Welcome', [
