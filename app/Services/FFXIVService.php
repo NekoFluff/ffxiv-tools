@@ -213,10 +213,18 @@ class FFXIVService
      */
     private function updatePurchaseCost(Recipe $recipe)
     {
+        foreach ($recipe->ingredients as $ingredient) {
+            if ($ingredient->craftingRecipe !== null) {
+                $this->updatePurchaseCost($ingredient->craftingRecipe);
+            }
+        }
+
         $cost = $recipe->item->market_price;
         if ($recipe->item->vendor_price != 0) {
             $cost = min($cost, $recipe->item->vendor_price);
         }
+
+        Log::debug("Purchase cost for item {$recipe->item->name}: {$cost}");
 
         $recipe->update([
             'purchase_cost' => $cost,
