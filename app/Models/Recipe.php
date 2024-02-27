@@ -85,12 +85,11 @@ class Recipe extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function alignAmounts(float $target_amount)
+    public function alignAmounts(float $target_amount): void
     {
         $ratio = $target_amount / $this->amount_result;
         $this->amount_result = $target_amount;
 
-        $this->purchase_cost = intval($this->purchase_cost * $ratio);
         $this->market_craft_cost = intval($this->market_craft_cost * $ratio);
         $this->optimal_craft_cost = intval($this->optimal_craft_cost * $ratio);
         foreach ($this->ingredients as $ingredient) {
