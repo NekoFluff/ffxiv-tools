@@ -25,16 +25,13 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
      */
     protected $description = 'Recalculate costs for a recipe';
 
-
     /**
      * Prompt for missing arguments or options.
-     *
-     * @return array
      */
     protected function promptForMissingArguments(InputInterface $input, OutputInterface $output): array
     {
         return [
-            'item' => ['Which item ID would you like to recalculate recipe costs for?']
+            'item' => ['Which item ID would you like to recalculate recipe costs for?'],
         ];
     }
 
@@ -43,7 +40,6 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
     /**
      * Create a new command instance.
      *
-     * @param  FFXIVService  $ffxivService
      * @return void
      */
     public function __construct(FFXIVService $ffxivService)
@@ -66,13 +62,15 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
             $itemID = intval($itemID);
             $recipe = $this->ffxivService->getRecipeByItemID($itemID);
 
-            if (!$recipe) {
+            if (! $recipe) {
                 $this->error("Recipe with Item ID #$itemID not found");
+
                 return 1;
             }
             $this->ffxivService->updateRecipeCosts($recipe);
         }
-        $this->info("Recipe costs recalculated successfully");
+        $this->info('Recipe costs recalculated successfully');
+
         return 0;
     }
 }

@@ -21,7 +21,7 @@ Route::get('/', function () {
     return inertia(
         'Recipe',
         [
-            "recipe" => null,
+            'recipe' => null,
         ]
     );
 })->name('home');

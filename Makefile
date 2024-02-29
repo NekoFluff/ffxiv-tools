@@ -4,5 +4,8 @@ up:
 down:
 	docker compose down
 
+pint:
+	${CURDIR}/vendor/bin/pint
+
 static-analysis:
 	${CURDIR}/vendor/bin/phpstan analyse --memory-limit=2G

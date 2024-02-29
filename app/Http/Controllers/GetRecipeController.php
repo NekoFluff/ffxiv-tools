@@ -8,8 +8,6 @@ use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Inertia\Inertia;
 
 class GetRecipeController extends Controller
 {
@@ -23,7 +21,7 @@ class GetRecipeController extends Controller
     public function __invoke(int $itemID)
     {
         $recalculate = boolval(request()->query('recalculate', 0));
-        $server = "Goblin";
+        $server = 'Goblin';
         $itemID = intval($itemID);
 
         $recipe = $this->service->getRecipeByItemID($itemID);
@@ -42,7 +40,7 @@ class GetRecipeController extends Controller
                 DB::transaction(function () use ($item, $server) {
                     $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
                     $listings = $mbListings[$item->id] ?? collect([]);
-                    if (!$listings->isEmpty()) {
+                    if (! $listings->isEmpty()) {
                         $this->service->updateMarketPrice($item, $listings);
                     }
                     $this->service->getMarketBoardSales($server, $item->id);
@@ -61,16 +59,16 @@ class GetRecipeController extends Controller
             $recipe->alignAmounts(1);
         }
 
-        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? "";
+        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? '';
 
         return inertia(
             'Recipe',
             [
-                "recipe" => $recipe,
-                "item" => $recipe?->item ?? $item ?? null,
-                "history" => $aggregatedSales,
-                "listings" => $listings,
-                "lastUpdated" => $lastUpdated,
+                'recipe' => $recipe,
+                'item' => $recipe?->item ?? $item ?? null,
+                'history' => $aggregatedSales,
+                'listings' => $listings,
+                'lastUpdated' => $lastUpdated,
             ]
         );
     }

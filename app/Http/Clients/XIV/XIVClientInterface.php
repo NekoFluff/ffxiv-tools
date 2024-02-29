@@ -7,7 +7,7 @@ interface XIVClientInterface
     /**
      * Fetches a recipe by its ID.
      *
-     * @param int $recipeID The ID of the recipe to fetch.
+     * @param  int  $recipeID  The ID of the recipe to fetch.
      * @return array The fetched recipe.
      */
     public function fetchRecipe(int $recipeID): array;
@@ -15,7 +15,7 @@ interface XIVClientInterface
     /**
      * Fetches the vendor cost of an item.
      *
-     * @param int $itemID The ID of the item.
+     * @param  int  $itemID  The ID of the item.
      * @return int The vendor cost of the item.
      */
     public function fetchVendorPrice(int $itemID): int;
@@ -23,7 +23,7 @@ interface XIVClientInterface
     /**
      * Fetches an item by its ID.
      *
-     * @param int $itemID The ID of the item to fetch.
+     * @param  int  $itemID  The ID of the item to fetch.
      * @return object The fetched item.
      */
     public function fetchItem(int $itemID): object;

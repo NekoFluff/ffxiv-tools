@@ -2,9 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Clients\Universalis\UniversalisClient;
-use App\Http\Clients\XIV\XIVClient;
-use App\Http\Controllers\GetRecipeController;
 use App\Models\Item;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
@@ -32,7 +29,6 @@ class RefreshProfitableRecipes extends Command
     /**
      * Create a new command instance.
      *
-     * @param  FFXIVService  $ffxivService
      * @return void
      */
     public function __construct(FFXIVService $ffxivService)
@@ -47,7 +43,7 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle()
     {
-        $server = "Goblin";
+        $server = 'Goblin';
 
         $recipes = Recipe::with('item')
             ->join('items', 'recipes.item_id', '=', 'items.id')
@@ -61,7 +57,7 @@ class RefreshProfitableRecipes extends Command
             ->limit(3000)->get();
 
         foreach ($recipes as $recipe) {
-            Log::info("Processing recipe " . $recipe->item->name . " (" . $recipe->id . ") | Item ID: " . $recipe->item_id);
+            Log::info('Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
             $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
             $this->ffxivService->updateMarketPrices($recipe, $mbListings);
             $this->ffxivService->updateRecipeCosts($recipe);
@@ -69,5 +65,4 @@ class RefreshProfitableRecipes extends Command
             sleep(1);
         }
     }
-
 }

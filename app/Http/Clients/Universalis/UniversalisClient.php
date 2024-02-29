@@ -2,7 +2,6 @@
 
 namespace App\Http\Clients\Universalis;
 
-use App\Http\Clients\Universalis\UniversalisClientInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
@@ -34,21 +33,22 @@ class UniversalisClient implements UniversalisClientInterface
         $itemIDs = array_unique($itemIDs);
         sort($itemIDs);
 
-        Log::debug("Fetching market board listings for server {$server}." . " | Items: " . implode(",", $itemIDs));
+        Log::debug("Fetching market board listings for server {$server}.".' | Items: '.implode(',', $itemIDs));
         try {
-            $mbListings = $this->client->get("{$server}/" . implode(",", $itemIDs));
+            $mbListings = $this->client->get("{$server}/".implode(',', $itemIDs));
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board listings for server {$server}. Exception: " . $ex->getMessage());
+            Log::error("Failed to retrieve market board listings for server {$server}. Exception: ".$ex->getMessage());
+
             return [];
         }
-        Log::debug("Retrieved market board listings for server {$server} | Items: " . implode(",", $itemIDs));
+        Log::debug("Retrieved market board listings for server {$server} | Items: ".implode(',', $itemIDs));
         $body = json_decode($mbListings->getBody(), true);
 
         /** @var array<string, mixed> $mbListings */
         $mbListings = [];
         if (isset($body['itemID'])) {
             $mbListings = [
-                $body['itemID'] => $body
+                $body['itemID'] => $body,
             ];
         } else {
             /** @var array<string, mixed> $mbListings */
@@ -63,9 +63,10 @@ class UniversalisClient implements UniversalisClientInterface
         try {
             $response = $this->client->get("history/{$server}/{$itemID}");
             Log::debug("Retrieved market board history for item {$itemID}");
+
             return json_decode($response->getBody(), true)['entries'] ?? [];
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board history for item {$itemID}. Exception: " . $ex->getMessage());
+            Log::error("Failed to retrieve market board history for item {$itemID}. Exception: ".$ex->getMessage());
         }
 
         return [];
@@ -77,6 +78,7 @@ class UniversalisClient implements UniversalisClientInterface
             $response = $this->client->get("history/{$server}/{$itemID}");
             Log::debug("Retrieved market board history for item {$itemID}");
             $mbSales = json_decode($response->getBody());
+
             return collect($mbSales->entries)->map(
                 function ($entry) {
                     return $entry->quantity;
@@ -88,5 +90,4 @@ class UniversalisClient implements UniversalisClientInterface
 
         return 0;
     }
-
 }

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
+ *
  * @method static \Database\Factories\ListingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Listing newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Listing newQuery()
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Listing extends Model
@@ -45,15 +47,15 @@ class Listing extends Model
     use HasFactory;
 
     protected $fillable = [
-       'item_id',
-       'retainer_name',
-       'retainer_city',
-       'quantity',
-       'hq',
-       'price_per_unit',
-       'total',
-       'tax',
-       'last_review_time',
+        'item_id',
+        'retainer_name',
+        'retainer_city',
+        'quantity',
+        'hq',
+        'price_per_unit',
+        'total',
+        'tax',
+        'last_review_time',
     ];
 
     protected $casts = [

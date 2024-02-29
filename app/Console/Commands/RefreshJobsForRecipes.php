@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Recipe;
-use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 
 class RefreshJobsForRecipes extends Command
@@ -31,8 +30,9 @@ class RefreshJobsForRecipes extends Command
         $recipes->each(
             function (Recipe $recipe) {
                 $id = $recipe->id;
-                $recipeData = cache()->remember('recipe_' . $id, now()->addMinutes(30), function () use ($id) {
+                $recipeData = cache()->remember('recipe_'.$id, now()->addMinutes(30), function () use ($id) {
                     logger("Fetching recipe {$id}");
+
                     return file_get_contents("https://xivapi.com/recipe/{$id}");
                 });
 
@@ -43,9 +43,9 @@ class RefreshJobsForRecipes extends Command
                 $recipeData = json_decode($recipeData, true);
 
                 $recipe->update([
-                    'class_job' => $recipeData["ClassJob"]["NameEnglish"],
-                    'class_job_level' => $recipeData["RecipeLevelTable"]["ClassJobLevel"],
-                    'class_job_icon' => $recipeData["ClassJob"]["Icon"],
+                    'class_job' => $recipeData['ClassJob']['NameEnglish'],
+                    'class_job_level' => $recipeData['RecipeLevelTable']['ClassJobLevel'],
+                    'class_job_icon' => $recipeData['ClassJob']['Icon'],
                 ]);
 
                 sleep(1);

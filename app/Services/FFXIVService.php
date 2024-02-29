@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 class FFXIVService
 {
     protected XIVClientInterface $xivClient;
+
     protected UniversalisClientInterface $universalisClient;
 
     public function __construct(XIVClientInterface $xivClient, UniversalisClientInterface $universalisClient)
@@ -37,7 +38,7 @@ class FFXIVService
             return null;
         }
 
-        $item =  $this->xivClient->fetchItem($itemID);
+        $item = $this->xivClient->fetchItem($itemID);
         Item::updateOrCreate([
             'id' => intval($item->ID),
         ], [
@@ -45,20 +46,20 @@ class FFXIVService
             'icon' => $item->Icon,
         ]);
         $recipeObj = collect($item->Recipes)->first();
-        if (!$recipeObj) {
+        if (! $recipeObj) {
             return null;
         }
 
         $recipe = $this->getRecipe($recipeObj->ID);
 
-        Log::debug("Recipe: " . json_encode($recipe));
+        Log::debug('Recipe: '.json_encode($recipe));
 
         return $recipe;
     }
 
     public function getRecipe(int $recipeID, bool $forceRefresh = false): ?Recipe
     {
-        if (!$forceRefresh) {
+        if (! $forceRefresh) {
             $recipe = Recipe::with('ingredients')->where('id', $recipeID)->first();
             if ($recipe) {
                 return $recipe;
@@ -70,14 +71,14 @@ class FFXIVService
             return null;
         }
 
-        if (!isset($recipeData["ItemResult"])) {
+        if (! isset($recipeData['ItemResult'])) {
             return null;
         }
 
         $recipe = $this->parseRecipeJson($recipeData);
         $this->updateVendorPrices($recipe);
 
-        $server = "Goblin";
+        $server = 'Goblin';
         DB::transaction(function () use ($recipe, $server) {
             $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
             $this->updateMarketPrices($recipe, $mbListings);
@@ -91,22 +92,22 @@ class FFXIVService
     public function parseRecipeJson(array $json): ?Recipe
     {
         $item = Item::updateOrCreate([
-            'id' => intval($json["ItemResult"]["ID"]),
+            'id' => intval($json['ItemResult']['ID']),
         ], [
-            'name' => $json["Name"],
-            'icon' => $json["Icon"],
+            'name' => $json['Name'],
+            'icon' => $json['Icon'],
         ]);
 
         $recipe = Recipe::updateOrCreate([
-            'id' => $json["ID"],
+            'id' => $json['ID'],
         ], [
-            'amount_result' => $json["AmountResult"],
+            'amount_result' => $json['AmountResult'],
             'purchase_cost' => 0,
             'market_craft_cost' => 0,
             'optimal_craft_cost' => 0,
-            'class_job' => $json["ClassJob"]["NameEnglish"],
-            'class_job_level' => $json["RecipeLevelTable"]["ClassJobLevel"],
-            'class_job_icon' => $json["ClassJob"]["Icon"],
+            'class_job' => $json['ClassJob']['NameEnglish'],
+            'class_job_level' => $json['RecipeLevelTable']['ClassJobLevel'],
+            'class_job_icon' => $json['ClassJob']['Icon'],
             'item_id' => $item->id,
         ]);
 
@@ -117,10 +118,10 @@ class FFXIVService
             }
 
             $ingredient_item = Item::updateOrCreate([
-                'id' => $json["ItemIngredient{$i}"]["ID"],
+                'id' => $json["ItemIngredient{$i}"]['ID'],
             ], [
-                'name' => $json["ItemIngredient{$i}"]["Name"],
-                'icon' => $json["ItemIngredient{$i}"]["Icon"],
+                'name' => $json["ItemIngredient{$i}"]['Name'],
+                'icon' => $json["ItemIngredient{$i}"]['Icon'],
             ]);
 
             Ingredient::updateOrCreate([
@@ -130,7 +131,7 @@ class FFXIVService
                 'amount' => $amount,
             ]);
 
-            $ingredient_recipe_id = $json["ItemIngredientRecipe{$i}"][0]["ID"] ?? null;
+            $ingredient_recipe_id = $json["ItemIngredientRecipe{$i}"][0]['ID'] ?? null;
             if ($ingredient_recipe_id !== null) {
                 $ingredient_recipe = Recipe::where('id', $ingredient_recipe_id)->first();
                 if ($ingredient_recipe === null) {
@@ -146,13 +147,13 @@ class FFXIVService
     {
         $item = $recipe->item;
         $item->update([
-            'vendor_price' => $this->getVendorCost($item->id)
+            'vendor_price' => $this->getVendorCost($item->id),
         ]);
 
         foreach ($recipe->ingredients as $ingredient) {
             $item = $ingredient->item;
             $item->update([
-                'vendor_price' => $this->getVendorCost($item->id)
+                'vendor_price' => $this->getVendorCost($item->id),
             ]);
         }
     }
@@ -163,26 +164,26 @@ class FFXIVService
         $vendor_data = cache()->rememberForever($cacheKey, function () use ($itemID) {
             return $this->xivClient->fetchVendorPrice($itemID);
         });
+
         return $vendor_data;
     }
 
     /**
      * Update the market prices for a recipe and its ingredients.
      *
-     * @param Recipe $recipe The recipe to update.
-     * @param array<int, Collection<Listing>> $mbListings The market board listings.
-     * @return void
+     * @param  Recipe  $recipe  The recipe to update.
+     * @param  array<int, Collection<Listing>>  $mbListings  The market board listings.
      */
     public function updateMarketPrices(Recipe $recipe, array $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
-        if (!$listings->isEmpty()) {
+        if (! $listings->isEmpty()) {
             $this->updateMarketPrice($recipe->item, $listings);
         }
 
         foreach ($recipe->ingredients as $ingredient) {
             $listings = $mbListings[$ingredient->item_id] ?? collect([]);
-            if (!$listings->isEmpty()) {
+            if (! $listings->isEmpty()) {
                 $this->updateMarketPrice($ingredient->item, $listings);
             }
 
@@ -195,8 +196,7 @@ class FFXIVService
     /**
      * Update the costs of a recipe
      *
-     * @param Recipe $recipe The recipe to update.
-     * @return void
+     * @param  Recipe  $recipe  The recipe to update.
      */
     public function updateRecipeCosts(Recipe $recipe): void
     {
@@ -208,7 +208,7 @@ class FFXIVService
     /**
      * Updates the purchase cost of a recipe.
      *
-     * @param Recipe $recipe The recipe to update the purchase cost for.
+     * @param  Recipe  $recipe  The recipe to update the purchase cost for.
      * @return void
      */
     private function updatePurchaseCost(Recipe $recipe)
@@ -232,8 +232,7 @@ class FFXIVService
     }
 
     /**
-     * @param Collection<Listing> $listings
-     * @return void
+     * @param  Collection<Listing>  $listings
      */
     public function updateMarketPrice(Item $item, Collection $listings): void
     {
@@ -258,17 +257,13 @@ class FFXIVService
         ]);
     }
 
-    /**
-     * @param Recipe $recipe
-     * @return void
-     */
     private function updateOptimalCraftCost(Recipe $recipe): void
     {
         $cost = 0;
 
         foreach ($recipe->ingredients as $ingredient) {
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
-            if (!$ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
+            if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
                 $this->updateOptimalCraftCost($ingredient->craftingRecipe);
                 $min_ingredient_cost = $ingredient->craftingRecipe->optimal_craft_cost / $ingredient->craftingRecipe->amount_result;
             }
@@ -288,10 +283,6 @@ class FFXIVService
         ]);
     }
 
-    /**
-     * @param Recipe $recipe
-     * @return void
-     */
     private function updateMarketCraftCost(Recipe $recipe): void
     {
         $cost = 0;
@@ -300,7 +291,7 @@ class FFXIVService
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
 
             // If the market price is not available, use the crafting cost
-            if (!$ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
+            if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
                 $this->updateMarketCraftCost($ingredient->craftingRecipe);
                 $min_ingredient_cost = $ingredient->craftingRecipe->market_craft_cost / $ingredient->craftingRecipe->amount_result;
             }
@@ -323,14 +314,15 @@ class FFXIVService
             $result[$key] = $this->processMarketBoardListings($item['itemID'], $item['listings']);
             $this->processMarketBoardSales($item['itemID'], $item['recentHistory']);
         }
+
         return $result;
     }
 
     /**
      * Process the market board listings for a specific item.
      *
-     * @param int $itemID The ID of the item.
-     * @param array $listings The array of market board listings.
+     * @param  int  $itemID  The ID of the item.
+     * @param  array  $listings  The array of market board listings.
      * @return Collection<Listing> The processed market board listings.
      */
     private function processMarketBoardListings(int $itemID, array $listings): Collection
@@ -344,16 +336,16 @@ class FFXIVService
         $listings = collect($listings)->map(
             function ($entry) use ($itemID) {
                 return [
-                    "id" => $entry['listingID'],
-                    "item_id" => $itemID,
-                    "retainer_name" => $entry['retainerName'],
-                    "retainer_city" => $entry['retainerCity'],
-                    "quantity" => $entry['quantity'],
-                    "price_per_unit" => $entry['pricePerUnit'],
-                    "hq" => $entry['hq'],
-                    "total" => $entry['total'],
-                    "tax" => $entry['tax'],
-                    "last_review_time" => Carbon::createFromTimestamp($entry['lastReviewTime']),
+                    'id' => $entry['listingID'],
+                    'item_id' => $itemID,
+                    'retainer_name' => $entry['retainerName'],
+                    'retainer_city' => $entry['retainerCity'],
+                    'quantity' => $entry['quantity'],
+                    'price_per_unit' => $entry['pricePerUnit'],
+                    'hq' => $entry['hq'],
+                    'total' => $entry['total'],
+                    'tax' => $entry['tax'],
+                    'last_review_time' => Carbon::createFromTimestamp($entry['lastReviewTime']),
                 ];
             }
         );
@@ -367,12 +359,11 @@ class FFXIVService
         return Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->limit($count)->get();
     }
 
-
     /**
      * Retrieves the market board sales for a specific server and item.
      *
-     * @param string $server The server name.
-     * @param int $itemID The ID of the item.
+     * @param  string  $server  The server name.
+     * @param  int  $itemID  The ID of the item.
      * @return Collection<Sale> The collection of market board sales.
      */
     public function getMarketBoardSales(string $server, int $itemID): Collection
@@ -385,8 +376,8 @@ class FFXIVService
     /**
      * Process the market board sale history for a specific item.
      *
-     * @param int $itemID The ID of the item.
-     * @param array $mbSales The array of market board sales.
+     * @param  int  $itemID  The ID of the item.
+     * @param  array  $mbSales  The array of market board sales.
      * @return Collection<Sale> The processed market board sales.
      */
     private function processMarketBoardSales(int $itemID, array $mbSales): Collection
@@ -394,12 +385,12 @@ class FFXIVService
         $mbSales = collect($mbSales)->map(
             function ($entry) use ($itemID) {
                 return [
-                    "item_id" => $itemID,
-                    "quantity" => $entry['quantity'],
-                    "price_per_unit" => $entry['pricePerUnit'],
-                    "buyer_name" => $entry['buyerName'],
-                    "timestamp" => Carbon::createFromTimestamp($entry['timestamp']),
-                    "hq" => $entry['hq'],
+                    'item_id' => $itemID,
+                    'quantity' => $entry['quantity'],
+                    'price_per_unit' => $entry['pricePerUnit'],
+                    'buyer_name' => $entry['buyerName'],
+                    'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
+                    'hq' => $entry['hq'],
                 ];
             }
         );
@@ -416,24 +407,24 @@ class FFXIVService
     /**
      * Returns Sales aggregated daily for the last week
      *
-     * @param Collection<Sale> $sales
+     * @param  Collection<Sale>  $sales
      * @return Collection<array>
-    */
+     */
     public function aggregateSales(Collection $sales): Collection
     {
         $aggregatedSales = collect($sales)->groupBy(
             function ($entry) {
-                return $entry["timestamp"]->format('Y-m-d');
+                return $entry['timestamp']->format('Y-m-d');
             }
         )->map(
             function ($entries, $date) {
                 return [
-                    "date" => $date,
-                    "quantity" => collect($entries)->sum("quantity"),
-                    "avg_price" => collect($entries)->avg("price_per_unit"),
-                    "median_price" => collect($entries)->median("price_per_unit"),
-                    "min_price" => collect($entries)->min("price_per_unit"),
-                    "max_price" => collect($entries)->max("price_per_unit"),
+                    'date' => $date,
+                    'quantity' => collect($entries)->sum('quantity'),
+                    'avg_price' => collect($entries)->avg('price_per_unit'),
+                    'median_price' => collect($entries)->median('price_per_unit'),
+                    'min_price' => collect($entries)->min('price_per_unit'),
+                    'max_price' => collect($entries)->max('price_per_unit'),
                 ];
             }
         )->reverse()->values();
@@ -454,12 +445,12 @@ class FFXIVService
             function ($date) use (&$aggregatedSales) {
                 $aggregatedSales->push(
                     [
-                        "date" => $date,
-                        "quantity" => 0,
-                        "median_price" => 0,
-                        "avg_price" => 0,
-                        "min_price" => 0,
-                        "max_price" => 0,
+                        'date' => $date,
+                        'quantity' => 0,
+                        'median_price' => 0,
+                        'avg_price' => 0,
+                        'min_price' => 0,
+                        'max_price' => 0,
                     ]
                 );
             }
@@ -478,6 +469,7 @@ class FFXIVService
                 return $this->universalisClient->fetchLastWeekSaleCount($server, $itemID);
             }
         );
+
         return $sale_count;
     }
 }

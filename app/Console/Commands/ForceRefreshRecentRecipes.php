@@ -28,7 +28,6 @@ class ForceRefreshRecentRecipes extends Command
     /**
      * Create a new command instance.
      *
-     * @param  FFXIVService  $ffxivService
      * @return void
      */
     public function __construct(FFXIVService $ffxivService)
@@ -48,7 +47,7 @@ class ForceRefreshRecentRecipes extends Command
         Log::info("Refreshing {$totalCount} recipes");
         $recipes->each(
             function (Recipe $recipe, $idx) use ($totalCount) {
-                Log::info("Refreshing recipe {$recipe->item_id} (" . ($idx + 1) . "/{$totalCount})");
+                Log::info("Refreshing recipe {$recipe->item_id} (".($idx + 1)."/{$totalCount})");
                 $this->ffxivService->getRecipe($recipe->id, true);
 
                 sleep(1);

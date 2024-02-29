@@ -2,7 +2,6 @@
 
 namespace App\Http\Clients\XIV;
 
-use App\Http\Clients\XIV\XIVClientInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -37,8 +36,9 @@ class XIVClient implements XIVClientInterface
         try {
             $response = $this->client->get("recipe/{$recipeID}");
             // Log::debug("Retrieved recipe data {$response->getBody()}");
-            Log::debug("Retrieved recipe data");
+            Log::debug('Retrieved recipe data');
             $recipeData = json_decode($response->getBody(), true);
+
             return $recipeData;
         } catch (Exception) {
             Log::error("Failed to retrieve recipe data for recipe {$recipeID}");
@@ -52,22 +52,23 @@ class XIVClient implements XIVClientInterface
         Log::debug("Fetching item data for item {$itemID}");
         try {
             $filterColumns = [
-                "ID",
-                "Name",
-                "Description",
-                "LevelItem",
-                "ClassJobCategory.Name",
-                "GameContentLinks.GilShopItem",
-                "Icon",
-                "IconHD",
-                "Recipes",
-                "PriceLow",
-                "PriceMid"
+                'ID',
+                'Name',
+                'Description',
+                'LevelItem',
+                'ClassJobCategory.Name',
+                'GameContentLinks.GilShopItem',
+                'Icon',
+                'IconHD',
+                'Recipes',
+                'PriceLow',
+                'PriceMid',
             ];
 
-            $response = $this->client->get("item/{$itemID}?columns=" . implode(",", $filterColumns));
+            $response = $this->client->get("item/{$itemID}?columns=".implode(',', $filterColumns));
             Log::debug("Retrieved item data {$response->getBody()}");
             $itemData = json_decode($response->getBody());
+
             return $itemData;
         } catch (Exception) {
             Log::error("Failed to retrieve item data for item {$itemID}");
@@ -83,7 +84,8 @@ class XIVClient implements XIVClientInterface
             $response = $this->client->get("item/{$itemID}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
             Log::debug("Retrieved vendor price data {$response->getBody()}");
             $vendorData = json_decode($response->getBody(), true);
-            return $vendorData["GameContentLinks"]["GilShopItem"]["Item"] ? $vendorData["PriceMid"] : 0;
+
+            return $vendorData['GameContentLinks']['GilShopItem']['Item'] ? $vendorData['PriceMid'] : 0;
         } catch (Exception) {
             Log::error("Failed to retrieve vendor data for item {$itemID}");
         }

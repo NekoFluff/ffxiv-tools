@@ -2,9 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Clients\Universalis\UniversalisClient;
-use App\Http\Clients\XIV\XIVClient;
-use App\Http\Controllers\GetRecipeController;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
@@ -31,7 +28,6 @@ class RefreshRecipes extends Command
     /**
      * Create a new command instance.
      *
-     * @param  FFXIVService  $ffxivService
      * @return void
      */
     public function __construct(FFXIVService $ffxivService)
@@ -47,24 +43,24 @@ class RefreshRecipes extends Command
     public function handle()
     {
         $page = 1;
-        $recipesStr = "";
-        $server = "Goblin";
+        $recipesStr = '';
+        $server = 'Goblin';
         do {
-            Log::info("Fetching recipes page " . $page);
+            Log::info('Fetching recipes page '.$page);
 
-            $recipesStr = file_get_contents("https://xivapi.com/recipe?page=" . $page);
+            $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page);
 
-            $recipeJsonObjs = json_decode($recipesStr, true)["Results"] ?? [];
+            $recipeJsonObjs = json_decode($recipesStr, true)['Results'] ?? [];
             foreach ($recipeJsonObjs as $recipeObj) {
-                if (empty($recipeObj["ID"])) {
+                if (empty($recipeObj['ID'])) {
                     continue;
                 }
 
-                Log::info("Processing recipe " . $recipeObj["Name"] . " (" . $recipeObj["ID"] . ")");
-                $recipe = Recipe::where('id', $recipeObj["ID"])->first();
+                Log::info('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
+                $recipe = Recipe::where('id', $recipeObj['ID'])->first();
 
                 if ($recipe === null) {
-                    $recipe = $this->ffxivService->getRecipe($recipeObj["ID"]);
+                    $recipe = $this->ffxivService->getRecipe($recipeObj['ID']);
                 }
 
                 if ($recipe) {
@@ -73,16 +69,15 @@ class RefreshRecipes extends Command
                     $this->ffxivService->updateRecipeCosts($recipe);
                     $this->ffxivService->getMarketBoardSales($server, $recipe->item_id);
                 } else {
-                    Log::error("Failed to retrieve recipe ID " . $recipeObj["ID"]);
+                    Log::error('Failed to retrieve recipe ID '.$recipeObj['ID']);
                 }
 
-                Log::info("Sleeping for 3 seconds");
+                Log::info('Sleeping for 3 seconds');
                 sleep(3);
             }
 
             $page += 1;
             sleep(5);
-        } while (!empty($recipeJsonObjs));
+        } while (! empty($recipeJsonObjs));
     }
-
 }
