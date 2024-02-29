@@ -90,7 +90,7 @@ class Recipe extends Model
         $ratio = $target_amount / $this->amount_result;
         $this->amount_result = $target_amount;
 
-        $this->purchase_cost = intval($this->item->market_price * $target_amount);
+        $this->purchase_cost = intval($this->purchase_cost * $target_amount);
         $this->market_craft_cost = intval($this->market_craft_cost * $ratio);
         $this->optimal_craft_cost = intval($this->optimal_craft_cost * $ratio);
         foreach ($this->ingredients as $ingredient) {
