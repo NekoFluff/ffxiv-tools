@@ -24,7 +24,7 @@ interface XIVClientInterface
      * Fetches an item by its ID.
      *
      * @param  int  $itemID  The ID of the item to fetch.
-     * @return object The fetched item.
+     * @return ?XIVItem The fetched item.
      */
-    public function fetchItem(int $itemID): object;
+    public function fetchItem(int $itemID): ?XIVItem;
 }

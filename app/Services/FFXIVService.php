@@ -143,7 +143,7 @@ class FFXIVService
         return $recipe;
     }
 
-    public function updateVendorPrices(Recipe $recipe)
+    public function updateVendorPrices(Recipe $recipe): void
     {
         $item = $recipe->item;
         $item->update([
@@ -172,7 +172,7 @@ class FFXIVService
      * Update the market prices for a recipe and its ingredients.
      *
      * @param  Recipe  $recipe  The recipe to update.
-     * @param  array<int, Collection<Listing>>  $mbListings  The market board listings.
+     * @param  array<int, Collection<int, Listing>>  $mbListings  The market board listings.
      */
     public function updateMarketPrices(Recipe $recipe, array $mbListings): void
     {
@@ -209,9 +209,8 @@ class FFXIVService
      * Updates the purchase cost of a recipe.
      *
      * @param  Recipe  $recipe  The recipe to update the purchase cost for.
-     * @return void
      */
-    private function updatePurchaseCost(Recipe $recipe)
+    private function updatePurchaseCost(Recipe $recipe): void
     {
         foreach ($recipe->ingredients as $ingredient) {
             if ($ingredient->craftingRecipe !== null) {
@@ -232,7 +231,10 @@ class FFXIVService
     }
 
     /**
-     * @param  Collection<Listing>  $listings
+     * Updates the market price of an item.
+     *
+     * @param  Item  $item  The item to update the market price for.
+     * @param  Collection<int, Listing>  $listings  The market board listings.
      */
     public function updateMarketPrice(Item $item, Collection $listings): void
     {
@@ -304,7 +306,7 @@ class FFXIVService
         ]);
     }
 
-    /** @return array<int, Collection<Listing>> */
+    /** @return array<int, Collection<int, Listing>> */
     public function getMarketBoardListings(string $server, array $itemIDs): array
     {
         $mbDataArr = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
@@ -323,7 +325,7 @@ class FFXIVService
      *
      * @param  int  $itemID  The ID of the item.
      * @param  array  $listings  The array of market board listings.
-     * @return Collection<Listing> The processed market board listings.
+     * @return Collection<int, Listing> The processed market board listings.
      */
     private function processMarketBoardListings(int $itemID, array $listings): Collection
     {
@@ -364,7 +366,7 @@ class FFXIVService
      *
      * @param  string  $server  The server name.
      * @param  int  $itemID  The ID of the item.
-     * @return Collection<Sale> The collection of market board sales.
+     * @return Collection<int, Sale> The collection of market board sales.
      */
     public function getMarketBoardSales(string $server, int $itemID): Collection
     {
@@ -378,7 +380,7 @@ class FFXIVService
      *
      * @param  int  $itemID  The ID of the item.
      * @param  array  $mbSales  The array of market board sales.
-     * @return Collection<Sale> The processed market board sales.
+     * @return Collection<int, Sale> The processed market board sales.
      */
     private function processMarketBoardSales(int $itemID, array $mbSales): Collection
     {
@@ -407,8 +409,8 @@ class FFXIVService
     /**
      * Returns Sales aggregated daily for the last week
      *
-     * @param  Collection<Sale>  $sales
-     * @return Collection<array>
+     * @param  Collection<int, Sale>  $sales
+     * @return Collection<int, array{date: mixed, quantity: mixed, avg_price: float|int|null, median_price: float|int|null, min_price: mixed, max_price: mixed}>
      */
     public function aggregateSales(Collection $sales): Collection
     {
@@ -431,14 +433,14 @@ class FFXIVService
 
         // Add missing days in the last week without quantity
         $lastWeekDates = [
-            date('Y-m-d', now()->subDays(0)->timestamp),
-            date('Y-m-d', now()->subDays(1)->timestamp),
-            date('Y-m-d', now()->subDays(2)->timestamp),
-            date('Y-m-d', now()->subDays(3)->timestamp),
-            date('Y-m-d', now()->subDays(4)->timestamp),
-            date('Y-m-d', now()->subDays(5)->timestamp),
-            date('Y-m-d', now()->subDays(6)->timestamp),
-            date('Y-m-d', now()->subDays(7)->timestamp),
+            date('Y-m-d', intval(now()->subDays(0)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(1)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(2)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(3)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(4)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(5)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(6)->timestamp)),
+            date('Y-m-d', intval(now()->subDays(7)->timestamp)),
         ];
         $missingDates = collect($lastWeekDates)->diff($aggregatedSales->pluck('date'));
         $missingDates->each(

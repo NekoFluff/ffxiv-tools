@@ -24,7 +24,7 @@ class RefreshJobsForRecipes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $recipes = Recipe::all();
         $recipes->each(

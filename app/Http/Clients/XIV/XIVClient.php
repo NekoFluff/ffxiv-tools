@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\Facades\Log;
-use stdClass;
 
 class XIVClient implements XIVClientInterface
 {
@@ -37,6 +36,8 @@ class XIVClient implements XIVClientInterface
             $response = $this->client->get("recipe/{$recipeID}");
             // Log::debug("Retrieved recipe data {$response->getBody()}");
             Log::debug('Retrieved recipe data');
+
+            /** @var array $recipeData */
             $recipeData = json_decode($response->getBody(), true);
 
             return $recipeData;
@@ -47,7 +48,7 @@ class XIVClient implements XIVClientInterface
         return [];
     }
 
-    public function fetchItem(int $itemID): stdClass
+    public function fetchItem(int $itemID): ?XIVItem
     {
         Log::debug("Fetching item data for item {$itemID}");
         try {
@@ -67,14 +68,19 @@ class XIVClient implements XIVClientInterface
 
             $response = $this->client->get("item/{$itemID}?columns=".implode(',', $filterColumns));
             Log::debug("Retrieved item data {$response->getBody()}");
-            $itemData = json_decode($response->getBody());
 
-            return $itemData;
+            /** @var array $itemData */
+            $itemData = json_decode($response->getBody(), true);
+
+            $xivItem = new XIVItem();
+            $xivItem->hydrate($itemData);
+
+            return $xivItem;
         } catch (Exception) {
             Log::error("Failed to retrieve item data for item {$itemID}");
         }
 
-        return (object) [];
+        return null;
     }
 
     public function fetchVendorPrice(int $itemID): int

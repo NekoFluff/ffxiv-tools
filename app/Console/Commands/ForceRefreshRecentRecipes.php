@@ -40,7 +40,7 @@ class ForceRefreshRecentRecipes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $recipes = Recipe::where('updated_at', '>', now()->subDays(3))->get();
         $totalCount = $recipes->count();
@@ -53,6 +53,5 @@ class ForceRefreshRecentRecipes extends Command
                 sleep(1);
             }
         );
-
     }
 }

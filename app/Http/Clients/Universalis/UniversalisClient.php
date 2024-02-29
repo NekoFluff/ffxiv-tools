@@ -42,16 +42,15 @@ class UniversalisClient implements UniversalisClientInterface
             return [];
         }
         Log::debug("Retrieved market board listings for server {$server} | Items: ".implode(',', $itemIDs));
+        /** @var array $body */
         $body = json_decode($mbListings->getBody(), true);
 
-        /** @var array<string, mixed> $mbListings */
         $mbListings = [];
         if (isset($body['itemID'])) {
             $mbListings = [
                 $body['itemID'] => $body,
             ];
         } else {
-            /** @var array<string, mixed> $mbListings */
             $mbListings = $body['items'] ?? [];
         }
 
@@ -77,11 +76,13 @@ class UniversalisClient implements UniversalisClientInterface
         try {
             $response = $this->client->get("history/{$server}/{$itemID}");
             Log::debug("Retrieved market board history for item {$itemID}");
-            $mbSales = json_decode($response->getBody());
 
-            return collect($mbSales->entries)->map(
+            /** @var array $mbSales */
+            $mbSales = json_decode($response->getBody(), true)['entries'] ?? [];
+
+            return collect($mbSales)->map(
                 function ($entry) {
-                    return $entry->quantity;
+                    return $entry['quantity'];
                 }
             )->sum();
         } catch (\Exception) {

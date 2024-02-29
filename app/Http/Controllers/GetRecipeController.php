@@ -8,6 +8,8 @@ use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
 class GetRecipeController extends Controller
 {
@@ -18,9 +20,9 @@ class GetRecipeController extends Controller
         $this->service = $service;
     }
 
-    public function __invoke(int $itemID)
+    public function __invoke(int $itemID): Response|ResponseFactory
     {
-        $recalculate = boolval(request()->query('recalculate', 0));
+        $recalculate = boolval(request()->query('recalculate', '0'));
         $server = 'Goblin';
         $itemID = intval($itemID);
 

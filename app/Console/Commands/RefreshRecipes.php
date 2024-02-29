@@ -40,7 +40,7 @@ class RefreshRecipes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $page = 1;
         $recipesStr = '';
@@ -48,7 +48,7 @@ class RefreshRecipes extends Command
         do {
             Log::info('Fetching recipes page '.$page);
 
-            $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page);
+            $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page) ?: '';
 
             $recipeJsonObjs = json_decode($recipesStr, true)['Results'] ?? [];
             foreach ($recipeJsonObjs as $recipeObj) {
