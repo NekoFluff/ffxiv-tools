@@ -17,6 +17,6 @@ class XIVItem
         $this->ID = $data['ID'];
         $this->Name = $data['Name'];
         $this->Icon = $data['Icon'];
-        $this->Recipes = $data['Recipes'];
+        $this->Recipes = $data['Recipes'] ?? [];
     }
 }
