@@ -290,11 +290,13 @@ class FFXIVService
         $cost = 0;
 
         foreach ($recipe->ingredients as $ingredient) {
+            if ($ingredient->craftingRecipe !== null) {
+                $this->updateMarketCraftCost($ingredient->craftingRecipe);
+            }
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
 
             // If the market price is not available, use the crafting cost
             if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $this->updateMarketCraftCost($ingredient->craftingRecipe);
                 $min_ingredient_cost = $ingredient->craftingRecipe->market_craft_cost / $ingredient->craftingRecipe->amount_result;
             }
 
