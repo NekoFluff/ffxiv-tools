@@ -24,7 +24,7 @@ class XIVClient implements XIVClientInterface
 
         $this->client = new Client([
             'base_uri' => 'https://xivapi.com/',
-            'timeout' => 5.0,
+            'timeout' => 10.0,
             'handler' => $stack,
         ]);
     }

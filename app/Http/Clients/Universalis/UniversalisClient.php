@@ -23,7 +23,7 @@ class UniversalisClient implements UniversalisClientInterface
 
         $this->client = new Client([
             'base_uri' => 'https://universalis.app/api/v2/',
-            'timeout' => 5.0,
+            'timeout' => 10.0,
             'handler' => $stack,
         ]);
     }
