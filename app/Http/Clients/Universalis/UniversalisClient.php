@@ -35,7 +35,7 @@ class UniversalisClient implements UniversalisClientInterface
 
         Log::debug("Fetching market board listings for server {$server}.".' | Items: '.implode(',', $itemIDs));
         try {
-            $mbListings = $this->client->get("{$server}/".implode(',', $itemIDs));
+            $mbListings = $this->client->get("{$server}/".implode(',', $itemIDs).'?listings=20');
         } catch (\Exception $ex) {
             Log::error("Failed to retrieve market board listings for server {$server}. Exception: ".$ex->getMessage());
 
