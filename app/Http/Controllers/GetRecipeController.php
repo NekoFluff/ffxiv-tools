@@ -31,21 +31,22 @@ class GetRecipeController extends Controller
         if ($recipe) {
             if ($recalculate || $recipe->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($recipe, $server) {
-                    $mbListings = $this->service->getMarketBoardListings($server, $recipe->itemIDs());
-                    $this->service->updateMarketPrices($recipe, $mbListings);
+                    $this->service->refreshMarketboardListings($server, $recipe->itemIDs());
+                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                    $this->service->updateMarketPrices($recipe, $listings);
                     $this->service->updateRecipeCosts($recipe);
-                    $this->service->getMarketBoardSales($server, $recipe->item_id);
+                    $this->service->refreshMarketBoardSales($server, $recipe->item_id);
                 });
             }
         } else {
             if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
                 DB::transaction(function () use ($item, $server) {
-                    $mbListings = $this->service->getMarketBoardListings($server, [$item->id]);
-                    $listings = $mbListings[$item->id] ?? collect([]);
+                    $this->service->refreshMarketboardListings($server, [$item->id]);
+                    $listings = Listing::where('item_id', $item->id)->get();
                     if (! $listings->isEmpty()) {
                         $this->service->updateMarketPrice($item, $listings);
                     }
-                    $this->service->getMarketBoardSales($server, $item->id);
+                    $this->service->refreshMarketBoardSales($server, $item->id);
                 });
             }
         }

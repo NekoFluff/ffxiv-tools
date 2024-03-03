@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
@@ -64,10 +65,11 @@ class RefreshRecipes extends Command
                 }
 
                 if ($recipe) {
-                    $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
-                    $this->ffxivService->updateMarketPrices($recipe, $mbListings);
+                    $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
+                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                    $this->ffxivService->updateMarketPrices($recipe, $listings);
                     $this->ffxivService->updateRecipeCosts($recipe);
-                    $this->ffxivService->getMarketBoardSales($server, $recipe->item_id);
+                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                 } else {
                     Log::error('Failed to retrieve recipe ID '.$recipeObj['ID']);
                 }

@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Listing;
 use App\Models\Recipe;
 use App\Models\Sale;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -80,10 +81,11 @@ class FFXIVService
 
         $server = 'Goblin';
         DB::transaction(function () use ($recipe, $server) {
-            $mbListings = $this->getMarketBoardListings($server, $recipe->itemIDs());
-            $this->updateMarketPrices($recipe, $mbListings);
+            $this->refreshMarketboardListings($server, $recipe->itemIDs());
+            $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+            $this->updateMarketPrices($recipe, $listings);
             $this->updateRecipeCosts($recipe);
-            $this->getMarketBoardSales($server, $recipe->item_id);
+            $this->refreshMarketBoardSales($server, $recipe->item_id);
         });
 
         return $recipe;
@@ -172,9 +174,9 @@ class FFXIVService
      * Update the market prices for a recipe and its ingredients.
      *
      * @param  Recipe  $recipe  The recipe to update.
-     * @param  array<int, Collection<int, Listing>>  $mbListings  The market board listings.
+     * @param  Collection<int, EloquentCollection<int|string, Listing>>  $mbListings  The market board listings.
      */
-    public function updateMarketPrices(Recipe $recipe, array $mbListings): void
+    public function updateMarketPrices(Recipe $recipe, Collection $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
         if (! $listings->isEmpty()) {
@@ -200,9 +202,16 @@ class FFXIVService
      */
     public function updateRecipeCosts(Recipe $recipe): void
     {
+        foreach ($recipe->ingredients as $ingredient) {
+            if ($ingredient->craftingRecipe !== null) {
+                $this->updateRecipeCosts($ingredient->craftingRecipe);
+            }
+        }
+
         $this->updatePurchaseCost($recipe);
         $this->updateMarketCraftCost($recipe);
         $this->updateOptimalCraftCost($recipe);
+        $recipe->save();
     }
 
     /**
@@ -212,12 +221,6 @@ class FFXIVService
      */
     private function updatePurchaseCost(Recipe $recipe): void
     {
-        foreach ($recipe->ingredients as $ingredient) {
-            if ($ingredient->craftingRecipe !== null) {
-                $this->updatePurchaseCost($ingredient->craftingRecipe);
-            }
-        }
-
         $cost = $recipe->item->market_price;
         if ($recipe->item->vendor_price != 0) {
             $cost = min($cost, $recipe->item->vendor_price);
@@ -225,9 +228,7 @@ class FFXIVService
 
         Log::debug("Purchase cost for item {$recipe->item->name}: {$cost}");
 
-        $recipe->update([
-            'purchase_cost' => $cost,
-        ]);
+        $recipe->purchase_cost = $cost;
     }
 
     /**
@@ -254,9 +255,7 @@ class FFXIVService
 
         // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
         // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
-        $item->update([
-            'market_price' => intval(min($avg_cost, $median_cost)) ?: Item::DEFAULT_MARKET_PRICE,
-        ]);
+        $item->market_price = intval(min($avg_cost, $median_cost)) ?: Item::DEFAULT_MARKET_PRICE;
     }
 
     private function updateOptimalCraftCost(Recipe $recipe): void
@@ -266,11 +265,9 @@ class FFXIVService
         foreach ($recipe->ingredients as $ingredient) {
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
             if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $this->updateOptimalCraftCost($ingredient->craftingRecipe);
                 $min_ingredient_cost = $ingredient->craftingRecipe->optimal_craft_cost / $ingredient->craftingRecipe->amount_result;
             }
             if ($ingredient->craftingRecipe !== null) {
-                $this->updateOptimalCraftCost($ingredient->craftingRecipe);
                 $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->optimal_craft_cost / $ingredient->craftingRecipe->amount_result);
             }
             if ($ingredient->item->vendor_price != 0) {
@@ -280,9 +277,7 @@ class FFXIVService
             $cost += $min_ingredient_cost * $ingredient->amount;
         }
 
-        $recipe->update([
-            'optimal_craft_cost' => intval($cost),
-        ]);
+        $recipe->optimal_craft_cost = intval($cost);
     }
 
     private function updateMarketCraftCost(Recipe $recipe): void
@@ -290,9 +285,6 @@ class FFXIVService
         $cost = 0;
 
         foreach ($recipe->ingredients as $ingredient) {
-            if ($ingredient->craftingRecipe !== null) {
-                $this->updateMarketCraftCost($ingredient->craftingRecipe);
-            }
             $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
 
             // If the market price is not available, use the crafting cost
@@ -303,64 +295,85 @@ class FFXIVService
             $cost += $min_ingredient_cost * $ingredient->amount;
         }
 
-        $recipe->update([
-            'market_craft_cost' => intval($cost),
-        ]);
+        $recipe->market_craft_cost = intval($cost);
     }
 
-    /** @return array<int, Collection<int, Listing>> */
-    public function getMarketBoardListings(string $server, array $itemIDs): array
+    public function refreshMarketboardListings(string $server, array $itemIDs): void
     {
-        $mbDataArr = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
+        $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
+        Listing::whereIn('item_id', $itemIDs)->delete();
 
-        $result = [];
-        foreach ($mbDataArr as $key => $item) {
-            $result[$key] = $this->processMarketBoardListings($item['itemID'], $item['listings']);
-            $this->processMarketBoardSales($item['itemID'], $item['recentHistory']);
-        }
+        $this->processMarketBoardListings($listingsData);
 
-        return $result;
+        $sales = collect($listingsData)->map(
+            function ($listingData, $itemID) {
+                Log::info("Listing data for item {$itemID}: ".json_encode($listingData));
+                Log::info("Item ID: {$itemID}   ");
+
+                /** @var array $l */
+                $l = $listingData['recentHistory'] ?? [];
+
+                return collect($l)->map(
+                    function ($entry) use ($itemID): Collection {
+                        return collect([
+                            'item_id' => $itemID,
+                            'quantity' => $entry['quantity'],
+                            'price_per_unit' => $entry['pricePerUnit'],
+                            'buyer_name' => $entry['buyerName'],
+                            'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
+                            'hq' => $entry['hq'],
+                        ]);
+                    }
+                );
+            }
+        )->flatten(1);
+
+        Sale::upsert(
+            $sales->toArray(),
+            ['item_id', 'timestamp', 'buyer_name'],
+            ['quantity', 'price_per_unit', 'hq']
+        );
     }
 
     /**
-     * Process the market board listings for a specific item.
+     * Process the market board listings data from Universalis.
      *
-     * @param  int  $itemID  The ID of the item.
-     * @param  array  $listings  The array of market board listings.
-     * @return Collection<int, Listing> The processed market board listings.
+     * @param  array  $listingsData  The listings data.
      */
-    private function processMarketBoardListings(int $itemID, array $listings): Collection
+    private function processMarketBoardListings(array $listingsData): void
     {
-        Item::where('id', $itemID)->first()?->listings()->delete();
+        $listings = collect($listingsData)->map(
+            function ($listingData, $itemID) {
+                Log::info("Listing data for item {$itemID}: ".json_encode($listingData));
+                Log::info("Item ID: {$itemID}   ");
 
-        if (empty($listings)) {
-            return collect([]);
-        }
+                /** @var array $l */
+                $l = $listingData['listings'] ?? [];
 
-        $listings = collect($listings)->map(
-            function ($entry) use ($itemID) {
-                return [
-                    'id' => $entry['listingID'],
-                    'item_id' => $itemID,
-                    'retainer_name' => $entry['retainerName'],
-                    'retainer_city' => $entry['retainerCity'],
-                    'quantity' => $entry['quantity'],
-                    'price_per_unit' => $entry['pricePerUnit'],
-                    'hq' => $entry['hq'],
-                    'total' => $entry['total'],
-                    'tax' => $entry['tax'],
-                    'last_review_time' => Carbon::createFromTimestamp($entry['lastReviewTime']),
-                ];
+                return collect($l)->map(
+                    function ($entry) use ($itemID): Collection {
+                        return collect([
+                            'id' => $entry['listingID'],
+                            'item_id' => $itemID,
+                            'retainer_name' => $entry['retainerName'],
+                            'retainer_city' => $entry['retainerCity'],
+                            'quantity' => $entry['quantity'],
+                            'price_per_unit' => $entry['pricePerUnit'],
+                            'hq' => $entry['hq'],
+                            'total' => $entry['total'],
+                            'tax' => $entry['tax'],
+                            'last_review_time' => Carbon::createFromTimestamp($entry['lastReviewTime']),
+                        ]);
+                    }
+                );
             }
-        );
+        )->flatten(1);
 
-        $count = Listing::upsert(
+        Listing::upsert(
             $listings->toArray(),
             ['id'],
             ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
         );
-
-        return Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->limit($count)->get();
     }
 
     /**
@@ -368,44 +381,29 @@ class FFXIVService
      *
      * @param  string  $server  The server name.
      * @param  int  $itemID  The ID of the item.
-     * @return Collection<int, Sale> The collection of market board sales.
      */
-    public function getMarketBoardSales(string $server, int $itemID): Collection
+    public function refreshMarketBoardSales(string $server, int $itemID): void
     {
         $mbSales = $this->universalisClient->fetchMarketBoardSales($server, $itemID);
 
-        return $this->processMarketBoardSales($itemID, $mbSales);
-    }
-
-    /**
-     * Process the market board sale history for a specific item.
-     *
-     * @param  int  $itemID  The ID of the item.
-     * @param  array  $mbSales  The array of market board sales.
-     * @return Collection<int, Sale> The processed market board sales.
-     */
-    private function processMarketBoardSales(int $itemID, array $mbSales): Collection
-    {
-        $mbSales = collect($mbSales)->map(
-            function ($entry) use ($itemID) {
-                return [
+        $sales = collect($mbSales)->map(
+            function ($entry) use ($itemID): Collection {
+                return collect([
                     'item_id' => $itemID,
                     'quantity' => $entry['quantity'],
                     'price_per_unit' => $entry['pricePerUnit'],
                     'buyer_name' => $entry['buyerName'],
                     'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
                     'hq' => $entry['hq'],
-                ];
+                ]);
             }
         );
 
-        $count = Sale::upsert(
-            $mbSales->toArray(),
+        Sale::upsert(
+            $sales->toArray(),
             ['item_id', 'timestamp', 'buyer_name'],
             ['quantity', 'price_per_unit', 'hq']
         );
-
-        return Sale::where('item_id', $itemID)->latest()->limit($count)->get();
     }
 
     /**

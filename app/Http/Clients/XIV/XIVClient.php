@@ -72,8 +72,7 @@ class XIVClient implements XIVClientInterface
             /** @var array $itemData */
             $itemData = json_decode($response->getBody(), true);
 
-            $xivItem = new XIVItem();
-            $xivItem->hydrate($itemData);
+            $xivItem = XIVItem::hydrate($itemData);
 
             return $xivItem;
         } catch (Exception) {

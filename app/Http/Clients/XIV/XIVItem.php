@@ -12,11 +12,15 @@ class XIVItem
 
     public array $Recipes;
 
-    public function hydrate(array $data): void
+    public static function hydrate(array $data): self
     {
-        $this->ID = $data['ID'];
-        $this->Name = $data['Name'];
-        $this->Icon = $data['Icon'];
-        $this->Recipes = $data['Recipes'] ?? [];
+        $item = new self();
+
+        $item->ID = $data['ID'];
+        $item->Name = $data['Name'];
+        $item->Icon = $data['Icon'];
+        $item->Recipes = $data['Recipes'] ?? [];
+
+        return $item;
     }
 }

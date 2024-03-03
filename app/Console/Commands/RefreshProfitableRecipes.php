@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Item;
+use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
@@ -58,10 +59,11 @@ class RefreshProfitableRecipes extends Command
 
         foreach ($recipes as $recipe) {
             Log::info('Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-            $mbListings = $this->ffxivService->getMarketBoardListings($server, $recipe->itemIDs());
-            $this->ffxivService->updateMarketPrices($recipe, $mbListings);
+            $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
+            $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+            $this->ffxivService->updateMarketPrices($recipe, $listings);
             $this->ffxivService->updateRecipeCosts($recipe);
-            $this->ffxivService->getMarketBoardSales($server, $recipe->item_id);
+            $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
             sleep(1);
         }
     }
