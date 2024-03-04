@@ -226,7 +226,7 @@ class FFXIVService
             $cost = min($cost, $recipe->item->vendor_price);
         }
 
-        Log::debug("Purchase cost for item {$recipe->item->name}: {$cost}");
+        // Log::debug("Purchase cost for item {$recipe->item->name}: {$cost}");
 
         $recipe->purchase_cost = $cost;
     }
@@ -307,8 +307,6 @@ class FFXIVService
 
         $sales = collect($listingsData)->map(
             function ($listingData, $itemID) {
-                Log::info("Listing data for item {$itemID}: ".json_encode($listingData));
-                Log::info("Item ID: {$itemID}   ");
 
                 /** @var array $l */
                 $l = $listingData['recentHistory'] ?? [];
@@ -344,8 +342,6 @@ class FFXIVService
     {
         $listings = collect($listingsData)->map(
             function ($listingData, $itemID) {
-                Log::info("Listing data for item {$itemID}: ".json_encode($listingData));
-                Log::info("Item ID: {$itemID}   ");
 
                 /** @var array $l */
                 $l = $listingData['listings'] ?? [];
