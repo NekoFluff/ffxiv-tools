@@ -243,7 +243,7 @@ class FFXIVService
             return;
         }
 
-        $listings = $listings->sortBy('price_per_unit')->take(10);
+        $listings = $listings->sortBy('price_per_unit')->take(5);
 
         $median_cost = $listings->median('price_per_unit');
 
