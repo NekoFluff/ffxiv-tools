@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RefreshProfitableRecipes extends Command
@@ -23,7 +24,7 @@ class RefreshProfitableRecipes extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes profitable recipes';
+    protected $description = 'Refreshes the market board current listings and sale history for the most profitable recipes';
 
     protected FFXIVService $ffxivService;
 
@@ -57,13 +58,19 @@ class RefreshProfitableRecipes extends Command
             ->orderByRaw('(market_price - optimal_craft_cost) * SUM(sales.quantity) desc')
             ->limit(3000)->get();
 
-        foreach ($recipes as $recipe) {
-            Log::info('Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
+        foreach ($recipes as $index => $recipe) {
+            if ($recipe->updated_at->diffInMinutes() < 60) {
+                continue;
+            }
+
+            Log::info('['.($index + 1).'/'.count($recipes).']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
             $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-            $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-            $this->ffxivService->updateMarketPrices($recipe, $listings);
-            $this->ffxivService->updateRecipeCosts($recipe);
-            $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+            DB::transaction(function () use ($recipe, $server) {
+                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                $this->ffxivService->updateMarketPrices($recipe, $listings);
+                $this->ffxivService->updateRecipeCosts($recipe);
+                $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+            });
             sleep(1);
         }
     }

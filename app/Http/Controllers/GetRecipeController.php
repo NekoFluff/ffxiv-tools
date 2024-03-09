@@ -30,8 +30,8 @@ class GetRecipeController extends Controller
         $item = $recipe->item ?? Item::find($itemID);
         if ($recipe) {
             if ($recalculate || $recipe->updated_at?->diffInMinutes(now()) > 15) {
+                $this->service->refreshMarketboardListings($server, $recipe->itemIDs());
                 DB::transaction(function () use ($recipe, $server) {
-                    $this->service->refreshMarketboardListings($server, $recipe->itemIDs());
                     $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                     $this->service->updateMarketPrices($recipe, $listings);
                     $this->service->updateRecipeCosts($recipe);
@@ -40,8 +40,8 @@ class GetRecipeController extends Controller
             }
         } else {
             if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
+                $this->service->refreshMarketboardListings($server, [$item->id]);
                 DB::transaction(function () use ($item, $server) {
-                    $this->service->refreshMarketboardListings($server, [$item->id]);
                     $listings = Listing::where('item_id', $item->id)->get();
                     if (! $listings->isEmpty()) {
                         $this->service->updateMarketPrice($item, $listings);

@@ -80,8 +80,8 @@ class FFXIVService
         $this->updateVendorPrices($recipe);
 
         $server = 'Goblin';
+        $this->refreshMarketboardListings($server, $recipe->itemIDs());
         DB::transaction(function () use ($recipe, $server) {
-            $this->refreshMarketboardListings($server, $recipe->itemIDs());
             $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
             $this->updateMarketPrices($recipe, $listings);
             $this->updateRecipeCosts($recipe);
@@ -311,25 +311,31 @@ class FFXIVService
                 /** @var array $l */
                 $l = $listingData['recentHistory'] ?? [];
 
-                return collect($l)->map(
-                    function ($entry) use ($itemID): Collection {
-                        return collect([
+                return array_map(
+                    function ($entry) use ($itemID): array {
+                        return [
                             'item_id' => $itemID,
                             'quantity' => $entry['quantity'],
                             'price_per_unit' => $entry['pricePerUnit'],
                             'buyer_name' => $entry['buyerName'],
                             'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
                             'hq' => $entry['hq'],
-                        ]);
-                    }
+                        ];
+                    },
+                    $l
                 );
             }
         )->flatten(1);
 
-        Sale::upsert(
-            $sales->toArray(),
-            ['item_id', 'timestamp', 'buyer_name'],
-            ['quantity', 'price_per_unit', 'hq']
+        // Upsert in chunks of 100
+        $sales->chunk(100)->each(
+            function ($chunk) {
+                Sale::upsert(
+                    $chunk->toArray(),
+                    ['item_id', 'timestamp', 'buyer_name'],
+                    ['quantity', 'price_per_unit', 'hq']
+                );
+            }
         );
     }
 
@@ -346,9 +352,9 @@ class FFXIVService
                 /** @var array $l */
                 $l = $listingData['listings'] ?? [];
 
-                return collect($l)->map(
-                    function ($entry) use ($itemID): Collection {
-                        return collect([
+                return array_map(
+                    function ($entry) use ($itemID): array {
+                        return [
                             'id' => $entry['listingID'],
                             'item_id' => $itemID,
                             'retainer_name' => $entry['retainerName'],
@@ -359,16 +365,22 @@ class FFXIVService
                             'total' => $entry['total'],
                             'tax' => $entry['tax'],
                             'last_review_time' => Carbon::createFromTimestamp($entry['lastReviewTime']),
-                        ]);
-                    }
+                        ];
+                    },
+                    $l
                 );
             }
         )->flatten(1);
 
-        Listing::upsert(
-            $listings->toArray(),
-            ['id'],
-            ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+        // Upsert in chunks of 100
+        $listings->chunk(100)->each(
+            function ($chunk) {
+                Listing::upsert(
+                    $chunk->toArray(),
+                    ['id'],
+                    ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+                );
+            }
         );
     }
 
@@ -383,15 +395,15 @@ class FFXIVService
         $mbSales = $this->universalisClient->fetchMarketBoardSales($server, $itemID);
 
         $sales = collect($mbSales)->map(
-            function ($entry) use ($itemID): Collection {
-                return collect([
+            function ($entry) use ($itemID): array {
+                return [
                     'item_id' => $itemID,
                     'quantity' => $entry['quantity'],
                     'price_per_unit' => $entry['pricePerUnit'],
                     'buyer_name' => $entry['buyerName'],
                     'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
                     'hq' => $entry['hq'],
-                ]);
+                ];
             }
         );
 

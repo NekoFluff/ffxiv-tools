@@ -6,6 +6,7 @@ use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RefreshRecipes extends Command
@@ -15,14 +16,14 @@ class RefreshRecipes extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:refresh';
+    protected $signature = 'recipes:fetch';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refreshes all recipes';
+    protected $description = 'Fetches all recipes from XIVAPI and populates the database with them.';
 
     protected FFXIVService $ffxivService;
 
@@ -62,20 +63,24 @@ class RefreshRecipes extends Command
 
                 if ($recipe === null) {
                     $recipe = $this->ffxivService->getRecipe($recipeObj['ID']);
+                } else {
+                    continue;
                 }
 
                 if ($recipe) {
                     $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                    $this->ffxivService->updateMarketPrices($recipe, $listings);
-                    $this->ffxivService->updateRecipeCosts($recipe);
-                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+                    DB::transaction(function () use ($recipe, $server) {
+                        $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                        $this->ffxivService->updateMarketPrices($recipe, $listings);
+                        $this->ffxivService->updateRecipeCosts($recipe);
+                        $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+                    });
                 } else {
                     Log::error('Failed to retrieve recipe ID '.$recipeObj['ID']);
                 }
 
                 Log::info('Sleeping for 3 seconds');
-                sleep(3);
+                sleep(2);
             }
 
             $page += 1;
