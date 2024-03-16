@@ -23,7 +23,7 @@ class RefreshOldRecipes extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the market board current listings and sale history for recipes that have not been updated in the last week';
+    protected $description = 'Refreshes the market board current listings and sale history for recipes that have not been updated in the last 3 days.';
 
     protected FFXIVService $ffxivService;
 
@@ -52,7 +52,7 @@ class RefreshOldRecipes extends Command
             ->join('items', 'recipes.item_id', '=', 'items.id')
             ->join('sales', 'items.id', '=', 'sales.item_id')
             ->select('recipes.*')
-            ->where('recipes.updated_at', '<', now()->subWeek())
+            ->where('recipes.updated_at', '<', now()->subDays(3))
             ->groupBy('recipes.id')
             ->orderBy('recipes.updated_at', 'asc')
             ->get()
@@ -64,10 +64,10 @@ class RefreshOldRecipes extends Command
                 ->join('items', 'recipes.item_id', '=', 'items.id')
                 ->join('sales', 'items.id', '=', 'sales.item_id')
                 ->select('recipes.*')
-                ->where('recipes.updated_at', '<', now()->subWeek())
+                ->where('recipes.updated_at', '<', now()->subDays(3))
                 ->groupBy('recipes.id')
                 ->orderBy('recipes.updated_at', 'asc')
-                ->limit(1000)
+                ->limit(2000)
                 ->get();
 
             foreach ($recipes as $recipe) {
@@ -80,9 +80,11 @@ class RefreshOldRecipes extends Command
                     $this->ffxivService->updateRecipeCosts($recipe);
                     $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                 });
-                echo '['.$count.'/'.$recipesCount.'] Mem Usage: '.memory_get_usage(true)."\n";
+                echo '['.$count.'/'.$recipesCount.'] Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
                 sleep(1);
             }
+
+            break; // Remove this line to process all recipes
         } while ($recipes->count() > 0);
 
         echo 'Done';

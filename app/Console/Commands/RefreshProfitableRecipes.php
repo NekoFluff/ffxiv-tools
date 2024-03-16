@@ -56,7 +56,7 @@ class RefreshProfitableRecipes extends Command
             ->whereRaw('DATE(sales.timestamp) > (NOW() - INTERVAL 7 DAY)')
             ->groupBy('recipes.id')
             ->orderByRaw('(market_price - optimal_craft_cost) * SUM(sales.quantity) desc')
-            ->limit(3000)->get();
+            ->limit(1000)->get();
 
         foreach ($recipes as $index => $recipe) {
             if ($recipe->updated_at->diffInMinutes() < 60) {
