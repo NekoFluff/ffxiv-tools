@@ -48,13 +48,14 @@ class RecipesDaemon extends Command
         ini_set('memory_limit', '256M');
         $server = 'Goblin';
 
+        /** @phpstan-ignore-next-line */
         while (true) {
             $this->refreshOldRecipes($server);
             sleep(60 * 10);
         }
     }
 
-    private function refreshOldRecipes($server)
+    private function refreshOldRecipes(string $server): void
     {
         $count = 0;
         do {
