@@ -64,8 +64,8 @@ class RecipesDaemon extends Command
 
         /** @var Collection<int, Recipe> $recipes */
         $recipes = Recipe::with('item')
-            ->join('items', 'recipes.item_id', '=', 'items.id')
-            ->join('sales', 'items.id', '=', 'sales.item_id')
+            ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
+            ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
             ->select('recipes.*')
             ->where('recipes.updated_at', '<', now()->subDays(1))
             ->groupBy('recipes.id')
