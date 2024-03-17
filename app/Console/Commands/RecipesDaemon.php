@@ -6,6 +6,7 @@ use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -26,6 +27,8 @@ class RecipesDaemon extends Command
     protected $description = 'Refreshes the market board current listings and sale history for recipes';
 
     protected FFXIVService $ffxivService;
+
+    protected int $totalCount = 0;
 
     /**
      * Create a new command instance.
@@ -58,32 +61,35 @@ class RecipesDaemon extends Command
     private function refreshOldRecipes(string $server): void
     {
         $count = 0;
-        do {
-            $recipes = Recipe::with('item')
-                ->join('items', 'recipes.item_id', '=', 'items.id')
-                ->join('sales', 'items.id', '=', 'sales.item_id')
-                ->select('recipes.*')
-                ->where('recipes.updated_at', '<', now()->subDays(1))
-                ->groupBy('recipes.id')
-                ->orderBy('recipes.updated_at', 'asc')
-                ->limit(100)
-                ->get();
-            $recipesCount = $recipes->count();
 
-            foreach ($recipes as $recipe) {
-                $count += 1;
-                Log::info('['.$count.'/'.$recipesCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-                $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-                DB::transaction(function () use ($recipe, $server) {
-                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                    $this->ffxivService->updateMarketPrices($recipe, $listings);
-                    $this->ffxivService->updateRecipeCosts($recipe);
-                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
-                });
-                echo '['.$count.'/'.$recipesCount.'] Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
-                sleep(2);
-            }
+        /** @var Collection<int, Recipe> $recipes */
+        $recipes = Recipe::with('item')
+            ->join('items', 'recipes.item_id', '=', 'items.id')
+            ->join('sales', 'items.id', '=', 'sales.item_id')
+            ->select('recipes.*')
+            ->where('recipes.updated_at', '<', now()->subDays(1))
+            ->groupBy('recipes.id')
+            ->orderBy('recipes.updated_at', 'asc')
+            ->limit(100)
+            ->get();
+        $recipesCount = $recipes->count();
 
-        } while ($recipes->count() > 0);
+        foreach ($recipes as $recipe) {
+            $count += 1;
+            $this->totalCount += 1;
+            Log::info('['.$count.'/'.$recipesCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
+            $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
+            DB::transaction(function () use ($recipe, $server) {
+                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                $this->ffxivService->updateMarketPrices($recipe, $listings);
+                $this->ffxivService->updateRecipeCosts($recipe);
+                $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+            });
+
+            echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$recipesCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
+            $profit = $recipe->item->market_price - $recipe->optimal_craft_cost;
+            echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->optimal_craft_cost."\n";
+            sleep(2);
+        }
     }
 }
