@@ -48,8 +48,8 @@ class RefreshProfitableRecipes extends Command
         $server = 'Goblin';
 
         $recipes = Recipe::with('item')
-            ->join('items', 'recipes.item_id', '=', 'items.id')
-            ->join('sales', 'items.id', '=', 'sales.item_id')
+            ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
+            ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
             ->select('recipes.*')
             ->where('items.market_price', '>', 'recipes.optimal_craft_cost')
             ->where('items.market_price', '!=', Item::DEFAULT_MARKET_PRICE)
