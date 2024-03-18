@@ -67,7 +67,7 @@ class RecipesDaemon extends Command
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
             ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
             ->select('recipes.*')
-            ->where('recipes.updated_at', '<', now()->subDays(1))
+            ->where('recipes.updated_at', '<', now()->subHours(24))
             ->groupBy('recipes.id')
             ->orderBy('recipes.updated_at', 'asc')
             ->limit(100)
