@@ -54,7 +54,7 @@ class RecipesDaemon extends Command
         /** @phpstan-ignore-next-line */
         while (true) {
             $this->refreshOldRecipes($server);
-            sleep(60 * 10);
+            sleep(60 * 5);
         }
     }
 
