@@ -256,6 +256,7 @@ class FFXIVService
         // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
         // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
         $item->market_price = intval(min($avg_cost, $median_cost)) ?: Item::DEFAULT_MARKET_PRICE;
+        $item->save();
     }
 
     private function updateOptimalCraftCost(Recipe $recipe): void
