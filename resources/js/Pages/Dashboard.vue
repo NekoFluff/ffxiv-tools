@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Item } from '@/Components/Item.vue';
-import { Recipe } from '@/Components/RecipeTree.vue';
 import SearchBar from '@/Components/SearchBar.vue';
 import RecipeTree from '@/Components/RecipeTree.vue';
 import ListingsTable from '@/Components/ListingsTable.vue';
 import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
+import { Listing } from '@/types/listing';
+import { Item } from '@/types/item';
+import { Recipe } from '@/types/recipe';
 
 const props = defineProps<{
     item: Item | undefined
     recipe: Recipe | undefined
     history: Array<{}>
-    listings: Array<{}>
+    listings: Array<Listing>
     lastUpdated: string
 }>();
 

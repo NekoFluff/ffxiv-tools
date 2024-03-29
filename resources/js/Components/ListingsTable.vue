@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-
+import { Listing } from "@/types/listing";
 
 const props = defineProps<{
-    listings: Array<{}>
+    listings: Array<Listing>
 }>();
 
 const first10Listings = ref(props.listings.slice(0, 20))

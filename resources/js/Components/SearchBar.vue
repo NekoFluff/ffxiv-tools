@@ -51,7 +51,7 @@ const showOptions = () => {
 }
 
 const vClickOutside = {
-    beforeMount(el: HTMLElement, binding: any) {
+    beforeMount(el: any, binding: any) {
         el.clickOutsideEvent = function (event: Event) {
             if (!(el == event.target || el.contains(event.target as Node))) {
                 binding.value()
@@ -59,7 +59,7 @@ const vClickOutside = {
         }
         document.body.addEventListener('click', el.clickOutsideEvent)
     },
-    unmounted(el: HTMLElement) {
+    unmounted(el: any) {
         document.body.removeEventListener('click', el.clickOutsideEvent)
     }
 }

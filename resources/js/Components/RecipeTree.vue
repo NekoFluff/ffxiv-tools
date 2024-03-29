@@ -1,20 +1,7 @@
 <script setup lang="ts">
-import type { Ingredient } from "./Ingredient.vue"
 import { defineProps, computed } from 'vue';
-import RecipeName from "./RecipeName.vue";
-import { Item } from "./Item.vue";
-
-export type Recipe = {
-    item: Item,
-    ingredients: Ingredient[],
-    amount_result: number,
-    purchase_cost: number,
-    market_craft_cost: number,
-    optimal_craft_cost: number,
-    class_job: string,
-    class_job_level: number,
-    class_job_icon: string,
-}
+import RecipeName from "@/Components/RecipeName.vue";
+import { Recipe } from "@/types/recipe";
 
 const props = defineProps<{
     recipe: Recipe
@@ -39,7 +26,7 @@ const profitRatio = computed(() => {
 
 const craftOrBuyColors = computed(() => {
     if (props.recipe == null) {
-        return "";
+        return {};
     }
 
     const prices = [

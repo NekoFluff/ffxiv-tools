@@ -32,10 +32,10 @@ const options = {
         },
     },
     responsive: true,
-    interaction: {
-        mode: 'index',
-        intersect: false,
-    },
+    // interaction: {
+    //     mode: 'index',
+    //     intersect: false,
+    // },
     scales: {
         y: {
             min: 0,
