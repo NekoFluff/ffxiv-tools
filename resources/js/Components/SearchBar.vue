@@ -67,12 +67,11 @@ const vClickOutside = {
 </script>
 
 <template>
-    <div v-click-outside="hideOptions" data-cy="searchBar" class="mb-3">
+    <div v-click-outside="hideOptions" data-cy="searchBar">
         <input :value="text"
-            class="w-full p-2 text-black bg-white rounded-md shadow-lg outline-none placeholder-slate-700 shadow-grey-900"
+            class="w-full p-2 text-black bg-white border-gray-300 rounded-md shadow-md outline-none placeholder-slate-700 shadow-grey-900"
             type="text" placeholder="Search..." @input="handleUpdate(($event.target as HTMLInputElement).value)"
             @keydown="handleKeyDown" @focus="showOptions" autocomplete="off" />
-        <SearchResultList v-if="optionsVisible" class="mt-0 " :options="options" />
-
+        <SearchResultList v-if="optionsVisible" class="mt-0" :options="options" />
     </div>
 </template>

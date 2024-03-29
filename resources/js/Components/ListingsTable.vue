@@ -11,7 +11,7 @@ const first10Listings = ref(props.listings.slice(0, 20))
 
 
 <template>
-    <table class="table w-full border border-collapse">
+    <table class="table w-full border border-collapse ">
         <thead>
             <tr>
                 <th class="px-4 py-2 bg-white border-b">Price</th>

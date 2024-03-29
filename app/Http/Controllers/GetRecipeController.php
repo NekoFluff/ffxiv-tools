@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -65,8 +66,10 @@ class GetRecipeController extends Controller
         $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? '';
 
         return inertia(
-            'Recipe',
+            'Dashboard',
             [
+                'canLogin' => Route::has('login'),
+                'canRegister' => Route::has('register'),
                 'recipe' => $recipe,
                 'item' => $recipe?->item ?? $item ?? null,
                 'history' => $aggregatedSales,

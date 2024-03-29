@@ -5,7 +5,6 @@
 /public/storage
 /storage/*.key
 /vendor
-.notes
 .env
 .env.backup
 .env.production
@@ -18,5 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+.notes
 mysql
 postgres

@@ -57,7 +57,7 @@ const craftOrBuyColors = computed(() => {
         }
     ]
 
-    const colors = ["text-green-500", "text-yellow-500", "text-red-500"]
+    const colors = ["text-green-500", "text-orange-400", "text-red-500"]
     prices.sort((a, b) => {
         if (a.value === b.value) {
             return a.name.localeCompare(b.name);
@@ -65,7 +65,7 @@ const craftOrBuyColors = computed(() => {
         return a.value - b.value;
     });
     let index = 0;
-    let mapping = [];
+    let mapping: { [key: string]: string } = {};
     for (const price of prices) {
         mapping[price.name] = colors[index];
         index += 1
@@ -76,10 +76,10 @@ const craftOrBuyColors = computed(() => {
 </script>
 
 <template>
-    <ul v-if="props.recipe != null" class="py-2 border border-gray-300 rounded-lg bg-gray-50">
+    <ul v-if="props.recipe != null" class="py-4 bg-white border shadow-sm sm:rounded-lg">
         <div class="flex items-center px-3 py-1">
             <img :src="base + props.recipe.item.icon" class="w-6 h-6" />&nbsp;
-            <RecipeName :id="props.recipe.item.id" :name="props.recipe.item.name" />
+            <RecipeName :id="props.recipe.item.id" :name="props.recipe.item.name" class="px-1" />
             <span class="text-sm text-gray-500">(x{{ props.recipe.amount_result }})&nbsp;</span>
             <span class="text-sm text-gray-500">{{ props.recipe.class_job }} lvl.{{ props.recipe.class_job_level }}</span>
 
@@ -124,12 +124,12 @@ const craftOrBuyColors = computed(() => {
                 </span>
             </section>
 
-            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
+            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-orange-400': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit: {{ profit }} gil</span>
 
             <span class="font-bold">&nbsp;|&nbsp;</span>
-            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-yellow-500': profit == 0 }"
+            <span :class="{ 'text-green-500': profit > 0, 'text-red-500': profit < 0, 'text-orange-400': profit == 0 }"
                 class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Profit Ratio: {{ profitRatio }}%&nbsp;</span>
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -7,6 +7,7 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
 const showingNavigationDropdown = ref(false);
+
 </script>
 
 <template>
@@ -29,10 +30,14 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
+                                <NavLink :href="route('retainers')" :active="route().current('retainers')">
+                                    Retainers
+                                </NavLink>
                             </div>
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
+
+                        <div v-if="$page.props.auth.user" class="hidden sm:flex sm:items-center sm:ms-6">
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -62,8 +67,18 @@ const showingNavigationDropdown = ref(false);
                             </div>
                         </div>
 
+                        <div v-else class="flex items-center">
+                            <NavLink class="mr-3" :href="route('login')">
+                                Log in
+                            </NavLink>
+
+                            <NavLink :href="route('register')">
+                                Register
+                            </NavLink>
+                        </div>
+
                         <!-- Hamburger -->
-                        <div class="flex items-center -me-2 sm:hidden">
+                        <div v-if="$page.props.auth.user" class="flex items-center -me-2 sm:hidden">
                             <button @click="showingNavigationDropdown = !showingNavigationDropdown"
                                 class="inline-flex items-center justify-center p-2 text-gray-400 transition duration-150 ease-in-out rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
                                 <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -92,7 +107,7 @@ const showingNavigationDropdown = ref(false);
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
+                    <div v-if="$page.props.auth.user" class="pt-4 pb-1 border-t border-gray-200">
                         <div class="px-4">
                             <div class="text-base font-medium text-gray-800">
                                 {{ $page.props.auth.user.name }}
