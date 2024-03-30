@@ -276,6 +276,7 @@ class FFXIVService
                 'price' => 0,
             ]);
             $item->marketPrices()->save($marketPrice);
+            $item->load('marketPrices');
         }
         $marketPrice->updated_at = now();
         $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
