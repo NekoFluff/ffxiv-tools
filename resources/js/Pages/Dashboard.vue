@@ -18,7 +18,7 @@ const props = defineProps<{
     lastUpdated: string
 }>();
 
-const server = ref(route().params.server || 'Goblin');
+const server = ref((route().params.server as string) || 'Goblin');
 provide('server', server)
 
 const totalSold = props.history != null ? props.history.reduce((acc, item: any) => acc + item['quantity'], 0) : 0
