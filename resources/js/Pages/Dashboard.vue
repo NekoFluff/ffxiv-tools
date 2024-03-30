@@ -19,6 +19,9 @@ const props = defineProps<{
 const totalSold = props.history != null ? props.history.reduce((acc, item: any) => acc + item['quantity'], 0) : 0
 const totalListed = props.listings != null ? props.listings.reduce((acc, item: any) => acc + item['quantity'], 0) : 0
 
+console.log(props.item);
+console.log(props.recipe);
+
 </script>
 
 <template>

@@ -71,8 +71,8 @@ class RefreshRecipes extends Command
                     $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
                     DB::transaction(function () use ($recipe, $server) {
                         $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                        $this->ffxivService->updateMarketPrices($recipe, $listings);
-                        $this->ffxivService->updateRecipeCosts($recipe);
+                        $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
+                        $this->ffxivService->updateRecipeCosts($server, $recipe);
                         $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                     });
                 } else {

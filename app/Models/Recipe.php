@@ -6,15 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\Recipe
  *
  * @property int $id
  * @property float $amount_result
- * @property int $purchase_cost
- * @property int $market_craft_cost
- * @property int $optimal_craft_cost
  * @property string $class_job
  * @property int $class_job_level
  * @property string $class_job_icon
@@ -24,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ingredient> $ingredients
  * @property-read int|null $ingredients_count
  * @property-read \App\Models\Item $item
- *
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe query()
@@ -39,7 +36,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereOptimalCraftCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe wherePurchaseCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereUpdatedAt($value)
- *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CraftingCost> $craftingCosts
+ * @property-read int|null $crafting_costs_count
  * @mixin \Eloquent
  */
 class Recipe extends Model
@@ -51,16 +49,12 @@ class Recipe extends Model
         'ingredients',
         'ingredients.item',
         'ingredients.craftingRecipe',
+        'craftingCosts'
     ];
 
     protected $fillable = [
         'id',
         'amount_result',
-        'purchase_cost',
-        'market_craft_cost',
-        'optimal_craft_cost',
-        'market_price',
-        'vendor_price',
         'class_job',
         'class_job_level',
         'class_job_icon',
@@ -69,9 +63,6 @@ class Recipe extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'purchase_cost' => 'integer',
-        'market_craft_cost' => 'integer',
-        'optimal_craft_cost' => 'integer',
         'item_id' => 'integer',
     ];
 
@@ -87,18 +78,24 @@ class Recipe extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function alignAmounts(float $target_amount): void
+    public function alignAmounts(string $server, float $target_amount): void
     {
         $ratio = $target_amount / $this->amount_result;
         $this->amount_result = $target_amount;
 
-        $this->purchase_cost = intval($this->purchase_cost * $target_amount);
-        $this->market_craft_cost = intval($this->market_craft_cost * $ratio);
-        $this->optimal_craft_cost = intval($this->optimal_craft_cost * $ratio);
+        /** @var CraftingCost */
+        $craftingCost = $this->craftingCost($server);
+
+        $this->purchase_cost = intval($craftingCost->purchase_cost * $target_amount);
+        $this->market_craft_cost = intval($craftingCost->market_craft_cost * $ratio);
+        $this->optimal_craft_cost = intval($craftingCost->optimal_craft_cost * $ratio);
+        $this->item->market_price = $this->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
         foreach ($this->ingredients as $ingredient) {
             $ingredient->amount = $ratio * $ingredient->amount;
             if ($ingredient->craftingRecipe !== null) {
-                $ingredient->craftingRecipe->alignAmounts($ingredient->amount);
+                $ingredient->craftingRecipe->alignAmounts($server, $ingredient->amount);
+            } else {
+                $ingredient->item->market_price = $ingredient->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
             }
         }
     }
@@ -115,5 +112,16 @@ class Recipe extends Model
         }
 
         return $ids;
+    }
+
+    public function craftingCosts(): HasMany
+    {
+        return $this->hasMany(CraftingCost::class);
+    }
+
+    public function craftingCost(string $server): ?CraftingCost
+    {
+        return $this->craftingCosts->first(fn (CraftingCost $craftingCost) => $craftingCost->server === $server);
+        // return $this->hasOne(CraftingCost::class)->where('server', $server);
     }
 }

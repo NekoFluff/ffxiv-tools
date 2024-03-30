@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\MarketPrice;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
@@ -50,9 +51,10 @@ class RefreshProfitableRecipes extends Command
         $recipes = Recipe::with('item')
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
             ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
+            ->leftJoin('market_prices', 'items.id', '=', 'market_prices.item_id')
             ->select('recipes.*')
-            ->where('items.market_price', '>', 'recipes.optimal_craft_cost')
-            ->where('items.market_price', '!=', Item::DEFAULT_MARKET_PRICE)
+            ->where('market_prices.price', '>', 'recipes.optimal_craft_cost')
+            ->where('market_prices.price', '!=', MarketPrice::DEFAULT_MARKET_PRICE)
             ->whereRaw('DATE(sales.timestamp) > (NOW() - INTERVAL 7 DAY)')
             ->groupBy('recipes.id')
             ->orderByRaw('(market_price - optimal_craft_cost) * SUM(sales.quantity) desc')
@@ -67,8 +69,8 @@ class RefreshProfitableRecipes extends Command
             $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
             DB::transaction(function () use ($recipe, $server) {
                 $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                $this->ffxivService->updateMarketPrices($recipe, $listings);
-                $this->ffxivService->updateRecipeCosts($recipe);
+                $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
+                $this->ffxivService->updateRecipeCosts($server, $recipe);
                 $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
             });
             sleep(1);

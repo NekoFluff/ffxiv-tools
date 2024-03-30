@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Http\Clients\Universalis\UniversalisClientInterface;
 use App\Http\Clients\XIV\XIVClientInterface;
+use App\Models\CraftingCost;
 use App\Models\Ingredient;
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\MarketPrice;
 use App\Models\Recipe;
 use App\Models\Sale;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -29,7 +31,7 @@ class FFXIVService
 
     public function getRecipeByItemID(int $itemID): ?Recipe
     {
-        $recipe = Recipe::with('ingredients')->where('item_id', $itemID)->first();
+        $recipe = Recipe::with('ingredients', 'craftingCosts')->where('item_id', $itemID)->first();
         if ($recipe) {
             return $recipe;
         }
@@ -83,8 +85,8 @@ class FFXIVService
         $this->refreshMarketboardListings($server, $recipe->itemIDs());
         DB::transaction(function () use ($recipe, $server) {
             $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-            $this->updateMarketPrices($recipe, $listings);
-            $this->updateRecipeCosts($recipe);
+            $this->updateMarketPrices($server, $recipe, $listings);
+            $this->updateRecipeCosts($server, $recipe);
             $this->refreshMarketBoardSales($server, $recipe->item_id);
         });
 
@@ -104,9 +106,6 @@ class FFXIVService
             'id' => $json['ID'],
         ], [
             'amount_result' => $json['AmountResult'],
-            'purchase_cost' => 0,
-            'market_craft_cost' => 0,
-            'optimal_craft_cost' => 0,
             'class_job' => $json['ClassJob']['NameEnglish'],
             'class_job_level' => $json['RecipeLevelTable']['ClassJobLevel'],
             'class_job_icon' => $json['ClassJob']['Icon'],
@@ -176,21 +175,21 @@ class FFXIVService
      * @param  Recipe  $recipe  The recipe to update.
      * @param  Collection<int, EloquentCollection<int|string, Listing>>  $mbListings  The market board listings.
      */
-    public function updateMarketPrices(Recipe $recipe, Collection $mbListings): void
+    public function updateMarketPrices(string $server, Recipe $recipe, Collection $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
         if (! $listings->isEmpty()) {
-            $this->updateMarketPrice($recipe->item, $listings);
+            $this->updateMarketPrice($server, $recipe->item, $listings);
         }
 
         foreach ($recipe->ingredients as $ingredient) {
             $listings = $mbListings[$ingredient->item_id] ?? collect([]);
             if (! $listings->isEmpty()) {
-                $this->updateMarketPrice($ingredient->item, $listings);
+                $this->updateMarketPrice($server, $ingredient->item, $listings);
             }
 
             if ($ingredient->craftingRecipe !== null) {
-                $this->updateMarketPrices($ingredient->craftingRecipe, $mbListings);
+                $this->updateMarketPrices($server, $ingredient->craftingRecipe, $mbListings);
             }
         }
     }
@@ -198,46 +197,59 @@ class FFXIVService
     /**
      * Update the costs of a recipe
      *
-     * @param  Recipe  $recipe  The recipe to update.
+     * @param  Recipe  $recipe  The recipe to update
+     * @param  string  $server  The server name
      */
-    public function updateRecipeCosts(Recipe $recipe): void
+    public function updateRecipeCosts(string $server, Recipe $recipe): void
     {
         foreach ($recipe->ingredients as $ingredient) {
             if ($ingredient->craftingRecipe !== null) {
-                $this->updateRecipeCosts($ingredient->craftingRecipe);
+                $this->updateRecipeCosts($server, $ingredient->craftingRecipe);
             }
         }
 
-        $this->updatePurchaseCost($recipe);
-        $this->updateMarketCraftCost($recipe);
-        $this->updateOptimalCraftCost($recipe);
+        $craftingCost = $recipe->craftingCost($server);
+        if ($craftingCost === null) {
+            $craftingCost = new CraftingCost([
+                'data_center' => self::dataCenterForServer($server),
+                'server' => $server,
+            ]);
+            $recipe->craftingCosts()->save($craftingCost);
+            $recipe->load('craftingCosts');
+        }
+
+        $this->updatePurchaseCost($server, $recipe);
+        $this->updateMarketCraftCost($server, $recipe);
+        $this->updateOptimalCraftCost($server, $recipe);
         $recipe->save();
     }
 
     /**
      * Updates the purchase cost of a recipe.
      *
-     * @param  Recipe  $recipe  The recipe to update the purchase cost for.
+     * @param  string  $server  The server name
+     * @param  Recipe  $recipe  The recipe to update the purchase cost for
      */
-    private function updatePurchaseCost(Recipe $recipe): void
+    private function updatePurchaseCost(string $server, Recipe $recipe): void
     {
-        $cost = $recipe->item->market_price;
+        $cost = $recipe->item->marketPrice($server)?->price;
         if ($recipe->item->vendor_price != 0) {
             $cost = min($cost, $recipe->item->vendor_price);
         }
 
         // Log::debug("Purchase cost for item {$recipe->item->name}: {$cost}");
-
-        $recipe->purchase_cost = $cost;
+        $craftingCost = $recipe->craftingCost($server);
+        $craftingCost->purchase_cost = $cost ?: MarketPrice::DEFAULT_MARKET_PRICE;
     }
 
     /**
      * Updates the market price of an item.
      *
-     * @param  Item  $item  The item to update the market price for.
-     * @param  Collection<int, Listing>  $listings  The market board listings.
+     * @param  string $server The server name
+     * @param  Item  $item  The item to update the market price for
+     * @param  Collection<int, Listing>  $listings  The market board listings
      */
-    public function updateMarketPrice(Item $item, Collection $listings): void
+    public function updateMarketPrice(string $server, Item $item, Collection $listings): void
     {
         if ($listings->isEmpty()) {
             return;
@@ -255,48 +267,95 @@ class FFXIVService
 
         // logger("Listings for item {$listings[0]->item->id}: " . json_encode($listings->toArray()));
         // logger("Market cost for item {$listings[0]->item->id}: avg={$avg_cost}, median={$median_cost}");
-        $item->market_price = intval(min($avg_cost, $median_cost)) ?: Item::DEFAULT_MARKET_PRICE;
-        $item->save();
+        $marketPrice = $item->marketPrice($server);
+        if ($marketPrice === null) {
+            $marketPrice = new MarketPrice([
+                'data_center' => self::dataCenterForServer($server),
+                'server' => $server,
+                'item_id' => $item->id,
+                'price' => 0,
+            ]);
+            $item->marketPrices()->save($marketPrice);
+        }
+        $marketPrice->updated_at = now();
+        $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
     }
 
-    private function updateOptimalCraftCost(Recipe $recipe): void
+    public static function dataCenterForServer(string $server): string
+    {
+        if (in_array($server, ['Adamantoise', 'Cactuar', 'Faerie', 'Gilgamesh', 'Jenova', 'Midgardsormr', 'Sargatanas', 'Siren'])) {
+            return 'Aether';
+        } elseif (in_array($server, ['Behemoth', 'Excalibur', 'Exodus', 'Famfrit', 'Hyperion', 'Lamia', 'Leviathan', 'Ultros'])) {
+            return 'Primal';
+        } elseif (in_array($server, ['Balmung', 'Brynhildr', 'Coeurl', 'Diabolos', 'Goblin', 'Malboro', 'Mateus', 'Zalera'])) {
+            return 'Crystal';
+        } elseif (in_array($server, ['Cerberus', 'Lich', 'Louisoix', 'Moogle', 'Odin', 'Omega', 'Phoenix', 'Ragnarok', 'Shiva', 'Twintania', 'Zodiark'])) {
+            return 'Chaos';
+        } elseif (in_array($server, ['Aegis', 'Atomos', 'Carbuncle', 'Garuda', 'Gungnir', 'Kujata', 'Ramuh', 'Tonberry', 'Typhon', 'Unicorn'])) {
+            return 'Elemental';
+        } elseif (in_array($server, ['Alexander', 'Bahamut', 'Durandal', 'Fenrir', 'Ifrit', 'Ridill', 'Tiamat', 'Ultima', 'Valefor', 'Yojimbo', 'Zeromus'])) {
+            return 'Gaia';
+        } elseif (in_array($server, ['Anima', 'Asura', 'Belias', 'Chocobo', 'Hades', 'Ixion', 'Mandragora', 'Masamune', 'Pandaemonium', 'Shinryu', 'Titan'])) {
+            return 'Mana';
+        } elseif (in_array($server, ['Aurora', 'Elemental', 'Gaia', 'Mana'])) {
+            return 'EU';
+        } elseif (in_array($server, ['Crystal', 'Primal', 'Aether'])) {
+            return 'NA';
+        } else {
+            return 'Unknown';
+        }
+    }
+
+    public static function validServers(): array
+    {
+        return [
+            'Adamantoise', 'Aegis', 'Alexander', 'Anima', 'Asura', 'Atomos', 'Bahamut', 'Balmung', 'Behemoth', 'Belias', 'Brynhildr', 'Cactuar', 'Carbuncle', 'Cerberus', 'Chocobo', 'Coeurl', 'Diabolos', 'Durandal', 'Excalibur', 'Exodus', 'Famfrit', 'Fenrir', 'Garuda', 'Gilgamesh', 'Goblin', 'Gungnir', 'Hades', 'Hyperion', 'Ifrit', 'Ixion', 'Jenova', 'Kujata', 'Lamia', 'Leviathan', 'Lich', 'Louisoix', 'Malboro', 'Mandragora', 'Masamune', 'Mateus', 'Midgardsormr', 'Moogle', 'Odin', 'Omega', 'Pandaemonium', 'Phoenix', 'Ragnarok', 'Ramuh', 'Ridill', 'Sargatanas', 'Shinryu', 'Shiva', 'Siren', 'Tiamat', 'Titan', 'Tonberry', 'Typhon', 'Ultima', 'Ultros', 'Unicorn', 'Valefor', 'Yojimbo', 'Zalera', 'Zeromus', 'Zodiark',
+        ];
+    }
+
+    private function updateOptimalCraftCost(string $server, Recipe $recipe): void
     {
         $cost = 0;
 
         foreach ($recipe->ingredients as $ingredient) {
-            $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
-            if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = $ingredient->craftingRecipe->optimal_craft_cost / $ingredient->craftingRecipe->amount_result;
+            $ingredientCraftingCost = $ingredient->craftingRecipe?->craftingCost($server);
+            $ingredientMarketPrice = $ingredient->item->marketPrice($server)?->price;
+            $minIngredientCost = $ingredientMarketPrice ?: MarketPrice::DEFAULT_MARKET_PRICE;
+            if (! $ingredientMarketPrice && $ingredientCraftingCost !== null) {
+                $minIngredientCost = $ingredientCraftingCost->optimal_craft_cost / $ingredient->craftingRecipe->amount_result;
             }
-            if ($ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->craftingRecipe->optimal_craft_cost / $ingredient->craftingRecipe->amount_result);
+            if ($ingredient->craftingRecipe !== null && $ingredientCraftingCost !== null) {
+                $minIngredientCost = min($minIngredientCost, $ingredientCraftingCost->optimal_craft_cost / $ingredient->craftingRecipe->amount_result);
             }
             if ($ingredient->item->vendor_price != 0) {
-                $min_ingredient_cost = min($min_ingredient_cost, $ingredient->item->vendor_price);
+                $minIngredientCost = min($minIngredientCost, $ingredient->item->vendor_price);
             }
 
-            $cost += $min_ingredient_cost * $ingredient->amount;
+            $cost += $minIngredientCost * $ingredient->amount;
         }
 
-        $recipe->optimal_craft_cost = intval($cost);
+        $craftingCost = $recipe->craftingCost($server);
+        $craftingCost->optimal_craft_cost = intval($cost);
     }
 
-    private function updateMarketCraftCost(Recipe $recipe): void
+    private function updateMarketCraftCost(string $server, Recipe $recipe): void
     {
         $cost = 0;
 
         foreach ($recipe->ingredients as $ingredient) {
-            $min_ingredient_cost = $ingredient->item->market_price ?: Item::DEFAULT_MARKET_PRICE;
+            $minIngredientCost = $ingredient->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
 
             // If the market price is not available, use the crafting cost
-            if (! $ingredient->item->market_price && $ingredient->craftingRecipe !== null) {
-                $min_ingredient_cost = $ingredient->craftingRecipe->market_craft_cost / $ingredient->craftingRecipe->amount_result;
+            if (! $ingredient->item->marketPrice($server)?->price && $ingredient->craftingRecipe !== null) {
+                $ingredientMarketCraftCost = $ingredient->craftingRecipe->craftingCost($server)?->market_craft_cost;
+                $minIngredientCost = $ingredientMarketCraftCost / $ingredient->craftingRecipe->amount_result;
             }
 
-            $cost += $min_ingredient_cost * $ingredient->amount;
+            $cost += $minIngredientCost * $ingredient->amount;
         }
 
-        $recipe->market_craft_cost = intval($cost);
+        $craftingCost = $recipe->craftingCost($server);
+        $craftingCost->market_craft_cost = intval($cost);
     }
 
     public function refreshMarketboardListings(string $server, array $itemIDs): void
@@ -304,18 +363,21 @@ class FFXIVService
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
         Listing::whereIn('item_id', $itemIDs)->delete();
 
-        $this->processMarketBoardListings($listingsData);
+        $this->processMarketBoardListings($server, $listingsData);
 
+        $dataCenter = self::dataCenterForServer($server);
         $sales = collect($listingsData)->map(
-            function ($listingData, $itemID) {
+            function ($listingData, $itemID) use ($dataCenter, $server) {
 
                 /** @var array $l */
                 $l = $listingData['recentHistory'] ?? [];
 
                 return array_map(
-                    function ($entry) use ($itemID): array {
+                    function ($entry) use ($dataCenter, $server, $itemID): array {
                         return [
                             'item_id' => $itemID,
+                            'data_center' => $dataCenter,
+                            'server' => $server,
                             'quantity' => $entry['quantity'],
                             'price_per_unit' => $entry['pricePerUnit'],
                             'buyer_name' => $entry['buyerName'],
@@ -343,21 +405,25 @@ class FFXIVService
     /**
      * Process the market board listings data from Universalis.
      *
+     * @param  string $server The server name.
      * @param  array  $listingsData  The listings data.
      */
-    private function processMarketBoardListings(array $listingsData): void
+    private function processMarketBoardListings(string $server, array $listingsData): void
     {
+        $dataCenter = self::dataCenterForServer($server);
         $listings = collect($listingsData)->map(
-            function ($listingData, $itemID) {
+            function ($listingData, $itemID) use ($dataCenter, $server): array {
 
                 /** @var array $l */
                 $l = $listingData['listings'] ?? [];
 
                 return array_map(
-                    function ($entry) use ($itemID): array {
+                    function ($entry) use ($dataCenter, $server, $itemID): array {
                         return [
                             'id' => $entry['listingID'],
                             'item_id' => $itemID,
+                            'data_center' => $dataCenter,
+                            'server' => $server,
                             'retainer_name' => $entry['retainerName'],
                             'retainer_city' => $entry['retainerCity'],
                             'quantity' => $entry['quantity'],
@@ -395,9 +461,12 @@ class FFXIVService
     {
         $mbSales = $this->universalisClient->fetchMarketBoardSales($server, $itemID);
 
+        $dataCenter = self::dataCenterForServer($server);
         $sales = collect($mbSales)->map(
-            function ($entry) use ($itemID): array {
+            function ($entry) use ($dataCenter, $server, $itemID): array {
                 return [
+                    'data_center' => $dataCenter,
+                    'server' => $server,
                     'item_id' => $itemID,
                     'quantity' => $entry['quantity'],
                     'price_per_unit' => $entry['pricePerUnit'],

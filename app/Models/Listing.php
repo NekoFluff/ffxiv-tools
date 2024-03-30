@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
- *
  * @method static \Database\Factories\ListingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Listing newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Listing newQuery()
@@ -39,7 +39,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereUpdatedAt($value)
- *
+ * @property string $data_center
+ * @property string $server
+ * @method static Builder|Listing fromServer(string $server)
+ * @method static Builder|Listing whereDataCenter($value)
+ * @method static Builder|Listing whereServer($value)
  * @mixin \Eloquent
  */
 class Listing extends Model
@@ -68,6 +72,17 @@ class Listing extends Model
         'tax' => 'integer',
         'last_review_time' => 'datetime',
     ];
+
+    /**
+     * Scope a query to only include sales from a specific server.
+     *
+     * @param Builder $query
+     * @param string $server
+     */
+    public function scopeFromServer(Builder $query, string $server): void
+    {
+        $query->where('server', $server);
+    }
 
     /** @return BelongsTo<Item, Listing> */
     public function item(): BelongsTo

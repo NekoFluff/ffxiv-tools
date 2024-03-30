@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\MarketPrice;
 use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
@@ -23,29 +24,37 @@ class GetRecipeController extends Controller
 
     public function __invoke(int $itemID): Response|ResponseFactory
     {
+
+        $server = request()->query('server', 'Goblin');
+        if (!in_array($server, FFXIVService::validServers())) {
+            abort(400, 'Invalid server');
+        }
+
         $recalculate = boolval(request()->query('recalculate', '0'));
-        $server = 'Goblin';
         $itemID = intval($itemID);
 
         $recipe = $this->service->getRecipeByItemID($itemID);
         $item = $recipe->item ?? Item::find($itemID);
         if ($recipe) {
-            if ($recalculate || $recipe->updated_at?->diffInMinutes(now()) > 15) {
+            $marketPrice =  $recipe->item->marketPrice($server);
+
+            if ($recalculate || $marketPrice === null || $marketPrice->updated_at?->diffInMinutes(now()) > 15) {
                 $this->service->refreshMarketboardListings($server, $recipe->itemIDs());
                 DB::transaction(function () use ($recipe, $server) {
                     $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                    $this->service->updateMarketPrices($recipe, $listings);
-                    $this->service->updateRecipeCosts($recipe);
+                    $this->service->updateMarketPrices($server, $recipe, $listings);
+                    $this->service->updateRecipeCosts($server, $recipe);
                     $this->service->refreshMarketBoardSales($server, $recipe->item_id);
                 });
             }
         } else {
-            if ($item && $item->updated_at?->diffInMinutes(now()) > 15) {
+            $marketPrice = $item->marketPrice($server);
+            if ($item && $marketPrice === null || $marketPrice->updated_at?->diffInMinutes(now()) > 15) {
                 $this->service->refreshMarketboardListings($server, [$item->id]);
                 DB::transaction(function () use ($item, $server) {
                     $listings = Listing::where('item_id', $item->id)->get();
                     if (! $listings->isEmpty()) {
-                        $this->service->updateMarketPrice($item, $listings);
+                        $this->service->updateMarketPrice($server, $item, $listings);
                     }
                     $this->service->refreshMarketBoardSales($server, $item->id);
                 });
@@ -53,17 +62,20 @@ class GetRecipeController extends Controller
         }
 
         // Sales
-        $sales = Sale::where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+        $sales = Sale::fromServer($server)->where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         $aggregatedSales = $this->service->aggregateSales($sales);
 
         // Listings
-        $listings = Listing::where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
+        $listings = Listing::fromServer($server)->where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
 
         if ($recipe) {
-            $recipe->alignAmounts(1);
+            $recipe->alignAmounts($server, 1);
         }
 
-        $lastUpdated = $recipe?->updated_at?->diffForHumans() ?? $item?->updated_at?->diffForHumans() ?? '';
+        $item = $recipe?->item ?? $item;
+
+        $item?->fresh();
+        $lastUpdated = $item?->marketPrice($server)?->updated_at?->diffForHumans() ?? '';
 
         return inertia(
             'Dashboard',
@@ -71,7 +83,7 @@ class GetRecipeController extends Controller
                 'canLogin' => Route::has('login'),
                 'canRegister' => Route::has('register'),
                 'recipe' => $recipe,
-                'item' => $recipe?->item ?? $item ?? null,
+                'item' => $item,
                 'history' => $aggregatedSales,
                 'listings' => $listings,
                 'lastUpdated' => $lastUpdated,

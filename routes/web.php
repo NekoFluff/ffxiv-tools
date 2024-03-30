@@ -24,7 +24,7 @@ Route::get('/', function () {
     ]);
 })->middleware([])->name('dashboard');
 
-Route::get('/items/{itemID}', GetRecipeController::class)->where('itemID', '.*')->name('recipe.get');
+Route::get('/items/{itemID}', GetRecipeController::class)->where('itemID', '\d*')->name('recipe.get');
 
 Route::get('/retainers', function () {
     return Inertia::render('Retainers', []);

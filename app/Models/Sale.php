@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
- *
  * @method static \Illuminate\Database\Eloquent\Builder|Sale newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sale newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sale query()
@@ -32,7 +32,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereUpdatedAt($value)
- *
+ * @property string $data_center
+ * @property string $server
+ * @method static Builder|Sale fromServer(string $server)
+ * @method static Builder|Sale whereDataCenter($value)
+ * @method static Builder|Sale whereServer($value)
  * @mixin \Eloquent
  */
 class Sale extends Model
@@ -54,6 +58,17 @@ class Sale extends Model
         'quantity' => 'integer',
         'hq' => 'boolean',
     ];
+
+    /**
+     * Scope a query to only include sales from a specific server.
+     *
+     * @param Builder $query
+     * @param string $server
+     */
+    public function scopeFromServer(Builder $query, string $server): void
+    {
+        $query->where('server', $server);
+    }
 
     /** @return BelongsTo<Item, Sale> */
     public function item(): BelongsTo

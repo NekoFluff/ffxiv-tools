@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $id
  * @property string $name
  * @property string $icon
- * @property int $market_price
  * @property int $vendor_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -24,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\Recipe|null $recipe
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sale> $sales
  * @property-read int|null $sales_count
- *
  * @method static \Database\Factories\ItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Item newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Item newQuery()
@@ -36,31 +34,27 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereVendorPrice($value)
- *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MarketPrice> $marketPrices
+ * @property-read int|null $market_prices_count
  * @mixin \Eloquent
  */
 class Item extends Model
 {
     use HasFactory;
 
-    public const DEFAULT_MARKET_PRICE = 10000000;
-
     protected $fillable = [
         'id',
         'name',
         'icon',
-        'market_price',
         'vendor_price',
     ];
 
     protected $attributes = [
-        'market_price' => self::DEFAULT_MARKET_PRICE,
         'vendor_price' => 0,
     ];
 
     protected $casts = [
         'id' => 'integer',
-        'market_price' => 'integer',
         'vendor_price' => 'integer',
     ];
 
@@ -86,5 +80,18 @@ class Item extends Model
     public function recipe(): HasOne
     {
         return $this->hasOne(Recipe::class);
+    }
+
+    /** @return HasMany<MarketPrice> */
+    public function marketPrices(): HasMany
+    {
+        return $this->hasMany(MarketPrice::class);
+    }
+
+
+    /** @return ?MarketPrice */
+    public function marketPrice(string $server): ?MarketPrice
+    {
+        return $this->marketPrices->filter(fn (MarketPrice $marketPrice) => $marketPrice->server === $server)->first();
     }
 }
