@@ -1,6 +1,24 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
+import axios from 'axios';
+import { onMounted } from 'vue';
+
+const getRetainers = async () => {
+    try {
+        const response = await axios.get('/api/retainers');
+        console.log("RETAINERS RESPONSE", response.data)
+        // Process the response data here
+    } catch (error) {
+        console.log("ERROR", error)
+        // Handle the error here
+    }
+};
+
+onMounted(() => {
+    getRetainers();
+});
+
 </script>
 
 <template>

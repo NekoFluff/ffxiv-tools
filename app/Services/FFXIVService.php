@@ -280,6 +280,7 @@ class FFXIVService
         }
         $marketPrice->updated_at = now();
         $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
+        $marketPrice->save();
     }
 
     public static function dataCenterForServer(string $server): string
@@ -357,6 +358,11 @@ class FFXIVService
 
         $craftingCost = $recipe->craftingCost($server);
         $craftingCost->market_craft_cost = intval($cost);
+    }
+
+    public function fetchMarketboardListings(string $server, array $itemIDs): array
+    {
+        return $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
     }
 
     public function refreshMarketboardListings(string $server, array $itemIDs): void

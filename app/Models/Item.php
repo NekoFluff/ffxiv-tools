@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -36,6 +37,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereVendorPrice($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MarketPrice> $marketPrices
  * @property-read int|null $market_prices_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Retainer> $retainers
+ * @property-read int|null $retainers_count
  * @mixin \Eloquent
  */
 class Item extends Model
@@ -88,10 +91,15 @@ class Item extends Model
         return $this->hasMany(MarketPrice::class);
     }
 
-
     /** @return ?MarketPrice */
     public function marketPrice(string $server): ?MarketPrice
     {
         return $this->marketPrices->filter(fn (MarketPrice $marketPrice) => $marketPrice->server === $server)->first();
+    }
+
+    /** @return BelongsToMany<Retainer> */
+    public function retainers(): BelongsToMany
+    {
+        return $this->belongsToMany(Retainer::class)->withTimestamps();
     }
 }
