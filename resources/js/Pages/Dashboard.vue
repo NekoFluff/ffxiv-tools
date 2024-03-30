@@ -7,6 +7,8 @@ import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
 import { Listing } from '@/types/listing';
 import { Item } from '@/types/item';
 import { Recipe } from '@/types/recipe';
+import ServerDropdown from '@/Components/ServerDropdown.vue';
+import { ref, provide } from 'vue';
 
 const props = defineProps<{
     item: Item | undefined
@@ -16,11 +18,11 @@ const props = defineProps<{
     lastUpdated: string
 }>();
 
+const server = ref(route().params.server || 'Goblin');
+provide('server', server)
+
 const totalSold = props.history != null ? props.history.reduce((acc, item: any) => acc + item['quantity'], 0) : 0
 const totalListed = props.listings != null ? props.listings.reduce((acc, item: any) => acc + item['quantity'], 0) : 0
-
-console.log(props.item);
-console.log(props.recipe);
 
 </script>
 
@@ -33,11 +35,11 @@ console.log(props.recipe);
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="mr-10 text-xl font-semibold leading-tight text-gray-800">{{ item?.name || 'Item Search' }}</h2>
-                <SearchBar class="flex-grow" />
+                <SearchBar class="flex-grow mr-6" />
+                <ServerDropdown :server="server"
+                    @select="(_server) => { server = _server; $inertia.visit(route('recipe.get', { itemID: item?.id, server: _server })) }" />
             </div>
         </template>
-
-
 
         <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -45,11 +47,11 @@ console.log(props.recipe);
                     <div class="p-6 text-gray-900">You're logged in!</div>
                 </div> -->
 
-
                 <div v-if="lastUpdated" class="flex justify-end text-sm">
                     <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
                     (
-                    <Link class="text-sm" :href="route('recipe.get', { id: item?.id })" :data="{ recalculate: 1 }">
+                    <Link class="text-sm" :href="route('recipe.get', { itemID: item?.id, server: server })"
+                        :data="{ recalculate: 1 }">
                     Refresh
                     </Link>
                     )
