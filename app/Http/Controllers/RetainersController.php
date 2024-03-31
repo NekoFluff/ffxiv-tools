@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyRetainerRequest;
+use App\Http\Requests\StoreRetainerRequest;
+use App\Models\Listing;
 use App\Models\Retainer;
 use App\Services\FFXIVService;
 use Illuminate\Http\JsonResponse;
@@ -32,46 +35,63 @@ class RetainersController extends Controller
 
         $listings = [];
         foreach ($itemIDsByServer as $server => $ids) {
-            //TODO: Look at the GetRecipeController... Need to also conditionally refresh marketboard listings every X minutes
-            $listings[$server] = $this->service->fetchMarketboardListings($server, $ids);
-
+            //TODO: Conditionally refresh marketboard listings
+            $this->service->refreshMarketboardListings($server, $ids);
         }
 
-        // $listings = Listing::fromServer($server)->where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->get();
-
+        $listings = Listing::whereIn('item_id', collect($itemIDsByServer)->flatten())->get()->groupBy('server')->map(function ($listings) {
+            return $listings->groupBy('item_id')->map(function ($listings) {
+                return $listings->sortBy('price_per_unit')->values()->toArray();
+            });
+        });
 
         $resp = [];
         foreach ($retainers as $retainer) {
             $retainerResp = [
+                'retainer_id' => $retainer->id,
                 'retainer_name' => $retainer->name,
                 'server' => $retainer->server,
                 'items' => [],
             ];
             foreach ($retainer->items as $item) {
+                $retainerListings = array_values(array_filter($listings[$retainer->server][$item->id] ?? [], function ($listing) use ($retainer) {
+                    return $listing['retainer_name'] === $retainer->name;
+                }));
                 $retainerResp['items'][] = [
                     'item_id' => $item->id,
                     'item_name' => $item->name,
-                    'listings' => array_filter($listings[$retainer->server][$item->id]['listings'] ?? [], function ($listing) use ($retainer) {
-                        return $listing['retainerName'] === $retainer->name;
-                    }),
-                    'cheapest_listing' => $listings[$retainer->server][$item->id]['listings'][0] ?? null,
+                    'retainer_listing_price' => $retainerListings ? $retainerListings[0]['price_per_unit'] : null,
+                    'num_retainer_listings' => $retainerListings ? count($retainerListings) : 0,
+                    'lowest_listing_price' => $listings[$retainer->server][$item->id][0]['price_per_unit'] ?? null,
                 ];
             }
             $resp[] = $retainerResp;
         }
 
-        return response()->json([
-            'retainers' => $resp,
-            'listings' => $listings,
-        ]);
+        return response()->json($resp);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRetainerRequest $request)
     {
-        //
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var Retainer $retainer */
+        $retainer = $user->retainers()->create([
+            'name' => $request->input('name'),
+            'data_center' => FFXIVService::dataCenterForServer($request->input('server')),
+            'server' => $request->input('server'),
+        ]);
+
+        return response()->json([
+            'retainer_id' => $retainer->id,
+            'retainer_name' => $retainer->name,
+            'server' => $retainer->server,
+            'items' => [],
+        ]);
     }
 
     /**
@@ -79,7 +99,7 @@ class RetainersController extends Controller
      */
     public function show(Retainer $retainer)
     {
-        //
+
     }
 
     /**
@@ -87,14 +107,17 @@ class RetainersController extends Controller
      */
     public function update(Request $request, Retainer $retainer)
     {
-        //
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Retainer $retainer)
+    public function destroy(DestroyRetainerRequest $request)
     {
-        //
+        $retainer = Retainer::find($request->route('retainerID'));
+        $retainer->delete();
+
+        return response()->noContent();
     }
 }

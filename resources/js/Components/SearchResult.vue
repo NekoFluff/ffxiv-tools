@@ -6,17 +6,17 @@ defineProps<{
     id: number;
 }>();
 
-const server = inject('server');
+const emits = defineEmits(["select"]);
 
 </script>
 
 <template>
-    <Link class="flex flex-row w-full p-3 text-sm text-white rounded-md hover:bg-blue-600"
-        :href="route('recipe.get', { itemID: id, server: server },)">
-    <slot name="icon"></slot>
+    <button class="flex flex-row w-full p-3 text-sm text-white rounded-md hover:bg-blue-600"
+        @click="emits('select', id, text)">
+        <slot name="icon"></slot>
 
-    <span class="ml-2">
-        {{ text }} (#{{ id }})
-    </span>
-    </Link>
+        <span class="ml-2">
+            {{ text }} (#{{ id }})
+        </span>
+    </button>
 </template>

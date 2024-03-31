@@ -35,7 +35,8 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item: a
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="mr-10 text-xl font-semibold leading-tight text-gray-800">{{ item?.name || 'Item Search' }}</h2>
-                <SearchBar class="flex-grow mr-6" />
+                <SearchBar class="flex-grow mr-6"
+                    @select="(_itemID: number) => { $inertia.visit(route('recipe.get', { itemID: _itemID, server: server })) }" />
                 <ServerDropdown :server="server"
                     @select="(_server) => { server = _server; $inertia.visit(route('recipe.get', { itemID: item?.id, server: _server })) }" />
             </div>

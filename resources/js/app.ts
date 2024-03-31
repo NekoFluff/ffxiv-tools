@@ -5,6 +5,7 @@ import { createApp, h, DefineComponent } from 'vue';
 import { Head, Link, createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import ClickOutside from '@/directives/ClickOutsideDirective';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,6 +18,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .component('Link', Link)
             .component('Head', Head)
+            .directive('click-outside', ClickOutside)
             .mount(el);
     },
     progress: {

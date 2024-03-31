@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
+ * 
  *
  * @property-read \App\Models\Item|null $item
  * @property-read \App\Models\Retainer|null $retainer
- * @method static \Illuminate\Database\Eloquent\Builder|RetainerItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RetainerItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RetainerItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer query()
  * @mixin \Eloquent
  */
-class RetainerItem extends Model
+class ItemRetainer extends Model
 {
     use HasFactory;
 

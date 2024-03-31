@@ -6,6 +6,8 @@ defineProps<{
     options: Option[];
 }>();
 
+const emits = defineEmits(["select"]);
+
 </script>
 
 <style>
@@ -31,7 +33,8 @@ defineProps<{
     <div class="relative z-10 " v-show="options.length > 0">
         <div class="absolute w-full overflow-auto bg-blue-500 max-h-96 scrollbar">
             <ul data-cy="searchResults">
-                <SearchResult v-for="option of options" :text="option.text" :id="option.id">
+                <SearchResult v-for="option of options" :text="option.text" :id="option.id"
+                    @select="(optionID, optionName) => emits('select', optionID, optionName)">
                     <template #icon>
                         <img v-if="option.image" class="inline w-6 h-6" :src="option.image" :alt="option.text" />
                     </template>

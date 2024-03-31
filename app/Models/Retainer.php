@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $user_id
@@ -30,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer whereUserId($value)
  * @property-read \App\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Listing> $listings
+ * @property-read int|null $listings_count
  * @mixin \Eloquent
  */
 class Retainer extends Model
@@ -48,5 +51,13 @@ class Retainer extends Model
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(Item::class)->withTimestamps();
+    }
+
+    /**
+     * Get the listings for the retainer.
+     */
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class, 'retainer_name', 'name')->orderBy('price_per_unit', 'asc');
     }
 }
