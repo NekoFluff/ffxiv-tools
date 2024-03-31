@@ -122,6 +122,5 @@ class Recipe extends Model
     public function craftingCost(string $server): ?CraftingCost
     {
         return $this->craftingCosts->first(fn (CraftingCost $craftingCost) => $craftingCost->server === $server);
-        // return $this->hasOne(CraftingCost::class)->where('server', $server);
     }
 }

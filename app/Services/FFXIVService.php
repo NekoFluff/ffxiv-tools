@@ -221,6 +221,7 @@ class FFXIVService
         $this->updatePurchaseCost($server, $recipe);
         $this->updateMarketCraftCost($server, $recipe);
         $this->updateOptimalCraftCost($server, $recipe);
+        $recipe->craftingCost($server)->save();
         $recipe->save();
     }
 
