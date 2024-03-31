@@ -11,8 +11,12 @@ import { ref, onMounted } from 'vue';
 
 const retainerListingSummaries = ref<RetainerListingsSummary[]>([]);
 const showModal = ref(false);
+const retainersLoading = ref(false);
 
 const getRetainers = async () => {
+    if (retainersLoading.value) return;
+    retainersLoading.value = true;
+
     try {
         const response = await axios.get('/api/retainers');
 
@@ -22,6 +26,8 @@ const getRetainers = async () => {
     } catch (error) {
         // TODO: Handle error
         console.log("An unexpected error occurred", error);
+    } finally {
+        retainersLoading.value = false;
     }
 };
 
@@ -74,6 +80,14 @@ onMounted(() => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">You must be logged in to use this feature</div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="retainersLoading && retainerListingSummaries.length === 0" class="py-10">
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900">Loading Retainers...</div>
                 </div>
             </div>
         </div>
