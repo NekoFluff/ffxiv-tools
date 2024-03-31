@@ -158,7 +158,13 @@ const deleteSelectedItems = async () => {
                         <input type="checkbox" class="w-5 h-5 border-2 border-black rounded-sm"
                             v-model="tableRow.selected" />
                     </td>
-                    <td class="px-6 py-3 font-semibold">{{ tableRow.itemName }}</td>
+                    <td class="px-6 py-3 font-semibold">
+                        <a class="text-black hover:underline" :href="route('recipe.get', { itemID: tableRow.itemID })"
+                            target="_blank">
+                            {{ tableRow.itemName }}
+                        </a>
+                    </td>
+
                     <td class="px-6 py-3 text-right">{{ tableRow.numListings }}</td>
                     <td class="px-6 py-3 text-right">{{ tableRow.retainerListingPrice ?? 'No Listings' }}</td>
                     <td class="px-6 py-3 text-right">{{ tableRow.lowestListingPrice ?? 'No Listings' }}</td>
