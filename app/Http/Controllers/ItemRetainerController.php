@@ -27,7 +27,7 @@ class ItemRetainerController extends Controller
 
         $retainerListings = $this->getListingsForRetainer($retainer, $request->input('item_id'));
 
-        if (empty($retainerListings)) {
+        if (empty($retainerListings) || $retainerListings[0]['updated_at'] < now()->subHours(1)) {
             $this->service->refreshMarketboardListings($retainer->server, [$request->input('item_id')]);
             $retainerListings = $this->getListingsForRetainer($retainer, $request->input('item_id'));
         }
