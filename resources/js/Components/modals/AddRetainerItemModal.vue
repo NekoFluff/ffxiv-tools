@@ -9,6 +9,7 @@ import SearchBar from '../SearchBar.vue';
 import PrimaryButton from '../PrimaryButton.vue';
 import axios from 'axios';
 import { RetainerListingsSummary } from '@/types/retainer';
+import SearchResult from '../SearchResult.vue';
 
 const props = defineProps<{
     retainerID: number;
@@ -72,8 +73,10 @@ const addItem = async () => {
 
             <div class="mt-6">
                 <InputLabel for="item" value="Item" class="sr-only" />
-                <SearchBar ref="searchBar" id="item" class="flex-grow mr-6"
-                    @select="(_itemID: number) => { form.item_id = _itemID }" />
+                <SearchBar ref="searchBar" id="item" class="flex-grow mr-6" v-slot="{ searchResult }">
+                    <SearchResult :search-result="searchResult"
+                        @select="(_itemID: number, _itemName: string) => { form.item_id = _itemID; searchBar?.selectSearchResult(_itemName); }" />
+                </SearchBar>
 
                 <InputError :message="form.errors.item_id" class="mt-2" />
             </div>

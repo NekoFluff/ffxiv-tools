@@ -9,6 +9,7 @@ import { Item } from '@/types/item';
 import { Recipe } from '@/types/recipe';
 import ServerDropdown from '@/Components/ServerDropdown.vue';
 import { ref, provide } from 'vue';
+import SearchResult from '@/Components/SearchResult.vue';
 
 const props = defineProps<{
     item: Item | undefined
@@ -35,8 +36,11 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item: a
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="mr-10 text-xl font-semibold leading-tight text-gray-800">{{ item?.name || 'Item Search' }}</h2>
-                <SearchBar class="flex-grow mr-6"
-                    @select="(_itemID: number) => { $inertia.visit(route('recipe.get', { itemID: _itemID, server: server })) }" />
+                <SearchBar ref="searchBar" class="flex-grow mr-6" v-slot="{ searchResult }">
+                    <SearchResult :search-result="searchResult"
+                        :href="route('recipe.get', { itemID: searchResult.id, server: server })">
+                    </SearchResult>
+                </SearchBar>
                 <ServerDropdown :server="server"
                     @select="(_server) => { server = _server; $inertia.visit(route('recipe.get', { itemID: item?.id, server: _server })) }" />
             </div>

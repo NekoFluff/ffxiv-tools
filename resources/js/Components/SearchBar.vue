@@ -2,23 +2,22 @@
 import { ref, defineExpose } from "vue"
 import { debounce } from "lodash"
 import axios from "axios";
-import SearchResultList from "./SearchResultList.vue";
 
-export type Option = {
+export type SearchResult = {
     text: string;
     image: string | undefined;
     id: number;
 };
 
-const emits = defineEmits(["search", "select"])
+const emits = defineEmits(["search"])
 
 let text = ref<string>("")
-let options = ref<Option[]>([])
-let optionsVisible = ref<boolean>(true)
+let searchResults = ref<SearchResult[]>([])
+let searchResultsVisible = ref<boolean>(true)
 
 let search = debounce(() => {
     axios.get(`https://xivapi.com/search?indexes=Item&string=${text.value}`).then((response) => {
-        options.value = response.data.Results.filter(
+        searchResults.value = response.data.Results.filter(
             (result: any) => result.UrlType === "Item"
         ).map((result: any) => {
             return {
@@ -32,7 +31,7 @@ let search = debounce(() => {
 
 const handleUpdate = (updatedText: string) => {
     search()
-    showOptions()
+    showSearchResults()
     text.value = updatedText
 }
 
@@ -42,30 +41,62 @@ const handleKeyDown = (event: KeyboardEvent) => {
     }
 }
 
-const hideOptions = () => {
-    optionsVisible.value = false
+const hideSearchResults = () => {
+    searchResultsVisible.value = false
 }
 
-const showOptions = () => {
-    optionsVisible.value = true
+const showSearchResults = () => {
+    searchResultsVisible.value = true
 }
 
 const clear = () => {
     text.value = ""
-    options.value = []
+    searchResults.value = []
 };
 
-defineExpose({ clear });
+const selectSearchResult = (searchResultName: string) => {
+    searchResultsVisible.value = false;
+    text.value = searchResultName;
+}
+
+defineExpose({ clear, selectSearchResult });
 
 </script>
 
+<style>
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #1533b6;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a0a0a0;
+}
+</style>
+
 <template>
-    <div v-click-outside="hideOptions">
+    <div v-click-outside="hideSearchResults">
         <input :value="text"
             class="w-full p-2 text-black bg-white border-gray-300 rounded-md shadow-md outline-none placeholder-slate-700 shadow-grey-900"
             type="text" placeholder="Search..." @input="handleUpdate(($event.target as HTMLInputElement).value)"
-            @keydown="handleKeyDown" @focus="showOptions" autocomplete="off" />
-        <SearchResultList v-if="optionsVisible" class="mt-0" :options="options"
-            @select="(optionID, optionName) => { emits('select', optionID, optionName); optionsVisible = false; text = optionName }" />
+            @keydown="handleKeyDown" @focus="showSearchResults" autocomplete="off" />
+
+        <div v-if="searchResultsVisible" class="mt-0">
+            <div class="relative z-10" v-show="searchResults.length > 0">
+                <div class="absolute w-full overflow-auto bg-blue-500 max-h-96 scrollbar">
+                    <ul>
+                        <slot v-for="searchResult in searchResults" :searchResult="searchResult" />
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

@@ -4,14 +4,12 @@ import InputLabel from '@/Components/InputLabel.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import SearchBar from '../SearchBar.vue';
 import PrimaryButton from '../PrimaryButton.vue';
 import axios from 'axios';
 import TextInput from '../TextInput.vue';
 import ServerDropdown from '../ServerDropdown.vue';
 
-const props = defineProps<{
+defineProps<{
     show?: boolean;
 }>();
 
@@ -22,10 +20,8 @@ const form = useForm({
 
 const emit = defineEmits(['close', 'success']);
 
-const searchBar = ref<InstanceType<typeof SearchBar> | null>(null);
 
 const closeModal = () => {
-    searchBar.value?.clear();
     emit('close')
     form.clearErrors();
     form.reset();
