@@ -7,12 +7,15 @@ defineProps<{
     href?: string;
 }>();
 
-const emits = defineEmits(["select"]);
+const emits = defineEmits<{
+    select: [id: number, text: string]
+}>();
 
 </script>
 
 <template>
-    <Link v-if="href" :href="href" class="flex flex-row items-center w-full p-3 rounded-md hover:bg-blue-600">
+    <Link v-if="href" :href="href" class="flex flex-row items-center w-full p-3 rounded-md hover:bg-blue-600"
+        @click="emits('select', searchResult.id, searchResult.text);">
     <img v-if="searchResult.image" class="inline w-6 h-6" :src="searchResult.image" :alt="searchResult.text" />
     <span class="ml-2 text-sm text-white">
         {{ searchResult.text }} (#{{ searchResult.id }})
