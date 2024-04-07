@@ -86,7 +86,8 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item: a
                         <PriceHistoryGraph v-if="history" :history="history" />
                     </div>
                     <div class="col-span-4">
-                        <ListingsTable v-if="listings" class="mt-4 mb-5 bg-gray-50" :listings="listings" />
+                        <h2 class="mt-2 mb-2 text-lg font-semibold text-center ">Current Listings</h2>
+                        <ListingsTable v-if="listings" class="mb-5 bg-gray-50" :listings="listings" />
                     </div>
                 </div>
             </div>
