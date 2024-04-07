@@ -1,3 +1,10 @@
+export type Retainer = {
+    id: number;
+    name: string;
+    data_center: string;
+    server: string;
+};
+
 export type RetainerListingsSummary = {
     retainer_id: number;
     retainer_name: string;

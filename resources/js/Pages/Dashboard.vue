@@ -7,6 +7,7 @@ import PriceHistoryGraph from '@/Components/PriceHistoryGraph.vue';
 import { Listing } from '@/types/listing';
 import { Item } from '@/types/item';
 import { Recipe } from '@/types/recipe';
+import { Retainer } from '@/types/retainer';
 import ServerDropdown from '@/Components/ServerDropdown.vue';
 import { ref, provide } from 'vue';
 import SearchResult from '@/Components/SearchResult.vue';
@@ -16,6 +17,7 @@ const props = defineProps<{
     recipe: Recipe | undefined
     history: Array<{}>
     listings: Array<Listing>
+    retainers: Array<Retainer>
     lastUpdated: string
 }>();
 
@@ -52,14 +54,23 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item: a
                     <div class="p-6 text-gray-900">You're logged in!</div>
                 </div> -->
 
-                <div v-if="lastUpdated" class="flex justify-end text-sm">
-                    <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
-                    (
-                    <Link class="text-sm" :href="route('recipe.get', { itemID: item?.id, server: server })"
-                        :data="{ recalculate: 1 }">
-                    Refresh
-                    </Link>
-                    )
+                <div class="flex text-sm">
+                    <div v-if="retainers.length > 0">
+                        Your Retainers:
+                        <span class="font-bold">
+                            {{ retainers.map(retainer => retainer.name).join(', ') }}
+                        </span>
+                    </div>
+                    <div class="flex-grow"></div>
+                    <template v-if="lastUpdated">
+                        <h2 class="mr-2 text-sm text-gray-500">Last Updated: {{ lastUpdated }}</h2>
+                        (
+                        <Link class="text-sm" :href="route('recipe.get', { itemID: item?.id, server: server })"
+                            :data="{ recalculate: 1 }">
+                        Refresh
+                        </Link>
+                        )
+                    </template>
                 </div>
                 <RecipeTree v-if="recipe" :recipe="recipe" />
                 <h1 v-if="!recipe && item" class="flex justify-center my-10 text-lg">There is no recipe for&nbsp;<span

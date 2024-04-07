@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Listing;
 use App\Models\MarketPrice;
+use App\Models\Retainer;
 use App\Models\Sale;
 use App\Services\FFXIVService;
 use Illuminate\Support\Carbon;
@@ -82,6 +83,7 @@ class GetRecipeController extends Controller
             [
                 'canLogin' => Route::has('login'),
                 'canRegister' => Route::has('register'),
+                'retainers' => Retainer::where('user_id', auth()->id())->where('server', $server)->whereRelation('items', 'id', $recipe?->item->id)->get(),
                 'recipe' => $recipe,
                 'item' => $item,
                 'history' => $aggregatedSales,
