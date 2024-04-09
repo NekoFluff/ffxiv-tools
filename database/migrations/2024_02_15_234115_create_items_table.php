@@ -14,6 +14,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('name');
             $table->string('icon');
+            $table->integer('market_price');
             $table->integer('vendor_price');
             $table->timestamps();
         });

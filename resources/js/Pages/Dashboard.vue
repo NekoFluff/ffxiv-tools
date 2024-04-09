@@ -55,7 +55,7 @@ const totalListed = props.listings != null ? props.listings.reduce((acc, item: a
                 </div> -->
 
                 <div class="flex text-sm">
-                    <div v-if="retainers.length > 0">
+                    <div v-if="retainers && retainers.length > 0">
                         Your Retainers:
                         <span class="font-bold">
                             {{ retainers.map(retainer => retainer.name).join(', ') }}
