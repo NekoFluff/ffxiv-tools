@@ -65,12 +65,12 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
         /** @var Collection<int, Recipe> $recipes */
         $items = $this->ffxivService->fetchMostRecentlyUpdatedItems($server);
+        $this->timestamp = now()->timestamp * 1000;
         $items = collect($items)->filter(function ($item) {
             return $item['lastUploadTime'] > $this->timestamp;
         });
         $recipes = Recipe::whereIn('item_id', $items->pluck('itemID'))->get();
         $recipesCount = $recipes->count();
-        $this->timestamp = now()->timestamp * 1000;
 
         foreach ($recipes as $recipe) {
             $count += 1;
