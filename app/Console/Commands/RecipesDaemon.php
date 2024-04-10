@@ -64,12 +64,14 @@ class RecipesDaemon extends Command
 
         /** @var Collection<int, Recipe> $recipes */
         $recipes = Recipe::with('item')
-            ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
-            ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
+            ->leftJoin('market_prices', function ($join) use ($server) {
+                $join->on('recipes.item_id', '=', 'market_prices.item_id')
+                     ->where('market_prices.server', '=', $server);
+            })
             ->select('recipes.*')
-            ->where('recipes.updated_at', '<', now()->subHours(24))
+            ->where('market_prices.updated_at', '<', now()->subHours(24))
             ->groupBy('recipes.id')
-            ->orderBy('recipes.updated_at', 'asc')
+            ->orderBy('market_prices.updated_at', 'asc')
             ->limit(100)
             ->get();
         $recipesCount = $recipes->count();
