@@ -21,4 +21,9 @@ interface UniversalisClientInterface
      * Fetch the total sale count for an item over the last week
      */
     public function fetchLastWeekSaleCount(string $server, int $itemID): int;
+
+    /**
+     * Fetch the most recently updated items
+     */
+    public function fetchMostRecentlyUpdatedItems(string $server): array;
 }

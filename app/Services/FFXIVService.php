@@ -357,6 +357,11 @@ class FFXIVService
         $craftingCost->market_craft_cost = intval($cost);
     }
 
+    public function fetchMostRecentlyUpdatedItems(string $server): array
+    {
+        return $this->universalisClient->fetchMostRecentlyUpdatedItems($server);
+    }
+
     public function fetchMarketboardListings(string $server, array $itemIDs): array
     {
         return $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);

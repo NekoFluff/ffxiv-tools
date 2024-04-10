@@ -92,4 +92,19 @@ class UniversalisClient implements UniversalisClientInterface
 
         return 0;
     }
+
+    public function fetchMostRecentlyUpdatedItems(string $server): array
+    {
+        Log::debug("Fetching most recently updated items for server {$server}");
+        try {
+            $response = $this->client->get("https://universalis.app/api/v2/extra/stats/most-recently-updated?world={$server}");
+            Log::debug("Retrieved most recently updated items for server {$server}");
+
+            return json_decode($response->getBody(), true)['items'] ?? [];
+        } catch (\Exception $ex) {
+            Log::error("Failed to retrieve most recently updated items for server {$server}. Exception: ".$ex->getMessage());
+        }
+
+        return [];
+    }
 }
