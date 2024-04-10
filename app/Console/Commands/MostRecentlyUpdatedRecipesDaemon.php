@@ -68,6 +68,11 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
         $items = collect($items)->filter(function ($item) {
             return $item['lastUploadTime'] > $this->timestamp;
         });
+
+        if ($items->isEmpty()) {
+            return;
+        }
+
         $this->timestamp = $items->max('lastUploadTime');
         $itemsCount = $items->count();
 
