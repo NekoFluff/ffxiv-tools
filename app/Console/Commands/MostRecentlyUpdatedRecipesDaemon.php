@@ -65,34 +65,40 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
         /** @var Collection<int, Recipe> $recipes */
         $items = $this->ffxivService->fetchMostRecentlyUpdatedItems($server);
-        $this->timestamp = now()->timestamp * 1000;
         $items = collect($items)->filter(function ($item) {
             return $item['lastUploadTime'] > $this->timestamp;
         });
-        $recipes = Recipe::whereIn('item_id', $items->pluck('itemID'))->get();
-        $recipesCount = $recipes->count();
+        $this->timestamp = now()->timestamp * 1000;
+        $itemsCount = $items->count();
 
-        foreach ($recipes as $recipe) {
+        foreach ($items as $item) {
+            $recipe = $this->ffxivService->getRecipeByItemID($item['itemID']);
             $count += 1;
-            $this->totalCount += 1;
-            Log::info('['.$count.'/'.$recipesCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-            $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-            DB::transaction(function () use ($recipe, $server) {
-                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
-                $marketPrice = $recipe->item->marketPrice($server);
-                if ($marketPrice !== null) {
-                    $marketPrice->updated_at = now();
-                    $marketPrice->save();
-                }
 
-                $this->ffxivService->updateRecipeCosts($server, $recipe);
-                $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
-            });
+            if ($recipe) {
+                $this->totalCount += 1;
+                Log::info('['.$count.'/'.$itemsCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
+                $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
+                DB::transaction(function () use ($recipe, $server) {
+                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                    $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
+                    $marketPrice = $recipe->item->marketPrice($server);
+                    if ($marketPrice !== null) {
+                        $marketPrice->updated_at = now();
+                        $marketPrice->save();
+                    }
 
-            echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$recipesCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
-            $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
-            echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->craftingCost($server)->optimal_craft_cost."\n";
+                    $this->ffxivService->updateRecipeCosts($server, $recipe);
+                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+                });
+
+                echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$itemsCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
+                $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
+                echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->craftingCost($server)->optimal_craft_cost."\n";
+            } else {
+                Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item ID '.$item['itemID']);
+                echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Recipe not found for item ID '.$item['itemID']."\n";
+            }
             sleep(2);
         }
 
