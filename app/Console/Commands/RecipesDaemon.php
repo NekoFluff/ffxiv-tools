@@ -87,8 +87,8 @@ class RecipesDaemon extends Command
             });
 
             echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$recipesCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
-            $profit = $recipe->item->marketPrice($server)?->price - $recipe->optimal_craft_cost;
-            echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->optimal_craft_cost."\n";
+            $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
+            echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->craftingCost($server)->optimal_craft_cost."\n";
             sleep(2);
         }
     }
