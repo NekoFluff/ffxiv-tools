@@ -71,7 +71,7 @@ class RecipesDaemon extends Command
             ->select('recipes.*')
             ->where('market_prices.updated_at', '<', now()->subHours(24))
             ->groupBy('recipes.id')
-            ->orderBy('market_prices.updated_at', 'asc')
+            ->orderByRaw('MIN(market_prices.updated_at) ASC')
             ->limit(100)
             ->get();
         $recipesCount = $recipes->count();
@@ -84,6 +84,12 @@ class RecipesDaemon extends Command
             DB::transaction(function () use ($recipe, $server) {
                 $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                 $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
+                $marketPrice = $recipe->item->marketPrice($server);
+                if ($marketPrice !== null) {
+                    $marketPrice->updated_at = now();
+                    $marketPrice->save();
+                }
+
                 $this->ffxivService->updateRecipeCosts($server, $recipe);
                 $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
             });

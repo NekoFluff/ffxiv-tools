@@ -53,7 +53,7 @@ services:
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_DATABASE: "ffxivtools"
+      MYSQL_DATABASE: "forge"
       MYSQL_USER: "ffxiv"
       MYSQL_PASSWORD: "supersecret"
       MYSQL_ROOT_PASSWORD: "supersecret"

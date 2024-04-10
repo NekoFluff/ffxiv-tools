@@ -178,15 +178,11 @@ class FFXIVService
     public function updateMarketPrices(string $server, Recipe $recipe, Collection $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
-        if (! $listings->isEmpty()) {
-            $this->updateMarketPrice($server, $recipe->item, $listings);
-        }
+        $this->updateMarketPrice($server, $recipe->item, $listings);
 
         foreach ($recipe->ingredients as $ingredient) {
             $listings = $mbListings[$ingredient->item_id] ?? collect([]);
-            if (! $listings->isEmpty()) {
-                $this->updateMarketPrice($server, $ingredient->item, $listings);
-            }
+            $this->updateMarketPrice($server, $ingredient->item, $listings);
 
             if ($ingredient->craftingRecipe !== null) {
                 $this->updateMarketPrices($server, $ingredient->craftingRecipe, $mbListings);
