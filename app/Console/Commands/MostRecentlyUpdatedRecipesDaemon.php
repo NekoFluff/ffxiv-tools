@@ -70,6 +70,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
         });
         $recipes = Recipe::whereIn('item_id', $items->pluck('itemID'))->get();
         $recipesCount = $recipes->count();
+        $this->timestamp = now()->timestamp * 1000;
 
         foreach ($recipes as $recipe) {
             $count += 1;
@@ -95,6 +96,5 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
             sleep(2);
         }
 
-        $this->timestamp = now()->timestamp * 1000;
     }
 }
