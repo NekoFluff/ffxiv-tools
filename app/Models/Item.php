@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -92,7 +93,7 @@ class Item extends Model
     }
 
     /** @return ?MarketPrice */
-    public function marketPrice(string $server): ?MarketPrice
+    public function marketPrice(Server $server): ?MarketPrice
     {
         return $this->marketPrices->filter(fn (MarketPrice $marketPrice) => $marketPrice->server === $server)->first();
     }

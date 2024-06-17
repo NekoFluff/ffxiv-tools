@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Enums\Server;
 use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
@@ -50,7 +51,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
     {
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
-        $server = 'Goblin';
+        $server = Server::from('Goblin');
 
         /** @phpstan-ignore-next-line */
         while (true) {
@@ -59,7 +60,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
         }
     }
 
-    private function refreshRecipes(string $server): void
+    private function refreshRecipes(Server $server): void
     {
         $count = 0;
 

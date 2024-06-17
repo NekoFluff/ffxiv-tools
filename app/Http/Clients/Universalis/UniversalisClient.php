@@ -2,6 +2,7 @@
 
 namespace App\Http\Clients\Universalis;
 
+use App\Models\Enums\Server;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
@@ -28,7 +29,7 @@ class UniversalisClient implements UniversalisClientInterface
         ]);
     }
 
-    public function fetchMarketBoardListings(string $server, array $itemIDs): array
+    public function fetchMarketBoardListings(Server $server, array $itemIDs): array
     {
         $itemIDs = array_unique($itemIDs);
         sort($itemIDs);
@@ -57,7 +58,7 @@ class UniversalisClient implements UniversalisClientInterface
         return $mbListings;
     }
 
-    public function fetchMarketBoardSales(string $server, int $itemID): array
+    public function fetchMarketBoardSales(Server $server, int $itemID): array
     {
         Log::debug("Fetching market board history for item {$itemID}");
         try {
@@ -72,7 +73,7 @@ class UniversalisClient implements UniversalisClientInterface
         return [];
     }
 
-    public function fetchLastWeekSaleCount(string $server, int $itemID): int
+    public function fetchLastWeekSaleCount(Server $server, int $itemID): int
     {
         try {
             $response = $this->client->get("history/{$server}/{$itemID}");
@@ -93,7 +94,7 @@ class UniversalisClient implements UniversalisClientInterface
         return 0;
     }
 
-    public function fetchMostRecentlyUpdatedItems(string $server): array
+    public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
         Log::debug("Fetching most recently updated items for server {$server}");
         try {

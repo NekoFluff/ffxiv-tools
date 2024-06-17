@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $item_id
  * @property string $data_center
- * @property string $server
+ * @property Server $server
  * @property int $price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

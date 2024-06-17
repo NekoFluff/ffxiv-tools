@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $recipe_id
  * @property string $data_center
- * @property string $server
+ * @property Server $server
  * @property int $purchase_cost
  * @property int $market_craft_cost
  * @property int $optimal_craft_cost
@@ -51,6 +52,7 @@ class CraftingCost extends Model
         'market_craft_cost' => 'integer',
         'optimal_craft_cost' => 'integer',
         'recipe_id' => 'integer',
+        'server' => Server::class,
     ];
 
     protected $attributes = [

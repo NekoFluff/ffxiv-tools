@@ -5,8 +5,10 @@ namespace Tests\Feature\Services;
 use App\Http\Clients\Universalis\MockUniversalisClient;
 use App\Services\FFXIVService;
 use App\Http\Clients\XIV\MockXIVClient;
+use App\Models\Enums\Server;
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\Sale;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -77,7 +79,7 @@ class FFXIVServiceTest extends TestCase
         $expectedPrice = 460;
 
         // Act
-        $this->service->updateMarketPrice('Goblin', $item, $listings);
+        $this->service->updateMarketPrice(Server::from('Goblin'), $item, $listings);
 
         // Assert
         $this->assertDatabaseHas('market_prices', [
@@ -102,7 +104,7 @@ class FFXIVServiceTest extends TestCase
         $expectedPrice = 400;
 
         // Act
-        $this->service->updateMarketPrice('Goblin', $item, $listings);
+        $this->service->updateMarketPrice(Server::from('Goblin'), $item, $listings);
 
         // Assert
         $this->assertDatabaseHas('market_prices', [

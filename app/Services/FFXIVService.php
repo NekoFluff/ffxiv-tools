@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Clients\Universalis\UniversalisClientInterface;
 use App\Http\Clients\XIV\XIVClientInterface;
 use App\Models\CraftingCost;
+use App\Models\Enums\Server;
 use App\Models\Ingredient;
 use App\Models\Item;
 use App\Models\Listing;
@@ -81,7 +82,7 @@ class FFXIVService
         $recipe = $this->parseRecipeJson($recipeData);
         $this->updateVendorPrices($recipe);
 
-        $server = 'Goblin';
+        $server = Server::from('Goblin');
         $this->refreshMarketboardListings($server, $recipe->itemIDs());
         DB::transaction(function () use ($recipe, $server) {
             $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
@@ -175,7 +176,7 @@ class FFXIVService
      * @param  Recipe  $recipe  The recipe to update.
      * @param  Collection<int, EloquentCollection<int|string, Listing>>  $mbListings  The market board listings.
      */
-    public function updateMarketPrices(string $server, Recipe $recipe, Collection $mbListings): void
+    public function updateMarketPrices(Server $server, Recipe $recipe, Collection $mbListings): void
     {
         $listings = $mbListings[$recipe->item_id] ?? collect([]);
         $this->updateMarketPrice($server, $recipe->item, $listings);
@@ -194,9 +195,9 @@ class FFXIVService
      * Update the costs of a recipe
      *
      * @param  Recipe  $recipe  The recipe to update
-     * @param  string  $server  The server name
+     * @param  Server  $server  The server
      */
-    public function updateRecipeCosts(string $server, Recipe $recipe): void
+    public function updateRecipeCosts(Server $server, Recipe $recipe): void
     {
         foreach ($recipe->ingredients as $ingredient) {
             if ($ingredient->craftingRecipe !== null) {
@@ -207,7 +208,7 @@ class FFXIVService
         $craftingCost = $recipe->craftingCost($server);
         if ($craftingCost === null) {
             $craftingCost = new CraftingCost([
-                'data_center' => self::dataCenterForServer($server),
+                'data_center' => $server->dataCenter(),
                 'server' => $server,
             ]);
             $recipe->craftingCosts()->save($craftingCost);
@@ -224,10 +225,10 @@ class FFXIVService
     /**
      * Updates the purchase cost of a recipe.
      *
-     * @param  string  $server  The server name
+     * @param  Server  $server  The server
      * @param  Recipe  $recipe  The recipe to update the purchase cost for
      */
-    private function updatePurchaseCost(string $server, Recipe $recipe): void
+    private function updatePurchaseCost(Server $server, Recipe $recipe): void
     {
         $cost = $recipe->item->marketPrice($server)?->price;
         if ($recipe->item->vendor_price != 0) {
@@ -242,11 +243,11 @@ class FFXIVService
     /**
      * Updates the market price of an item.
      *
-     * @param  string $server The server name
+     * @param  Server $server The server
      * @param  Item  $item  The item to update the market price for
      * @param  Collection<int, Listing>  $listings  The market board listings
      */
-    public function updateMarketPrice(string $server, Item $item, Collection $listings): void
+    public function updateMarketPrice(Server $server, Item $item, Collection $listings): void
     {
         if ($listings->isEmpty()) {
             return;
@@ -267,7 +268,7 @@ class FFXIVService
         $marketPrice = $item->marketPrice($server);
         if ($marketPrice === null) {
             $marketPrice = new MarketPrice([
-                'data_center' => self::dataCenterForServer($server),
+                'data_center' => $server->dataCenter(),
                 'server' => $server,
                 'item_id' => $item->id,
                 'price' => 0,
@@ -280,39 +281,7 @@ class FFXIVService
         $marketPrice->save();
     }
 
-    public static function dataCenterForServer(string $server): string
-    {
-        if (in_array($server, ['Adamantoise', 'Cactuar', 'Faerie', 'Gilgamesh', 'Jenova', 'Midgardsormr', 'Sargatanas', 'Siren'])) {
-            return 'Aether';
-        } elseif (in_array($server, ['Behemoth', 'Excalibur', 'Exodus', 'Famfrit', 'Hyperion', 'Lamia', 'Leviathan', 'Ultros'])) {
-            return 'Primal';
-        } elseif (in_array($server, ['Balmung', 'Brynhildr', 'Coeurl', 'Diabolos', 'Goblin', 'Malboro', 'Mateus', 'Zalera'])) {
-            return 'Crystal';
-        } elseif (in_array($server, ['Cerberus', 'Lich', 'Louisoix', 'Moogle', 'Odin', 'Omega', 'Phoenix', 'Ragnarok', 'Shiva', 'Twintania', 'Zodiark'])) {
-            return 'Chaos';
-        } elseif (in_array($server, ['Aegis', 'Atomos', 'Carbuncle', 'Garuda', 'Gungnir', 'Kujata', 'Ramuh', 'Tonberry', 'Typhon', 'Unicorn'])) {
-            return 'Elemental';
-        } elseif (in_array($server, ['Alexander', 'Bahamut', 'Durandal', 'Fenrir', 'Ifrit', 'Ridill', 'Tiamat', 'Ultima', 'Valefor', 'Yojimbo', 'Zeromus'])) {
-            return 'Gaia';
-        } elseif (in_array($server, ['Anima', 'Asura', 'Belias', 'Chocobo', 'Hades', 'Ixion', 'Mandragora', 'Masamune', 'Pandaemonium', 'Shinryu', 'Titan'])) {
-            return 'Mana';
-        } elseif (in_array($server, ['Aurora', 'Elemental', 'Gaia', 'Mana'])) {
-            return 'EU';
-        } elseif (in_array($server, ['Crystal', 'Primal', 'Aether'])) {
-            return 'NA';
-        } else {
-            return 'Unknown';
-        }
-    }
-
-    public static function validServers(): array
-    {
-        return [
-            'Adamantoise', 'Aegis', 'Alexander', 'Anima', 'Asura', 'Atomos', 'Bahamut', 'Balmung', 'Behemoth', 'Belias', 'Brynhildr', 'Cactuar', 'Carbuncle', 'Cerberus', 'Chocobo', 'Coeurl', 'Diabolos', 'Durandal', 'Excalibur', 'Exodus', 'Famfrit', 'Fenrir', 'Garuda', 'Gilgamesh', 'Goblin', 'Gungnir', 'Hades', 'Hyperion', 'Ifrit', 'Ixion', 'Jenova', 'Kujata', 'Lamia', 'Leviathan', 'Lich', 'Louisoix', 'Malboro', 'Mandragora', 'Masamune', 'Mateus', 'Midgardsormr', 'Moogle', 'Odin', 'Omega', 'Pandaemonium', 'Phoenix', 'Ragnarok', 'Ramuh', 'Ridill', 'Sargatanas', 'Shinryu', 'Shiva', 'Siren', 'Tiamat', 'Titan', 'Tonberry', 'Typhon', 'Ultima', 'Ultros', 'Unicorn', 'Valefor', 'Yojimbo', 'Zalera', 'Zeromus', 'Zodiark',
-        ];
-    }
-
-    private function updateOptimalCraftCost(string $server, Recipe $recipe): void
+    private function updateOptimalCraftCost(Server $server, Recipe $recipe): void
     {
         $cost = 0;
 
@@ -337,7 +306,7 @@ class FFXIVService
         $craftingCost->optimal_craft_cost = intval($cost);
     }
 
-    private function updateMarketCraftCost(string $server, Recipe $recipe): void
+    private function updateMarketCraftCost(Server $server, Recipe $recipe): void
     {
         $cost = 0;
 
@@ -357,24 +326,24 @@ class FFXIVService
         $craftingCost->market_craft_cost = intval($cost);
     }
 
-    public function fetchMostRecentlyUpdatedItems(string $server): array
+    public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
         return $this->universalisClient->fetchMostRecentlyUpdatedItems($server);
     }
 
-    public function fetchMarketboardListings(string $server, array $itemIDs): array
+    public function fetchMarketboardListings(Server $server, array $itemIDs): array
     {
         return $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
     }
 
-    public function refreshMarketboardListings(string $server, array $itemIDs): void
+    public function refreshMarketboardListings(Server $server, array $itemIDs): void
     {
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
         Listing::whereIn('item_id', $itemIDs)->delete();
 
         $this->processMarketBoardListings($server, $listingsData);
 
-        $dataCenter = self::dataCenterForServer($server);
+        $dataCenter = $server->dataCenter();
         $sales = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server) {
 
@@ -414,12 +383,12 @@ class FFXIVService
     /**
      * Process the market board listings data from Universalis.
      *
-     * @param  string $server The server name.
+     * @param  Server $server The server
      * @param  array  $listingsData  The listings data.
      */
-    private function processMarketBoardListings(string $server, array $listingsData): void
+    private function processMarketBoardListings(Server $server, array $listingsData): void
     {
-        $dataCenter = self::dataCenterForServer($server);
+        $dataCenter = $server->dataCenter();
         $listings = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server): array {
 
@@ -463,14 +432,14 @@ class FFXIVService
     /**
      * Retrieves the market board sales for a specific server and item.
      *
-     * @param  string  $server  The server name.
-     * @param  int  $itemID  The ID of the item.
+     * @param Server $server The server name.
+     * @param int $itemID  The ID of the item.
      */
-    public function refreshMarketBoardSales(string $server, int $itemID): void
+    public function refreshMarketBoardSales(Server $server, int $itemID): void
     {
         $mbSales = $this->universalisClient->fetchMarketBoardSales($server, $itemID);
 
-        $dataCenter = self::dataCenterForServer($server);
+        $dataCenter = $server->dataCenter();
         $sales = collect($mbSales)->map(
             function ($entry) use ($dataCenter, $server, $itemID): array {
                 return [
@@ -548,7 +517,7 @@ class FFXIVService
         return $aggregatedSales->sortBy('date')->values();
     }
 
-    public function getLastWeekSaleCount(string $server, int $itemID): int
+    public function getLastWeekSaleCount(Server $server, int $itemID): int
     {
         $cacheKey = "last_week_sale_count_{$itemID}";
         $sale_count = cache()->remember(

@@ -2,6 +2,8 @@
 
 namespace App\Http\Clients\Universalis;
 
+use App\Models\Enums\Server;
+
 interface UniversalisClientInterface
 {
     /**
@@ -10,20 +12,20 @@ interface UniversalisClientInterface
      * @param  array<int>  $itemIDs
      * @return array<int, array>
      */
-    public function fetchMarketBoardListings(string $server, array $itemIDs): array;
+    public function fetchMarketBoardListings(Server $server, array $itemIDs): array;
 
     /**
      * Fetch market board history for a specific item
      */
-    public function fetchMarketBoardSales(string $server, int $itemID): array;
+    public function fetchMarketBoardSales(Server $server, int $itemID): array;
 
     /**
      * Fetch the total sale count for an item over the last week
      */
-    public function fetchLastWeekSaleCount(string $server, int $itemID): int;
+    public function fetchLastWeekSaleCount(Server $server, int $itemID): int;
 
     /**
      * Fetch the most recently updated items
      */
-    public function fetchMostRecentlyUpdatedItems(string $server): array;
+    public function fetchMostRecentlyUpdatedItems(Server $server): array;
 }

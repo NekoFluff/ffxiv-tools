@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Enums\Server;
 use App\Models\Item;
 use App\Models\Listing;
-use App\Models\MarketPrice;
 use App\Models\Retainer;
 use App\Models\Sale;
 use App\Services\FFXIVService;
@@ -26,10 +26,7 @@ class GetRecipeController extends Controller
     public function __invoke(int $itemID): Response|ResponseFactory
     {
 
-        $server = request()->query('server', 'Goblin');
-        if (!in_array($server, FFXIVService::validServers())) {
-            abort(400, 'Invalid server');
-        }
+        $server = Server::from(request()->query('server', 'Goblin'));
 
         $recalculate = boolval(request()->query('recalculate', '0'));
         $itemID = intval($itemID);

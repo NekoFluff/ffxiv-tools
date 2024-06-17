@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Http\Clients\XIV\MockXIVClient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -25,7 +26,7 @@ class GetRecipeControllerTest extends TestCase
         $user = User::factory()->create();
 
         // Arrange
-        $itemID = 777;
+        $itemID = MockXIVClient::WOODEN_LOFT_ITEM_ID;
         $server = 'Goblin';
 
         // Act

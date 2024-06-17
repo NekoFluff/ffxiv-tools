@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,8 +41,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereUpdatedAt($value)
  * @property string $data_center
- * @property string $server
- * @method static Builder|Listing fromServer(string $server)
+ * @property Server $server
+ * @method static Builder|Listing fromServer(Server $server)
  * @method static Builder|Listing whereDataCenter($value)
  * @method static Builder|Listing whereServer($value)
  * @mixin \Eloquent
@@ -77,9 +78,9 @@ class Listing extends Model
      * Scope a query to only include sales from a specific server.
      *
      * @param Builder $query
-     * @param string $server
+     * @param Server $server
      */
-    public function scopeFromServer(Builder $query, string $server): void
+    public function scopeFromServer(Builder $query, Server $server): void
     {
         $query->where('server', $server);
     }

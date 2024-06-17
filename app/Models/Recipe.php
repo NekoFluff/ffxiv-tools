@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\Recipe
@@ -78,7 +78,7 @@ class Recipe extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function alignAmounts(string $server, float $target_amount): void
+    public function alignAmounts(Server $server, float $target_amount): void
     {
         $ratio = $target_amount / $this->amount_result;
         $this->amount_result = $target_amount;
@@ -119,8 +119,8 @@ class Recipe extends Model
         return $this->hasMany(CraftingCost::class);
     }
 
-    public function craftingCost(string $server): ?CraftingCost
+    public function craftingCost(Server $server): ?CraftingCost
     {
-        return $this->craftingCosts->first(fn (CraftingCost $craftingCost) => $craftingCost->server === $server);
+        return $this->craftingCosts->first(fn (CraftingCost $craftingCost) => $craftingCost->server == $server);
     }
 }
