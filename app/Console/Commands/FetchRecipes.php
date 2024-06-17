@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class RefreshRecipes extends Command
+class FetchRecipes extends Command
 {
     /**
      * The name and signature of the console command.
