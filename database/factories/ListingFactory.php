@@ -16,8 +16,23 @@ class ListingFactory extends Factory
      */
     public function definition(): array
     {
+        $quantity = 1;
+        $pricePerUnit = $this->faker->numberBetween(1, 1000);
+        $total = $quantity;
+        $tax = intval(0.05 * $total);
+
         return [
-            //
+            'id' => $this->faker->unique()->randomNumber(),
+            'data_center' => 'Crystal',
+            'server' => 'Goblin',
+            'retainer_name' => $this->faker->name,
+            'retainer_city' => 1,
+            'quantity' => $quantity,
+            'hq' => false,
+            'price_per_unit' => $pricePerUnit,
+            'total' => $total,
+            'tax' => $tax,
+            'last_review_time' => now(),
         ];
     }
 }

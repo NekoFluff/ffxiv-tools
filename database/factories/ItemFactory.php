@@ -17,7 +17,8 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word,
+            'icon' => 'test-icon.png',
         ];
     }
 }
