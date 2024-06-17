@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $item_id
@@ -40,6 +40,10 @@ class MarketPrice extends Model
         'data_center',
         'server',
         'price',
+    ];
+
+    protected $casts = [
+        'server' => Server::class,
     ];
 
     public function item()

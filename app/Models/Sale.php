@@ -58,6 +58,7 @@ class Sale extends Model
         'price_per_unit' => 'integer',
         'quantity' => 'integer',
         'hq' => 'boolean',
+        'server' => Server::class,
     ];
 
     /**

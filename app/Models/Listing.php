@@ -72,6 +72,7 @@ class Listing extends Model
         'total' => 'integer',
         'tax' => 'integer',
         'last_review_time' => 'datetime',
+        'server' => Server::class,
     ];
 
     /**

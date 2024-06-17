@@ -54,7 +54,7 @@ class FFXIVService
             return null;
         }
 
-        $recipe = $this->getRecipe($recipeObj->ID);
+        $recipe = $this->getRecipe($recipeObj['ID']);
 
         Log::debug('Recipe: '.json_encode($recipe));
 

@@ -34,12 +34,12 @@ class UniversalisClient implements UniversalisClientInterface
         $itemIDs = array_unique($itemIDs);
         sort($itemIDs);
 
-        Log::debug("Fetching market board listings for server {$server}.".' | Items: '.implode(',', $itemIDs));
+        Log::debug("Fetching market board listings for server {$server->value}.".' | Items: '.implode(',', $itemIDs));
         try {
-            $mbListings = $this->client->get("{$server}/".implode(',', $itemIDs).'?listings=40');
-            Log::debug("Retrieved market board listings for server {$server} | Items: ".implode(',', $itemIDs));
+            $mbListings = $this->client->get("{$server->value}/".implode(',', $itemIDs).'?listings=40');
+            Log::debug("Retrieved market board listings for server {$server->value} | Items: ".implode(',', $itemIDs));
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board listings for server {$server}. Exception: ".$ex->getMessage());
+            Log::error("Failed to retrieve market board listings for server {$server->value}. Exception: ".$ex->getMessage());
 
             return [];
         }
@@ -62,7 +62,7 @@ class UniversalisClient implements UniversalisClientInterface
     {
         Log::debug("Fetching market board history for item {$itemID}");
         try {
-            $response = $this->client->get("history/{$server}/{$itemID}");
+            $response = $this->client->get("history/{$server->value}/{$itemID}");
             Log::debug("Retrieved market board history for item {$itemID}");
 
             return json_decode($response->getBody(), true)['entries'] ?? [];
@@ -76,7 +76,7 @@ class UniversalisClient implements UniversalisClientInterface
     public function fetchLastWeekSaleCount(Server $server, int $itemID): int
     {
         try {
-            $response = $this->client->get("history/{$server}/{$itemID}");
+            $response = $this->client->get("history/{$server->value}/{$itemID}");
             Log::debug("Retrieved market board history for item {$itemID}");
 
             /** @var array $mbSales */
@@ -96,14 +96,14 @@ class UniversalisClient implements UniversalisClientInterface
 
     public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
-        Log::debug("Fetching most recently updated items for server {$server}");
+        Log::debug("Fetching most recently updated items for server {$server->value}");
         try {
-            $response = $this->client->get("https://universalis.app/api/v2/extra/stats/most-recently-updated?world={$server}");
-            Log::debug("Retrieved most recently updated items for server {$server}");
+            $response = $this->client->get("https://universalis.app/api/v2/extra/stats/most-recently-updated?world={$server->value}");
+            Log::debug("Retrieved most recently updated items for server {$server->value}");
 
             return json_decode($response->getBody(), true)['items'] ?? [];
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve most recently updated items for server {$server}. Exception: ".$ex->getMessage());
+            Log::error("Failed to retrieve most recently updated items for server {$server->value}. Exception: ".$ex->getMessage());
         }
 
         return [];
