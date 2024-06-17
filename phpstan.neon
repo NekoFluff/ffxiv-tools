@@ -7,7 +7,6 @@ parameters:
         - tests
     level: 7
     inferPrivatePropertyTypeFromConstructor: true
-    checkMissingIterableValueType: false
     excludePaths:
         - %currentWorkingDirectory%/app/Providers/*
     ignoreErrors:
