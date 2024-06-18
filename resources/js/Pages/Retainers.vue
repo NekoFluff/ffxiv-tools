@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import RetainerListingsSummaryTable from '@/Components/RetainerListingsSummaryTable.vue';
-import AddRetainerModal from '@/Components/modals/AddRetainerModal.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { RetainerListingsSummary, RetainerListingsSummaryItem } from '@/types/retainer';
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import RetainerListingsSummaryTable from "@/Components/RetainerListingsSummaryTable.vue";
+import AddRetainerModal from "@/Components/modals/AddRetainerModal.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { RetainerListingsSummary, RetainerListingsSummaryItem } from "@/types/retainer";
 
-import axios from 'axios';
-import { reactive } from 'vue';
-import { ref, onMounted } from 'vue';
+import axios from "axios";
+import { reactive } from "vue";
+import { ref, onMounted } from "vue";
 
 const retainerListingSummaries = ref<RetainerListingsSummary[]>([]);
 const showModal = ref(false);
@@ -18,7 +18,7 @@ const getRetainers = async () => {
     retainersLoading.value = true;
 
     try {
-        const response = await axios.get('/api/retainers');
+        const response = await axios.get("/api/retainers");
 
         for (const summary of response.data) {
             retainerListingSummaries.value.push(reactive(summary));
@@ -40,11 +40,11 @@ const addRetainerListingSummary = (summary: RetainerListingsSummary) => {
 };
 
 const deleteRetainerListingSummary = (retainerID: number) => {
-    retainerListingSummaries.value = [...retainerListingSummaries.value.filter(summary => summary.retainer_id !== retainerID)];
+    retainerListingSummaries.value = [...retainerListingSummaries.value.filter((summary) => summary.retainer_id !== retainerID)];
 };
 
 const addRetainerItem = (retainerID: number, item: RetainerListingsSummaryItem) => {
-    retainerListingSummaries.value.find(summary => summary.retainer_id === retainerID)?.items.push(item);
+    retainerListingSummaries.value.find((summary) => summary.retainer_id === retainerID)?.items.push(item);
 
     retainerListingSummaries.value = [...retainerListingSummaries.value];
 };
@@ -52,7 +52,6 @@ const addRetainerItem = (retainerID: number, item: RetainerListingsSummaryItem) 
 onMounted(() => {
     getRetainers();
 });
-
 </script>
 
 <template>
@@ -94,12 +93,10 @@ onMounted(() => {
 
         <div v-else v-for="summary in retainerListingSummaries" class="py-10">
             <div :key="summary.retainer_name" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <RetainerListingsSummaryTable :summary="summary" @delete="deleteRetainerListingSummary"
-                    @new-retainer-item="addRetainerItem" />
+                <RetainerListingsSummaryTable :summary="summary" @delete="deleteRetainerListingSummary" @new-retainer-item="addRetainerItem" />
             </div>
         </div>
 
         <AddRetainerModal :show="showModal" @close="showModal = false" @success="addRetainerListingSummary" />
-
     </AuthenticatedLayout>
 </template>

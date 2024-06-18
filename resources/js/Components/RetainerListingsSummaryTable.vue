@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RetainerListingsSummary, RetainerListingsSummaryItem } from "@/types/retainer";
 import { ref, watch } from "vue";
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faTrashAlt, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faTrashAlt, faPlus } from "@fortawesome/free-solid-svg-icons";
 import AddRetainerItemModal from "./modals/AddRetainerItemModal.vue";
 import axios from "axios";
 import ConfirmationModal from "./modals/ConfirmationModal.vue";
@@ -17,44 +17,46 @@ type TableRow = {
 };
 
 const props = defineProps<{
-    summary: RetainerListingsSummary
+    summary: RetainerListingsSummary;
 }>();
 
 const emit = defineEmits<{
-    delete: [retainerId: number]
-    newRetainerItem: [retainerId: number, item: RetainerListingsSummaryItem]
-}>()
+    delete: [retainerId: number];
+    newRetainerItem: [retainerId: number, item: RetainerListingsSummaryItem];
+}>();
 
 const showModal = ref(false);
 const deleting = ref(false);
 const confirmationModal = ref<InstanceType<typeof ConfirmationModal> | null>(null);
 
-const tableRows = ref<TableRow[]>(props.summary.items.map(item => ({
-    itemID: item.item_id,
-    itemName: item.item_name,
-    numListings: item.num_retainer_listings,
-    retainerListingPrice: item.retainer_listing_price,
-    lowestListingPrice: item.lowest_listing_price,
-    selected: false
-})));
-
-watch(props.summary, (newSummary) => {
-    tableRows.value = newSummary.items.map(item => ({
+const tableRows = ref<TableRow[]>(
+    props.summary.items.map((item) => ({
         itemID: item.item_id,
         itemName: item.item_name,
         numListings: item.num_retainer_listings,
         retainerListingPrice: item.retainer_listing_price,
         lowestListingPrice: item.lowest_listing_price,
-        selected: false
+        selected: false,
+    }))
+);
+
+watch(props.summary, (newSummary) => {
+    tableRows.value = newSummary.items.map((item) => ({
+        itemID: item.item_id,
+        itemName: item.item_name,
+        numListings: item.num_retainer_listings,
+        retainerListingPrice: item.retainer_listing_price,
+        lowestListingPrice: item.lowest_listing_price,
+        selected: false,
     }));
 });
 
 const toggleAll = () => {
-    const allItemsSelected = tableRows.value.every(row => row.selected);
+    const allItemsSelected = tableRows.value.every((row) => row.selected);
     if (allItemsSelected) {
-        tableRows.value.forEach(row => row.selected = false);
+        tableRows.value.forEach((row) => (row.selected = false));
     } else {
-        tableRows.value.forEach(row => row.selected = true);
+        tableRows.value.forEach((row) => (row.selected = true));
     }
 };
 
@@ -69,12 +71,15 @@ const deleteRetainer = async () => {
     }
 
     deleting.value = true;
-    await axios.delete(route('retainers.destroy', { retainerID: props.summary.retainer_id })).then(() => {
-        emit('delete', props.summary.retainer_id);
-    }).finally(() => {
-        deleting.value = false;
-    });
-}
+    await axios
+        .delete(route("retainers.destroy", { retainerID: props.summary.retainer_id }))
+        .then(() => {
+            emit("delete", props.summary.retainer_id);
+        })
+        .finally(() => {
+            deleting.value = false;
+        });
+};
 
 const deleteSelectedItems = async () => {
     if (deleting.value) {
@@ -82,15 +87,18 @@ const deleteSelectedItems = async () => {
     }
 
     deleting.value = true;
-    const selectedItems = tableRows.value.filter(row => row.selected);
-    const itemIDs = selectedItems.map(item => item.itemID);
+    const selectedItems = tableRows.value.filter((row) => row.selected);
+    const itemIDs = selectedItems.map((item) => item.itemID);
 
     const body = { item_ids: itemIDs };
-    await axios.delete(route('retainers.items.destroy', { retainerID: props.summary.retainer_id }), { data: body }).then(() => {
-        tableRows.value = tableRows.value.filter(row => !row.selected);
-    }).finally(() => {
-        deleting.value = false;
-    })
+    await axios
+        .delete(route("retainers.items.destroy", { retainerID: props.summary.retainer_id }), { data: body })
+        .then(() => {
+            tableRows.value = tableRows.value.filter((row) => !row.selected);
+        })
+        .finally(() => {
+            deleting.value = false;
+        });
 };
 </script>
 
@@ -120,14 +128,12 @@ const deleteSelectedItems = async () => {
         <div class="flex items-center justify-between px-6 py-5">
             <span class="flex">
                 <h1 class="text-2xl font-bold text-center">{{ summary.retainer_name }}</h1>
-                <p class="text-sm text-center">
-                    &nbsp;[{{ summary.server }}]
-                </p>
+                <p class="text-sm text-center">&nbsp;[{{ summary.server }}]</p>
                 <button class="ml-3" @click="confirmationModal?.open()">
                     <FontAwesomeIcon :icon="faTrashAlt" />
                 </button>
             </span>
-            <button v-if="!tableRows.some(row => row.selected)" @click="addItem">
+            <button v-if="!tableRows.some((row) => row.selected)" @click="addItem">
                 <FontAwesomeIcon :icon="faPlus" />
             </button>
             <button v-else @click="deleteSelectedItems" :disabled="deleting">
@@ -138,8 +144,12 @@ const deleteSelectedItems = async () => {
             <thead>
                 <tr>
                     <th class="w-6 pl-6 text-center">
-                        <input type="checkbox" class="w-5 h-5 border-2 border-black rounded-sm" @click="toggleAll"
-                            :checked="tableRows.every(row => row.selected)" />
+                        <input
+                            type="checkbox"
+                            class="w-5 h-5 border-2 border-black rounded-sm"
+                            @click="toggleAll"
+                            :checked="tableRows.every((row) => row.selected)"
+                        />
                     </th>
                     <th class="px-6 py-3 text-left">Item Name</th>
                     <th class="px-6 py-3 text-right"># Listings</th>
@@ -149,36 +159,51 @@ const deleteSelectedItems = async () => {
             </thead>
 
             <tbody name="slide" is="transition-group">
-                <tr v-for="tableRow in tableRows" :key="tableRow.itemID" :class="{
-                    'bg-green-500': tableRow.retainerListingPrice && tableRow.lowestListingPrice && (tableRow.retainerListingPrice <= tableRow.lowestListingPrice),
-                    'bg-red-500': tableRow.retainerListingPrice && tableRow.lowestListingPrice && (tableRow.retainerListingPrice > tableRow.lowestListingPrice),
-                    'bg-yellow-500': tableRow.retainerListingPrice === null
-                }">
+                <tr
+                    v-for="tableRow in tableRows"
+                    :key="tableRow.itemID"
+                    :class="{
+                        'bg-green-500':
+                            tableRow.retainerListingPrice &&
+                            tableRow.lowestListingPrice &&
+                            tableRow.retainerListingPrice <= tableRow.lowestListingPrice,
+                        'bg-red-500':
+                            tableRow.retainerListingPrice &&
+                            tableRow.lowestListingPrice &&
+                            tableRow.retainerListingPrice > tableRow.lowestListingPrice,
+                        'bg-yellow-500': tableRow.retainerListingPrice === null,
+                    }"
+                >
                     <td class="pl-6 text-center">
-                        <input type="checkbox" class="w-5 h-5 border-2 border-black rounded-sm"
-                            v-model="tableRow.selected" />
+                        <input type="checkbox" class="w-5 h-5 border-2 border-black rounded-sm" v-model="tableRow.selected" />
                     </td>
                     <td class="px-6 py-3 font-semibold">
-                        <a class="text-black hover:underline" :href="route('recipe.get', { itemID: tableRow.itemID })"
-                            target="_blank">
+                        <a class="text-black hover:underline" :href="route('recipe.get', { itemID: tableRow.itemID })" target="_blank">
                             {{ tableRow.itemName }}
                         </a>
                     </td>
 
                     <td class="px-6 py-3 text-right">{{ tableRow.numListings }}</td>
-                    <td class="px-6 py-3 text-right">{{ tableRow.retainerListingPrice ?? 'No Listings' }}</td>
-                    <td class="px-6 py-3 text-right">{{ tableRow.lowestListingPrice ?? 'No Listings' }}</td>
+                    <td class="px-6 py-3 text-right">{{ tableRow.retainerListingPrice ?? "No Listings" }}</td>
+                    <td class="px-6 py-3 text-right">{{ tableRow.lowestListingPrice ?? "No Listings" }}</td>
                 </tr>
             </tbody>
         </table>
 
-        <AddRetainerItemModal v-if="$page.props.auth.user" :show="showModal" :retainer-i-d="summary.retainer_id"
-            :retainer-name="summary.retainer_name" @close="() => showModal = false"
-            @success="(summary: RetainerListingsSummary) => { emit('newRetainerItem', summary.retainer_id, summary.items[0]) }" />
+        <AddRetainerItemModal
+            v-if="$page.props.auth.user"
+            :show="showModal"
+            :retainer-i-d="summary.retainer_id"
+            :retainer-name="summary.retainer_name"
+            @close="() => (showModal = false)"
+            @success="(summary: RetainerListingsSummary) => { emit('newRetainerItem', summary.retainer_id, summary.items[0]) }"
+        />
 
-        <ConfirmationModal ref="confirmationModal"
+        <ConfirmationModal
+            ref="confirmationModal"
             message="There is no going back from this action. This will delete the retainer and all of its items."
-            button-text="Delete Retainer" @confirm="deleteRetainer" />
-
+            button-text="Delete Retainer"
+            @confirm="deleteRetainer"
+        />
     </div>
 </template>

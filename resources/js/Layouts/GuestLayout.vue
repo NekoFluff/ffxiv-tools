@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 </script>
 
 <template>
     <div class="flex flex-col items-center min-h-screen pt-6 bg-gray-100 sm:justify-center sm:pt-0">
         <div>
             <Link href="/">
-            <ApplicationLogo class="w-20 h-20 text-gray-500 fill-current" />
+                <ApplicationLogo class="w-20 h-20 text-gray-500 fill-current" />
             </Link>
         </div>
 

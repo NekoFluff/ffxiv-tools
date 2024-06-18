@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
 defineProps<{
-    id: number,
-    name: string
+    id: number;
+    name: string;
 }>();
 
 let showRecipeId = ref(false);

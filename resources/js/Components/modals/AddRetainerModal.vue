@@ -54,25 +54,14 @@ const addRetainer = async () => {
 <template>
     <Modal :show="show" @close="closeModal">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900">
-                Add a new retainer
-            </h2>
+            <h2 class="text-lg font-medium text-gray-900">Add a new retainer</h2>
 
-            <p class="mt-1 text-sm text-gray-600">
-                You have a limit of 10 retainers. Please enter the name and
-                server of the new retainer.
-            </p>
+            <p class="mt-1 text-sm text-gray-600">You have a limit of 10 retainers. Please enter the name and server of the new retainer.</p>
 
             <div class="mt-6">
                 <InputLabel for="name" value="Name" class="sr-only" />
 
-                <TextInput
-                    id="name"
-                    ref="nameInput"
-                    v-model="form.name"
-                    class="block w-3/4 mt-1"
-                    placeholder="Name"
-                />
+                <TextInput id="name" ref="nameInput" v-model="form.name" class="block w-3/4 mt-1" placeholder="Name" />
 
                 <InputError :message="form.errors.name" class="mt-2" />
             </div>
@@ -97,12 +86,7 @@ const addRetainer = async () => {
 
             <div class="flex justify-end mt-6">
                 <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
-                <PrimaryButton
-                    class="ms-3"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                    @click="addRetainer"
-                >
+                <PrimaryButton class="ms-3" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" @click="addRetainer">
                     Add Retainer
                 </PrimaryButton>
             </div>

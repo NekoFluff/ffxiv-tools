@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import Modal from '../Modal.vue';
-import SecondaryButton from '../SecondaryButton.vue';
-import DangerButton from '../DangerButton.vue';
+import { ref } from "vue";
+import Modal from "../Modal.vue";
+import SecondaryButton from "../SecondaryButton.vue";
+import DangerButton from "../DangerButton.vue";
 
 defineProps<{
     title?: string;
@@ -10,7 +10,7 @@ defineProps<{
     buttonText?: string;
 }>();
 
-const emit = defineEmits(['confirm']);
+const emit = defineEmits(["confirm"]);
 
 const show = ref(false);
 
@@ -23,15 +23,13 @@ const close = () => {
 };
 
 defineExpose({ open, close });
-
-
 </script>
 
 <template>
     <Modal :show="show" @close="close">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900">
-                {{ title ?? 'Are you sure?' }}
+                {{ title ?? "Are you sure?" }}
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
@@ -41,7 +39,7 @@ defineExpose({ open, close });
             <div class="flex justify-end mt-6">
                 <SecondaryButton @click="close"> Cancel </SecondaryButton>
                 <DangerButton class="ms-3" @click="emit('confirm')">
-                    {{ buttonText ?? 'YES' }}
+                    {{ buttonText ?? "YES" }}
                 </DangerButton>
             </div>
         </div>
