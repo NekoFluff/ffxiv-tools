@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\FFXIVService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -94,7 +95,7 @@ class RetainersController extends Controller
             'retainer_name' => $retainer->name,
             'server' => $retainer->server,
             'items' => [],
-        ]);
+        ], Response::HTTP_CREATED);
     }
 
     /**
