@@ -101,11 +101,6 @@ parameters:
 			path: app/Http/Requests/StoreRetainerRequest.php
 
 		-
-			message: "#^Method App\\\\Models\\\\CraftingCost\\:\\:recipe\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/CraftingCost.php
-
-		-
 			message: "#^Property App\\\\Models\\\\CraftingCost\\:\\:\\$attributes type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Models/CraftingCost.php

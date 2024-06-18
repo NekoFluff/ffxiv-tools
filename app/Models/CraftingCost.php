@@ -6,6 +6,7 @@ use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  *
@@ -63,7 +64,8 @@ class CraftingCost extends Model
         'optimal_craft_cost' => 0,
     ];
 
-    public function recipe()
+    /** @return BelongsTo<Recipe, self> */
+    public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
