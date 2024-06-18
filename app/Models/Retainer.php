@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,12 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
  * @property string $name
- * @property string $data_center
+ * @property DataCenter $data_center
  * @property Server $server
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -41,6 +42,11 @@ class Retainer extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'data_center', 'server'];
+
+    protected $casts = [
+        'server' => Server::class,
+        'data_center' => DataCenter::class,
+    ];
 
     /** @return BelongsTo<User> */
     public function user(): BelongsTo

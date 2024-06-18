@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $item_id
- * @property string $data_center
+ * @property DataCenter $data_center
  * @property Server $server
  * @property int $price
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -44,6 +45,7 @@ class MarketPrice extends Model
 
     protected $casts = [
         'server' => Server::class,
+        'data_center' => DataCenter::class,
     ];
 
     public function item()

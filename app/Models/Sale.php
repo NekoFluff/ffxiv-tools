@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereUpdatedAt($value)
- * @property string $data_center
+ * @property DataCenter $data_center
  * @property Server $server
  * @method static Builder|Sale fromServer(Server $server)
  * @method static Builder|Sale whereDataCenter($value)
@@ -59,6 +60,7 @@ class Sale extends Model
         'quantity' => 'integer',
         'hq' => 'boolean',
         'server' => Server::class,
+        'data_center' => DataCenter::class,
     ];
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,7 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Listing whereUpdatedAt($value)
- * @property string $data_center
+ * @property DataCenter $data_center
  * @property Server $server
  * @method static Builder|Listing fromServer(Server $server)
  * @method static Builder|Listing whereDataCenter($value)
@@ -73,6 +74,7 @@ class Listing extends Model
         'tax' => 'integer',
         'last_review_time' => 'datetime',
         'server' => Server::class,
+        'data_center' => DataCenter::class,
     ];
 
     /**

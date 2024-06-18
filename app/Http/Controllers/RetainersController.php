@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DestroyRetainerRequest;
 use App\Http\Requests\StoreRetainerRequest;
+use App\Models\Enums\Server;
 use App\Models\Listing;
 use App\Models\Retainer;
 use App\Services\FFXIVService;
@@ -82,8 +83,8 @@ class RetainersController extends Controller
         /** @var Retainer $retainer */
         $retainer = $user->retainers()->create([
             'name' => $request->input('name'),
-            'data_center' => FFXIVService::dataCenterForServer($request->input('server')),
-            'server' => $request->input('server'),
+            'data_center' => Server::from($request->input('server'))->dataCenter(),
+            'server' => Server::from($request->input('server')),
         ]);
 
         return response()->json([

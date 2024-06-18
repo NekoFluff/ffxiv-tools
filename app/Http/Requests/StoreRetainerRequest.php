@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Enums\Server;
 use App\Services\FFXIVService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class StoreRetainerRequest extends FormRequest
@@ -26,7 +28,7 @@ class StoreRetainerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', 'min:2'],
-            'server' => ['required', 'string', 'max:255'],
+            'server' => ['required', Rule::enum(Server::class)],
         ];
     }
 
@@ -56,10 +58,6 @@ class StoreRetainerRequest extends FormRequest
 
                 if ($user->retainers->contains('name', $this->input('name'))) {
                     $validator->errors()->add('name', 'You already have a retainer with that name');
-                }
-
-                if (!in_array($this->input('server'), FFXIVService::validServers())) {
-                    $validator->errors()->add('server', 'Invalid server name');
                 }
             }
         ];

@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Enums\DataCenter;
+use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,8 +25,8 @@ class ListingFactory extends Factory
 
         return [
             'id' => $this->faker->unique()->randomNumber(),
-            'data_center' => 'Crystal',
-            'server' => 'Goblin',
+            'data_center' => DataCenter::from('Crystal'),
+            'server' => Server::from('Goblin'),
             'retainer_name' => $this->faker->name,
             'retainer_city' => 1,
             'quantity' => $quantity,
