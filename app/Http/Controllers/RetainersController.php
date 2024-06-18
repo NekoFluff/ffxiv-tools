@@ -7,10 +7,12 @@ use App\Http\Requests\StoreRetainerRequest;
 use App\Models\Enums\Server;
 use App\Models\Listing;
 use App\Models\Retainer;
+use App\Models\User;
 use App\Services\FFXIVService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RetainersController extends Controller
 {
@@ -30,14 +32,17 @@ class RetainersController extends Controller
         $user = Auth::user();
         $retainers = $user->retainers()->with('items', 'items.marketPrices')->get();
 
+
+
         $itemIDsByServer = $retainers->groupBy('server')->map(function ($retainers) {
             return $retainers->pluck('items')->flatten()->pluck('id')->toArray();
         })->toArray();
 
         $listings = [];
         foreach ($itemIDsByServer as $server => $ids) {
+
             //TODO: Conditionally refresh marketboard listings
-            $this->service->refreshMarketboardListings($server, $ids);
+            $this->service->refreshMarketboardListings(Server::from($server), $ids);
         }
 
         $listings = Listing::whereIn('item_id', collect($itemIDsByServer)->flatten())->get()->groupBy('server')->map(function ($listings) {
@@ -55,7 +60,7 @@ class RetainersController extends Controller
                 'items' => [],
             ];
             foreach ($retainer->items as $item) {
-                $retainerListings = array_values(array_filter($listings[$retainer->server][$item->id] ?? [], function ($listing) use ($retainer) {
+                $retainerListings = array_values(array_filter($listings[$retainer->server->value][$item->id] ?? [], function ($listing) use ($retainer) {
                     return $listing['retainer_name'] === $retainer->name;
                 }));
                 $retainerResp['items'][] = [
@@ -63,7 +68,7 @@ class RetainersController extends Controller
                     'item_name' => $item->name,
                     'retainer_listing_price' => $retainerListings ? $retainerListings[0]['price_per_unit'] : null,
                     'num_retainer_listings' => $retainerListings ? count($retainerListings) : 0,
-                    'lowest_listing_price' => $listings[$retainer->server][$item->id][0]['price_per_unit'] ?? null,
+                    'lowest_listing_price' => $listings[$retainer->server->value][$item->id][0]['price_per_unit'] ?? null,
                 ];
             }
             $resp[] = $retainerResp;
