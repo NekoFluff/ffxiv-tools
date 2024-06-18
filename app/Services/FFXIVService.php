@@ -94,6 +94,7 @@ class FFXIVService
         return $recipe;
     }
 
+    /** @param array<mixed,mixed> $json */
     public function parseRecipeJson(array $json): ?Recipe
     {
         $item = Item::updateOrCreate([
@@ -326,16 +327,25 @@ class FFXIVService
         $craftingCost->market_craft_cost = intval($cost);
     }
 
+    /** @return array<mixed> */
     public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
         return $this->universalisClient->fetchMostRecentlyUpdatedItems($server);
     }
 
+    /**
+     * @param array<int> $itemIDs
+     * @return array<mixed>
+    */
     public function fetchMarketboardListings(Server $server, array $itemIDs): array
     {
         return $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
     }
 
+    /**
+     * @param array<int> $itemIDs
+     * @return void
+    */
     public function refreshMarketboardListings(Server $server, array $itemIDs): void
     {
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
@@ -347,7 +357,7 @@ class FFXIVService
         $sales = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server) {
 
-                /** @var array $l */
+                /** @var array<mixed> $l */
                 $l = $listingData['recentHistory'] ?? [];
 
                 return array_map(
@@ -383,8 +393,8 @@ class FFXIVService
     /**
      * Process the market board listings data from Universalis.
      *
-     * @param  Server $server The server
-     * @param  array  $listingsData  The listings data.
+     * @param Server $server The server
+     * @param array<mixed> $listingsData The listings data
      */
     private function processMarketBoardListings(Server $server, array $listingsData): void
     {
@@ -392,7 +402,7 @@ class FFXIVService
         $listings = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server): array {
 
-                /** @var array $l */
+                /** @var array<mixed> $l */
                 $l = $listingData['listings'] ?? [];
 
                 return array_map(
@@ -465,8 +475,8 @@ class FFXIVService
     /**
      * Returns Sales aggregated daily for the last week
      *
-     * @param  Collection<int, Sale>  $sales
-     * @return Collection<int, array{date: mixed, quantity: mixed, avg_price: float|int|null, median_price: float|int|null, min_price: mixed, max_price: mixed}>
+     * @param  Collection<int, Sale> $sales
+     * @return Collection<int, array{date: (int|string), quantity: mixed, avg_price: float|int|null, median_price: float|int|null, min_price: mixed, max_price: mixed}>
      */
     public function aggregateSales(Collection $sales): Collection
     {

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Enums\Server;
 use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
@@ -46,7 +47,7 @@ class FetchRecipes extends Command
     {
         $page = 1;
         $recipesStr = '';
-        $server = 'Goblin';
+        $server = Server::from('Goblin');
         do {
             Log::info('Fetching recipes page '.$page);
 

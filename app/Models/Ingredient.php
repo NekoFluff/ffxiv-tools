@@ -45,13 +45,13 @@ class Ingredient extends Model
         'item_id' => 'integer',
     ];
 
-    /** @return BelongsTo<Recipe, Ingredient> */
+    /** @return BelongsTo<Recipe, self> */
     public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
 
-    /** @return BelongsTo<Item, Ingredient> */
+    /** @return BelongsTo<Item, self> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);

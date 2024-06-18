@@ -57,6 +57,11 @@ class ItemRetainerController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Get the listings for the retainer.
+     *
+     * @return array<Listing>
+     */
     private function getListingsForRetainer(Retainer $retainer, int $itemID): array
     {
         return $retainer->load('listings')->listings->filter(function ($listing) use ($itemID) {

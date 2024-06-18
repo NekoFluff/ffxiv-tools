@@ -6,6 +6,7 @@ use App\Models\Enums\DataCenter;
 use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  *
@@ -48,7 +49,8 @@ class MarketPrice extends Model
         'data_center' => DataCenter::class,
     ];
 
-    public function item()
+    /** @return BelongsTo<Item, self> */
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }

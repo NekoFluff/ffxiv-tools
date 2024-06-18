@@ -80,7 +80,7 @@ class Listing extends Model
     /**
      * Scope a query to only include sales from a specific server.
      *
-     * @param Builder $query
+     * @param Builder<self> $query
      * @param Server $server
      */
     public function scopeFromServer(Builder $query, Server $server): void
@@ -88,7 +88,7 @@ class Listing extends Model
         $query->where('server', $server);
     }
 
-    /** @return BelongsTo<Item, Listing> */
+    /** @return BelongsTo<Item, self> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);

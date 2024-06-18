@@ -58,6 +58,7 @@ class UniversalisClient implements UniversalisClientInterface
         return $mbListings;
     }
 
+    /** @return array<mixed> */
     public function fetchMarketBoardSales(Server $server, int $itemID): array
     {
         Log::debug("Fetching market board history for item {$itemID}");
@@ -94,6 +95,7 @@ class UniversalisClient implements UniversalisClientInterface
         return 0;
     }
 
+    /** @return array<mixed> */
     public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
         Log::debug("Fetching most recently updated items for server {$server->value}");

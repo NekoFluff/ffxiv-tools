@@ -64,7 +64,6 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
     {
         $count = 0;
 
-        /** @var Collection<int, Recipe> $recipes */
         $items = $this->ffxivService->fetchMostRecentlyUpdatedItems($server);
         $items = collect($items)->filter(function ($item) {
             return $item['lastUploadTime'] > $this->timestamp;

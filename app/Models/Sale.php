@@ -66,7 +66,7 @@ class Sale extends Model
     /**
      * Scope a query to only include sales from a specific server.
      *
-     * @param Builder $query
+     * @param Builder<self> $query
      * @param Server $server
      */
     public function scopeFromServer(Builder $query, Server $server): void

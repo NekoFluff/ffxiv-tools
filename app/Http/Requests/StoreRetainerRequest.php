@@ -45,7 +45,7 @@ class StoreRetainerRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string, string>
+     * @return array<int, Closure>
      */
     public function after(): array
     {

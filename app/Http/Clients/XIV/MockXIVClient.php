@@ -79,7 +79,7 @@ class MockXIVClient implements XIVClientInterface
         if (array_key_exists($itemID, $map)) {
             $item->Recipes = [
                 (object)[
-                    'ID' => $map[$itemID] ?? null,
+                    'ID' => $map[$itemID],
                 ]
             ];
         }

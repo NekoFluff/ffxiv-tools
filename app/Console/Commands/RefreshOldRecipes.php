@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Enums\Server;
 use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
@@ -46,7 +47,7 @@ class RefreshOldRecipes extends Command
     {
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
-        $server = 'Goblin';
+        $server = Server::from('Goblin');
 
         $recipesCount = Recipe::with('item')
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
@@ -55,7 +56,6 @@ class RefreshOldRecipes extends Command
             ->where('recipes.updated_at', '<', now()->subDays(3))
             ->groupBy('recipes.id')
             ->orderBy('recipes.updated_at', 'asc')
-            ->get()
             ->count();
         $count = 0;
 

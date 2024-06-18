@@ -46,7 +46,7 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle(): void
     {
-        $server = 'Goblin';
+        $server = Server::from('Goblin');
 
         $recipes = Recipe::with('item')
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')

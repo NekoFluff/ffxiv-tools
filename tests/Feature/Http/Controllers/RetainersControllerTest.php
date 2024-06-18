@@ -19,7 +19,7 @@ class RetainersControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_get_a_list_of_retainers()
+    public function it_should_get_a_list_of_retainers(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -49,7 +49,7 @@ class RetainersControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_save_a_retainer()
+    public function it_should_save_a_retainer(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -67,7 +67,7 @@ class RetainersControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_not_save_the_retainer_because_the_user_already_has_10_retainers()
+    public function it_should_not_save_the_retainer_because_the_user_already_has_10_retainers(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -94,7 +94,7 @@ class RetainersControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_not_save_the_retainer_because_the_user_already_has_a_retainer_with_that_name()
+    public function it_should_not_save_the_retainer_because_the_user_already_has_a_retainer_with_that_name(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -114,7 +114,7 @@ class RetainersControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_delete_the_retainer()
+    public function it_should_delete_the_retainer(): void
     {
         // Arrange
         $user = User::factory()->create();

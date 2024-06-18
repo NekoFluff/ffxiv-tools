@@ -72,7 +72,7 @@ class Recipe extends Model
         return $this->hasMany(Ingredient::class);
     }
 
-    /** @return BelongsTo<Item, Recipe> */
+    /** @return BelongsTo<Item, self> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
@@ -86,6 +86,7 @@ class Recipe extends Model
         /** @var CraftingCost */
         $craftingCost = $this->craftingCost($server);
 
+        // TODO: Return data in a better format, instead of just assigning random values on the model that is not saved
         $this->purchase_cost = intval($craftingCost->purchase_cost * $target_amount);
         $this->market_craft_cost = intval($craftingCost->market_craft_cost * $ratio);
         $this->optimal_craft_cost = intval($craftingCost->optimal_craft_cost * $ratio);

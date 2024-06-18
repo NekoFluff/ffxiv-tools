@@ -10,10 +10,8 @@ use App\Models\Retainer;
 use App\Models\User;
 use App\Services\FFXIVService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class RetainersController extends Controller
 {
@@ -78,7 +76,7 @@ class RetainersController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRetainerRequest $request)
+    public function store(StoreRetainerRequest $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -99,25 +97,9 @@ class RetainersController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Retainer $retainer)
-    {
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Retainer $retainer)
-    {
-
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
-    public function destroy(DestroyRetainerRequest $request)
+    public function destroy(DestroyRetainerRequest $request): Response
     {
         $retainer = Retainer::find($request->route('retainerID'));
         $retainer->delete();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Retainer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
@@ -13,7 +14,10 @@ class StoreItemRetainerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->retainers->contains($this->route('retainerID'));
+        /** @var int $retainerID */
+        $retainerID = $this->route('retainerID');
+
+        return Auth::user()->retainers->contains(intval($retainerID));
     }
 
     /**
@@ -43,12 +47,14 @@ class StoreItemRetainerRequest extends FormRequest
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array<string, string>
+     * @return array<int, Closure>
      */
     public function after(): array
     {
         return [
             function (Validator $validator) {
+
+                /** @var Retainer $retainer */
                 $retainer = Auth::user()->retainers->find($this->route('retainerID'));
                 if ($retainer->items->contains($this->input('item_id'))) {
                     $item = $retainer->items->find($this->input('item_id'));

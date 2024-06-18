@@ -29,6 +29,7 @@ class XIVClient implements XIVClientInterface
         ]);
     }
 
+    /** @return array<mixed> */
     public function fetchRecipe(int $recipeID): array
     {
         Log::debug("Fetching recipe data for recipe {$recipeID}");
@@ -37,7 +38,7 @@ class XIVClient implements XIVClientInterface
             // Log::debug("Retrieved recipe data {$response->getBody()}");
             Log::debug('Retrieved recipe data');
 
-            /** @var array $recipeData */
+            /** @var array<mixed> $recipeData */
             $recipeData = json_decode($response->getBody(), true);
 
             return $recipeData;
@@ -69,7 +70,7 @@ class XIVClient implements XIVClientInterface
             $response = $this->client->get("item/{$itemID}?columns=".implode(',', $filterColumns));
             Log::debug("Retrieved item data {$response->getBody()}");
 
-            /** @var array $itemData */
+            /** @var array<mixed> $itemData */
             $itemData = json_decode($response->getBody(), true);
 
             $xivItem = XIVItem::hydrate($itemData);

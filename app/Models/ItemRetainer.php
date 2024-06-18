@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
+ *
  *
  * @property-read \App\Models\Item|null $item
  * @property-read \App\Models\Retainer|null $retainer
@@ -22,13 +22,13 @@ class ItemRetainer extends Model
 
     protected $fillable = ['retainer_id', 'item_id'];
 
-    /** @return BelongsTo<Retainer> */
+    /** @return BelongsTo<Retainer, self> */
     public function retainer(): BelongsTo
     {
         return $this->belongsTo(Retainer::class);
     }
 
-    /** @return BelongsTo<Item> */
+    /** @return BelongsTo<Item, self> */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);

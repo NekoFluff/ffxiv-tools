@@ -21,7 +21,7 @@ class GetRecipeControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_get_a_recipe_for_the_requested_item()
+    public function it_should_get_a_recipe_for_the_requested_item(): void
     {
         $user = User::factory()->create();
 

@@ -1,0 +1,196 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method App\\\\Console\\\\Commands\\\\RecalculateCostsForRecipe\\:\\:promptForMissingArguments\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Console/Commands/RecalculateCostsForRecipe.php
+
+		-
+			message: "#^Call to static method from\\(\\) on an unknown class App\\\\Console\\\\Commands\\\\Server\\.$#"
+			count: 1
+			path: app/Console/Commands/RefreshProfitableRecipes.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$body has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/Universalis/UniversalisClient.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$mbSales has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/Universalis/UniversalisClient.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Clients\\\\XIV\\\\MockXIVClient\\:\\:fetchRecipe\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/XIV/MockXIVClient.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
+			count: 6
+			path: app/Http/Clients/XIV/MockXIVClient.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Clients\\\\XIV\\\\XIVClientInterface\\:\\:fetchRecipe\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/XIV/XIVClientInterface.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Clients\\\\XIV\\\\XIVItem\\:\\:hydrate\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/XIV/XIVItem.php
+
+		-
+			message: "#^Property App\\\\Http\\\\Clients\\\\XIV\\\\XIVItem\\:\\:\\$Recipes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Clients/XIV/XIVItem.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of class Illuminate\\\\Auth\\\\Events\\\\Verified constructor expects Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail, App\\\\Models\\\\User\\|null given\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method App\\\\Models\\\\Enums\\\\Server\\:\\:from\\(\\) expects int\\|string, array\\|string\\|null given\\.$#"
+			count: 1
+			path: app/Http/Controllers/GetRecipeController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\Auth\\\\LoginRequest\\:\\:rules\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Requests/Auth/LoginRequest.php
+
+		-
+			message: "#^Call to method retainers\\(\\) on an unknown class App\\\\Http\\\\Requests\\\\User\\.$#"
+			count: 1
+			path: app/Http/Requests/DestroyRetainerRequest.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$user contains unknown class App\\\\Http\\\\Requests\\\\User\\.$#"
+			count: 1
+			path: app/Http/Requests/DestroyRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\ProfileUpdateRequest\\:\\:rules\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Http/Requests/ProfileUpdateRequest.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Item\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Item\\>\\:\\:\\$name\\.$#"
+			count: 1
+			path: app/Http/Requests/StoreItemRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\StoreItemRetainerRequest\\:\\:after\\(\\) has invalid return type App\\\\Http\\\\Requests\\\\Closure\\.$#"
+			count: 1
+			path: app/Http/Requests/StoreItemRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\StoreItemRetainerRequest\\:\\:after\\(\\) should return array\\<int, App\\\\Http\\\\Requests\\\\Closure\\> but returns array\\<int, Closure\\>\\.$#"
+			count: 1
+			path: app/Http/Requests/StoreItemRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\StoreRetainerRequest\\:\\:after\\(\\) has invalid return type App\\\\Http\\\\Requests\\\\Closure\\.$#"
+			count: 1
+			path: app/Http/Requests/StoreRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Requests\\\\StoreRetainerRequest\\:\\:after\\(\\) should return array\\<int, App\\\\Http\\\\Requests\\\\Closure\\> but returns array\\<int, Closure\\>\\.$#"
+			count: 1
+			path: app/Http/Requests/StoreRetainerRequest.php
+
+		-
+			message: "#^Method App\\\\Models\\\\CraftingCost\\:\\:recipe\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: app/Models/CraftingCost.php
+
+		-
+			message: "#^Property App\\\\Models\\\\CraftingCost\\:\\:\\$attributes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Models/CraftingCost.php
+
+		-
+			message: "#^Property App\\\\Models\\\\Item\\:\\:\\$attributes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Models/Item.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Item\\:\\:\\$market_price\\.$#"
+			count: 2
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Recipe\\:\\:\\$market_craft_cost\\.$#"
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Recipe\\:\\:\\$optimal_craft_cost\\.$#"
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Recipe\\:\\:\\$purchase_cost\\.$#"
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Method App\\\\Models\\\\Recipe\\:\\:craftingCosts\\(\\) return type with generic class Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\HasMany does not specify its types\\: TRelatedModel$#"
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Method App\\\\Models\\\\Recipe\\:\\:itemIDs\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 7
+			path: tests/Feature/Auth/AuthenticationTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 3
+			path: tests/Feature/Auth/EmailVerificationTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 3
+			path: tests/Feature/Auth/PasswordConfirmationTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 6
+			path: tests/Feature/Auth/PasswordResetTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 3
+			path: tests/Feature/Auth/PasswordUpdateTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 3
+			path: tests/Feature/Auth/RegistrationTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 1
+			path: tests/Feature/ExampleTest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 12
+			path: tests/Feature/ProfileTest.php
+
+		-
+			message: "#^Function something\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Pest.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 1
+			path: tests/Pest.php

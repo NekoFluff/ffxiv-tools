@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Enums\Server;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
@@ -56,7 +57,7 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
      */
     public function handle()
     {
-        /** @var array */
+        /** @var array<int> $itemIDs */
         $itemIDs = $this->argument('item');
         foreach ($itemIDs as $itemID) {
             $itemID = intval($itemID);
@@ -67,7 +68,7 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
 
                 return 1;
             }
-            $this->ffxivService->updateRecipeCosts($recipe);
+            $this->ffxivService->updateRecipeCosts(Server::from('Goblin'), $recipe);
         }
         $this->info('Recipe costs recalculated successfully');
 

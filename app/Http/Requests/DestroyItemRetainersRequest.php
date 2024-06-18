@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +13,13 @@ class DestroyItemRetainersRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->retainers->contains($this->route('retainerID'));
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var int $retainerID */
+        $retainerID = $this->route('retainerID');
+
+        return $user->retainers->contains($retainerID);
     }
 
     /**

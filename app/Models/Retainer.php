@@ -48,7 +48,7 @@ class Retainer extends Model
         'data_center' => DataCenter::class,
     ];
 
-    /** @return BelongsTo<User> */
+    /** @return BelongsTo<User,self> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -62,6 +62,7 @@ class Retainer extends Model
 
     /**
      * Get the listings for the retainer.
+     * @return HasMany<Listing>
      */
     public function listings(): HasMany
     {
