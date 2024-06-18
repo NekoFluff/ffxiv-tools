@@ -32,15 +32,12 @@ class RetainersController extends Controller
         $user = Auth::user();
         $retainers = $user->retainers()->with('items', 'items.marketPrices')->get();
 
-
-
         $itemIDsByServer = $retainers->groupBy('server')->map(function ($retainers) {
             return $retainers->pluck('items')->flatten()->pluck('id')->toArray();
         })->toArray();
 
         $listings = [];
         foreach ($itemIDsByServer as $server => $ids) {
-
             //TODO: Conditionally refresh marketboard listings
             $this->service->refreshMarketboardListings(Server::from($server), $ids);
         }
