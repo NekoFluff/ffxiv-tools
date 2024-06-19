@@ -47,7 +47,7 @@ class FetchRecipes extends Command
     {
         $page = 1;
         $recipesStr = '';
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
         do {
             Log::info('Fetching recipes page '.$page);
 

@@ -57,7 +57,7 @@ class MockXIVClient implements XIVClientInterface
 
     public function fetchVendorPrice(int $itemID): int
     {
-        return $this->faker->numberBetween(1, 1000);
+        return 1000;
     }
 
     public function fetchItem(int $itemID): ?XIVItem

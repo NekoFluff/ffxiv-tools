@@ -68,7 +68,7 @@ class RecalculateCostsForRecipe extends Command implements PromptsForMissingInpu
 
                 return 1;
             }
-            $this->ffxivService->updateRecipeCosts(Server::from('Goblin'), $recipe);
+            $this->ffxivService->updateRecipeCosts(Server::GOBLIN, $recipe);
         }
         $this->info('Recipe costs recalculated successfully');
 

@@ -241,10 +241,6 @@ class FFXIVService
      */
     public function updateMarketPrice(Server $server, Item $item, Collection $listings): void
     {
-        if ($listings->isEmpty()) {
-            return;
-        }
-
         $listings = $listings->sortBy('price_per_unit')->take(5);
 
         $median_cost = $listings->median('price_per_unit');

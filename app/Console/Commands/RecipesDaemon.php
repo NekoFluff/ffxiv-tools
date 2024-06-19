@@ -50,7 +50,7 @@ class RecipesDaemon extends Command
     {
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
 
         /** @phpstan-ignore-next-line */
         while (true) {

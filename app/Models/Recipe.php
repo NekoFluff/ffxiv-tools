@@ -115,6 +115,7 @@ class Recipe extends Model
         return $ids;
     }
 
+    /** @return HasMany<CraftingCost> */
     public function craftingCosts(): HasMany
     {
         return $this->hasMany(CraftingCost::class);
@@ -124,4 +125,9 @@ class Recipe extends Model
     {
         return $this->craftingCosts->first(fn (CraftingCost $craftingCost) => $craftingCost->server == $server);
     }
+
+    // public function craftingCost(Server $server): ?CraftingCost
+    // {
+    //     return $this->hasOne(CraftingCost::class)->where('server', $server)->first();
+    // }
 }

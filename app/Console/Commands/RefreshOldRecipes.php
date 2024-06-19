@@ -47,7 +47,7 @@ class RefreshOldRecipes extends Command
     {
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
 
         $recipesCount = Recipe::with('item')
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')

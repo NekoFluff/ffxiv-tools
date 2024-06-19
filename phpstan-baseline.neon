@@ -6,11 +6,6 @@ parameters:
 			path: app/Console/Commands/RecalculateCostsForRecipe.php
 
 		-
-			message: "#^Call to static method from\\(\\) on an unknown class App\\\\Console\\\\Commands\\\\Server\\.$#"
-			count: 1
-			path: app/Console/Commands/RefreshProfitableRecipes.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$mbSales has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Http/Clients/Universalis/UniversalisClient.php
@@ -112,11 +107,6 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Recipe\\:\\:\\$purchase_cost\\.$#"
-			count: 1
-			path: app/Models/Recipe.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Recipe\\:\\:craftingCosts\\(\\) return type with generic class Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\HasMany does not specify its types\\: TRelatedModel$#"
 			count: 1
 			path: app/Models/Recipe.php
 

@@ -50,9 +50,9 @@ class GetRecipeControllerTest extends TestCase
                         ->has('class_job_icon')
                         ->has('updated_at')
                         ->has('created_at')
-                        ->has('purchase_cost')
-                        ->has('market_craft_cost')
-                        ->has('optimal_craft_cost')
+                        ->where('purchase_cost', 1000)
+                        ->where('market_craft_cost', 150000297)
+                        ->where('optimal_craft_cost', 15297)
                         ->has('crafting_costs');
                 })
                 ->has('item', function (Assert $item) {

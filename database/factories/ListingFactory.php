@@ -26,7 +26,7 @@ class ListingFactory extends Factory
         return [
             'id' => $this->faker->unique()->randomNumber(),
             'data_center' => DataCenter::from('Crystal'),
-            'server' => Server::from('Goblin'),
+            'server' => Server::GOBLIN,
             'retainer_name' => $this->faker->name,
             'retainer_city' => 1,
             'quantity' => $quantity,

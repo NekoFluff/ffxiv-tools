@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Enums\Server;
 use App\Models\Item;
 use App\Models\Listing;
 use App\Models\MarketPrice;
@@ -46,7 +47,7 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle(): void
     {
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
 
         $recipes = Recipe::with('item')
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')

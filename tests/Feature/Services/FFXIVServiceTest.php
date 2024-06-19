@@ -6,8 +6,11 @@ use App\Http\Clients\Universalis\MockUniversalisClient;
 use App\Services\FFXIVService;
 use App\Http\Clients\XIV\MockXIVClient;
 use App\Models\Enums\Server;
+use App\Models\Ingredient;
 use App\Models\Item;
 use App\Models\Listing;
+use App\Models\MarketPrice;
+use App\Models\Recipe;
 use App\Models\Sale;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,7 +72,7 @@ class FFXIVServiceTest extends TestCase
     public function it_should_update_the_market_price_for_an_item_to_the_average_price(): void
     {
         // Arrange
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
         $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
 
         /** @var Collection<int, Listing> $listings */
@@ -98,7 +101,7 @@ class FFXIVServiceTest extends TestCase
     public function it_should_update_the_market_price_for_an_item_to_the_median_price(): void
     {
         // Arrange
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
         $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
 
         /** @var Collection<int, Listing> $listings */
@@ -127,7 +130,7 @@ class FFXIVServiceTest extends TestCase
     public function it_should_successfully_overwrite_any_existing_market_price(): void
     {
         // Arrange
-        $server = Server::from('Goblin');
+        $server = Server::GOBLIN;
         $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
 
         /** @var Collection<int, Listing> $listings */
@@ -159,5 +162,135 @@ class FFXIVServiceTest extends TestCase
             'price' => $expectedPrice
         ]);
         $this->assertDatabaseCount('market_prices', 1);
+    }
+
+    #[Test]
+    public function it_should_update_the_market_price_to_the_default_value_if_there_are_no_listings(): void
+    {
+        // Arrange
+        $server = Server::GOBLIN;
+        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+
+        // Act
+        $this->service->updateMarketPrice($server, $item, collect());
+
+        // Assert
+        $this->assertEquals(MarketPrice::DEFAULT_MARKET_PRICE, $item->marketPrice($server)->price);
+        $this->assertDatabaseHas('market_prices', [
+            'item_id' => $item->id,
+            'price' => MarketPrice::DEFAULT_MARKET_PRICE
+        ]);
+        $this->assertDatabaseCount('market_prices', 1);
+    }
+
+    #[Test]
+    public function it_should_update_the_recipe_costs_so_its_best_to_buy_all_ingredients(): void
+    {
+        // Arrange
+        $server = Server::GOBLIN;
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3, 'recipe_id' => $recipe->id]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4, 'recipe_id' => $recipe->id]);
+
+        // Act
+        $this->service->updateRecipeCosts($server, $recipe);
+
+        // Assert
+        $this->assertEquals(500, $recipe->craftingCost($server)->purchase_cost);
+        $this->assertEquals(2000, $recipe->craftingCost($server)->market_craft_cost);
+        $this->assertEquals(2000, $recipe->craftingCost($server)->optimal_craft_cost);
+
+        $this->assertDatabaseHas('crafting_costs', [
+            'recipe_id' => $recipe->id,
+            'purchase_cost' => 500,
+            'market_craft_cost' => 2000,
+            'optimal_craft_cost' => 2000,
+        ]);
+        $this->assertDatabaseCount('crafting_costs', 1);
+    }
+
+    #[Test]
+    public function it_should_update_the_recipe_costs_so_its_best_to_craft_some_ingredients(): void
+    {
+        // Arrange
+        $server = Server::GOBLIN;
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2]);
+        Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3]);
+        Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4]);
+
+        $recipe2 = Recipe::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID,]);
+        $cheapItem = Item::factory()->has(MarketPrice::factory()->state(['price' => 7]))->create(['id' => 1]);
+        Ingredient::factory()->for($recipe2)->create(['item_id' => $cheapItem->id, 'amount' => 1]);
+
+        // Act
+        $this->service->updateRecipeCosts($server, $recipe);
+
+        // Assert
+        $this->assertEquals(500, $recipe->craftingCost($server)->purchase_cost);
+        $this->assertEquals(2000, $recipe->craftingCost($server)->market_craft_cost);
+        $this->assertEquals(1814, $recipe->craftingCost($server)->optimal_craft_cost);
+
+        $this->assertDatabaseHas('crafting_costs', [
+            'recipe_id' => $recipe->id,
+            'purchase_cost' => 500,
+            'market_craft_cost' => 2000,
+            'optimal_craft_cost' => 1814,
+        ]);
+
+        $this->assertEquals(100, $recipe2->craftingCost($server)->purchase_cost);
+        $this->assertEquals(7, $recipe2->craftingCost($server)->market_craft_cost);
+        $this->assertEquals(7, $recipe2->craftingCost($server)->optimal_craft_cost);
+
+        $this->assertDatabaseHas('crafting_costs', [
+            'recipe_id' => $recipe2->id,
+            'purchase_cost' => 100,
+            'market_craft_cost' => 7,
+            'optimal_craft_cost' => 7,
+        ]);
+        $this->assertDatabaseCount('crafting_costs', 2);
+    }
+
+    #[Test]
+    public function it_should_update_the_crafting_costs_to_the_default_cost_if_there_is_no_market_price_data(): void
+    {
+        // Arrange
+        $server = Server::GOBLIN;
+        Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        Item::factory()->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
+        Item::factory()->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
+        Item::factory()->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3, 'recipe_id' => $recipe->id]);
+        Ingredient::factory()->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4, 'recipe_id' => $recipe->id]);
+
+        // Act
+        $this->service->updateRecipeCosts($server, $recipe);
+
+        // Assert
+        $this->assertEquals(10000000, $recipe->craftingCost($server)->purchase_cost);
+        $this->assertEquals(90000000, $recipe->craftingCost($server)->market_craft_cost);
+        $this->assertEquals(90000000, $recipe->craftingCost($server)->optimal_craft_cost);
+
+        $this->assertDatabaseHas('crafting_costs', [
+            'recipe_id' => $recipe->id,
+            'purchase_cost' => 10000000,
+            'market_craft_cost' => 90000000,
+            'optimal_craft_cost' => 90000000,
+        ]);
+        $this->assertDatabaseCount('crafting_costs', 1);
     }
 }
