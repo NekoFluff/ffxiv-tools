@@ -107,11 +107,6 @@ parameters:
 
 		-
 			message: "#^Undefined variable\\: \\$this$#"
-			count: 7
-			path: tests/Feature/Auth/AuthenticationTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
 			count: 3
 			path: tests/Feature/Auth/EmailVerificationTest.php
 
