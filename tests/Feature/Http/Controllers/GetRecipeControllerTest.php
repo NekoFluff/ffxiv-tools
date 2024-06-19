@@ -59,7 +59,7 @@ class GetRecipeControllerTest extends TestCase
                     $item->has('name')
                         ->has('icon')
                         ->has('vendor_price')
-                        ->where('market_price', 10000000)
+                        ->where('market_price', 9999)
                         ->where('id', 24511)
                         ->has('created_at')
                         ->has('updated_at')

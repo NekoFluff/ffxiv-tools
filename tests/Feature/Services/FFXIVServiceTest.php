@@ -60,9 +60,9 @@ class FFXIVServiceTest extends TestCase
         $this->assertDatabaseCount('items', 15);
         $this->assertDatabaseCount('ingredients', 17);
         $this->assertDatabaseCount('market_prices', 0);
-        $this->assertDatabaseCount('crafting_costs', 6);
-        // $this->assertDatabaseCount('listings', 6);
-        // $this->assertDatabaseCount('sales', 6);
+        $this->assertDatabaseCount('crafting_costs', 0);
+        $this->assertDatabaseCount('listings', 0);
+        $this->assertDatabaseCount('sales', 0);
     }
 
     #[Test]

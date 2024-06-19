@@ -1,0 +1,240 @@
+{
+    "itemIDs": [
+        24511,
+        5376
+    ],
+    "items": {
+        "24511": {
+            "itemID": 24511,
+            "worldID": 81,
+            "lastUploadTime": 1718819832348,
+            "listings": [
+                {
+                    "lastReviewTime": 1718828079,
+                    "pricePerUnit": 9999,
+                    "quantity": 1,
+                    "stainID": 0,
+                    "creatorName": "",
+                    "creatorID": "2004b596bf9cbb88e54292ae9ef2e333316123d04d6f2bb90896b6f1baed30e3",
+                    "hq": false,
+                    "isCrafted": true,
+                    "listingID": "e7ea68f86b1c4908dc0c8da20f6d42f6c46f6ed3e07aaa81eb63d5197b7fe3fc",
+                    "materia": [],
+                    "onMannequin": false,
+                    "retainerCity": 2,
+                    "retainerID": "0283805d2bc6c8fc996dd5e0bd07397c032b18ea63d7ade8327be0d5f4b368f7",
+                    "retainerName": "Adamence",
+                    "sellerID": "2004b596bf9cbb88e54292ae9ef2e333316123d04d6f2bb90896b6f1baed30e3",
+                    "total": 9999,
+                    "tax": 499
+                }
+            ],
+            "recentHistory": [
+                {
+                    "hq": false,
+                    "pricePerUnit": 10000,
+                    "quantity": 1,
+                    "timestamp": 1718807789,
+                    "onMannequin": false,
+                    "buyerName": "Midori Mizkan",
+                    "total": 10000
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 10478,
+                    "quantity": 1,
+                    "timestamp": 1718794260,
+                    "onMannequin": false,
+                    "buyerName": "Shirindari Khatayin",
+                    "total": 10478
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 10477,
+                    "quantity": 1,
+                    "timestamp": 1718794259,
+                    "onMannequin": false,
+                    "buyerName": "Shirindari Khatayin",
+                    "total": 10477
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 10477,
+                    "quantity": 1,
+                    "timestamp": 1718794257,
+                    "onMannequin": false,
+                    "buyerName": "Shirindari Khatayin",
+                    "total": 10477
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 10477,
+                    "quantity": 1,
+                    "timestamp": 1718782586,
+                    "onMannequin": false,
+                    "buyerName": "Grem L'ynn",
+                    "total": 10477
+                }
+            ],
+            "currentAveragePrice": 10788.48,
+            "currentAveragePriceNQ": 10788.48,
+            "currentAveragePriceHQ": 0,
+            "regularSaleVelocity": 0.71428573,
+            "nqSaleVelocity": 0.71428573,
+            "hqSaleVelocity": 0,
+            "averagePrice": 10381.8,
+            "averagePriceNQ": 10381.8,
+            "averagePriceHQ": 0,
+            "minPrice": 9999,
+            "minPriceNQ": 9999,
+            "minPriceHQ": 0,
+            "maxPrice": 12000,
+            "maxPriceNQ": 12000,
+            "maxPriceHQ": 0,
+            "stackSizeHistogram": {
+                "1": 52
+            },
+            "stackSizeHistogramNQ": {
+                "1": 52
+            },
+            "stackSizeHistogramHQ": {},
+            "worldName": "Goblin",
+            "listingsCount": 1,
+            "recentHistoryCount": 5,
+            "unitsForSale": 1,
+            "unitsSold": 5
+        },
+        "5376": {
+            "itemID": 5376,
+            "worldID": 81,
+            "lastUploadTime": 1718820731897,
+            "listings": [
+                {
+                    "lastReviewTime": 1718831954,
+                    "pricePerUnit": 99,
+                    "quantity": 99,
+                    "stainID": 0,
+                    "creatorName": "",
+                    "creatorID": "76fa3828348d795fbdd832ec87af2e2b193b9aed2c65ac6fd8dccd6b98a91dcf",
+                    "hq": false,
+                    "isCrafted": true,
+                    "listingID": "1dd102b969b7afbe6184623221f7d716211e6515a683a50590eda017e6eb1db4",
+                    "materia": [],
+                    "onMannequin": false,
+                    "retainerCity": 2,
+                    "retainerID": "69364e1ec6d5f8f009cbaa1029a18de2e33b7dbb5d51a5d3b0007ea6f6d0a133",
+                    "retainerName": "Nekasha",
+                    "sellerID": "e68f7a3a66b7fe272548857336c861585d86fe19603da5d6aceebbd83998c0ca",
+                    "total": 9801,
+                    "tax": 490
+                }
+            ],
+            "recentHistory": [
+                {
+                    "hq": true,
+                    "pricePerUnit": 149,
+                    "quantity": 18,
+                    "timestamp": 1718817284,
+                    "onMannequin": false,
+                    "buyerName": "Llenna Ysio-ro",
+                    "total": 2682
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 100,
+                    "quantity": 99,
+                    "timestamp": 1718804861,
+                    "onMannequin": false,
+                    "buyerName": "Suma Fukiku",
+                    "total": 9900
+                },
+                {
+                    "hq": false,
+                    "pricePerUnit": 100,
+                    "quantity": 32,
+                    "timestamp": 1718802883,
+                    "onMannequin": false,
+                    "buyerName": "T'ide Pod",
+                    "total": 3200
+                },
+                {
+                    "hq": true,
+                    "pricePerUnit": 2998,
+                    "quantity": 3,
+                    "timestamp": 1718779348,
+                    "onMannequin": false,
+                    "buyerName": "Zevitch Zebnok",
+                    "total": 8994
+                },
+                {
+                    "hq": true,
+                    "pricePerUnit": 2999,
+                    "quantity": 3,
+                    "timestamp": 1718769427,
+                    "onMannequin": false,
+                    "buyerName": "Talia Breylar",
+                    "total": 8997
+                }
+            ],
+            "currentAveragePrice": 1251.35,
+            "currentAveragePriceNQ": 1365.4166,
+            "currentAveragePriceHQ": 1202.4642,
+            "regularSaleVelocity": 22.142857,
+            "nqSaleVelocity": 18.714285,
+            "hqSaleVelocity": 3.4285715,
+            "averagePrice": 1269.2,
+            "averagePriceNQ": 100,
+            "averagePriceHQ": 2048.6667,
+            "minPrice": 99,
+            "minPriceNQ": 99,
+            "minPriceHQ": 150,
+            "maxPrice": 5000,
+            "maxPriceNQ": 5000,
+            "maxPriceHQ": 4999,
+            "stackSizeHistogram": {
+                "3": 7,
+                "12": 1,
+                "20": 2,
+                "30": 1,
+                "49": 1,
+                "50": 2,
+                "54": 1,
+                "56": 1,
+                "59": 1,
+                "63": 1,
+                "78": 1,
+                "82": 1,
+                "90": 1,
+                "99": 19
+            },
+            "stackSizeHistogramNQ": {
+                "50": 1,
+                "56": 1,
+                "59": 1,
+                "63": 1,
+                "82": 1,
+                "99": 7
+            },
+            "stackSizeHistogramHQ": {
+                "3": 7,
+                "12": 1,
+                "20": 2,
+                "30": 1,
+                "49": 1,
+                "50": 1,
+                "54": 1,
+                "78": 1,
+                "90": 1,
+                "99": 12
+            },
+            "worldName": "Goblin",
+            "listingsCount": 1,
+            "recentHistoryCount": 5,
+            "unitsForSale": 99,
+            "unitsSold": 155
+        }
+    },
+    "worldID": 81,
+    "unresolvedItems": [],
+    "worldName": "Goblin"
+}

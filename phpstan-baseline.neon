@@ -11,24 +11,9 @@ parameters:
 			path: app/Console/Commands/RefreshProfitableRecipes.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$body has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Http/Clients/Universalis/UniversalisClient.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$mbSales has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Http/Clients/Universalis/UniversalisClient.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Clients\\\\XIV\\\\MockXIVClient\\:\\:fetchRecipe\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Http/Clients/XIV/MockXIVClient.php
-
-		-
-			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
-			count: 6
-			path: app/Http/Clients/XIV/MockXIVClient.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Clients\\\\XIV\\\\XIVClientInterface\\:\\:fetchRecipe\\(\\) return type has no value type specified in iterable type array\\.$#"

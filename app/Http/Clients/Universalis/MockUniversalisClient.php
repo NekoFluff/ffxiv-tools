@@ -11,12 +11,21 @@ class MockUniversalisClient implements UniversalisClientInterface
     {
     }
 
+    /** @return array<mixed> */
     public function fetchMarketBoardListings(Server $server, array $itemIDs): array
     {
-        return [];
+        $json = (string) file_get_contents('app\Http\Clients\Universalis\24511_5376.json');
+        $data = json_decode($json, true)['items'];
+        if (!in_array(24511, $itemIDs)) {
+            unset($data['24511']);
+        }
+        if (!in_array(5376, $itemIDs)) {
+            unset($data['5376']);
+        }
+        return $data;
     }
 
-
+    /** @return array<mixed> */
     public function fetchMarketBoardSales(Server $server, int $itemID): array
     {
         return [];
@@ -28,7 +37,7 @@ class MockUniversalisClient implements UniversalisClientInterface
         return $this->faker->numberBetween(1, 1000);
     }
 
-
+    /** @return array<mixed> */
     public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
         return [];

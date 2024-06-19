@@ -82,15 +82,6 @@ class FFXIVService
         $recipe = $this->parseRecipeJson($recipeData);
         $this->updateVendorPrices($recipe);
 
-        $server = Server::from('Goblin');
-        $this->refreshMarketboardListings($server, $recipe->itemIDs());
-        DB::transaction(function () use ($recipe, $server) {
-            $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-            $this->updateMarketPrices($server, $recipe, $listings);
-            $this->updateRecipeCosts($server, $recipe);
-            $this->refreshMarketBoardSales($server, $recipe->item_id);
-        });
-
         return $recipe;
     }
 
@@ -348,6 +339,10 @@ class FFXIVService
     */
     public function refreshMarketboardListings(Server $server, array $itemIDs): void
     {
+        if (empty($itemIDs)) {
+            return;
+        }
+
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
         Listing::whereIn('item_id', $itemIDs)->delete();
 

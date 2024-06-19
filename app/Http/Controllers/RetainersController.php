@@ -37,7 +37,7 @@ class RetainersController extends Controller
 
         $listings = [];
         foreach ($itemIDsByServer as $server => $ids) {
-            //TODO: Conditionally refresh marketboard listings
+            // TODO: Conditionally refresh marketboard listings
             $this->service->refreshMarketboardListings(Server::from($server), $ids);
         }
 

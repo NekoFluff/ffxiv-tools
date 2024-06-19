@@ -43,7 +43,7 @@ class UniversalisClient implements UniversalisClientInterface
 
             return [];
         }
-        /** @var array $body */
+        /** @var array<mixed> $body */
         $body = json_decode($mbListings->getBody(), true);
 
         $mbListings = [];
