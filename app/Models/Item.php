@@ -95,7 +95,7 @@ class Item extends Model
     /** @return ?MarketPrice */
     public function marketPrice(Server $server): ?MarketPrice
     {
-        return $this->marketPrices->filter(fn (MarketPrice $marketPrice) => $marketPrice->server === $server)->first()?->fresh();
+        return $this->marketPrices->filter(fn (MarketPrice $marketPrice) => $marketPrice->server === $server)->first();
     }
 
     /** @return BelongsToMany<Retainer> */

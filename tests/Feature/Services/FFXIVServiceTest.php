@@ -69,6 +69,7 @@ class FFXIVServiceTest extends TestCase
     public function it_should_update_the_market_price_for_an_item_to_the_average_price(): void
     {
         // Arrange
+        $server = Server::from('Goblin');
         $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
 
         /** @var Collection<int, Listing> $listings */
@@ -82,9 +83,10 @@ class FFXIVServiceTest extends TestCase
         $expectedPrice = 460;
 
         // Act
-        $this->service->updateMarketPrice(Server::from('Goblin'), $item, $listings);
+        $this->service->updateMarketPrice($server, $item, $listings);
 
         // Assert
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => $expectedPrice
@@ -96,6 +98,7 @@ class FFXIVServiceTest extends TestCase
     public function it_should_update_the_market_price_for_an_item_to_the_median_price(): void
     {
         // Arrange
+        $server = Server::from('Goblin');
         $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
 
         /** @var Collection<int, Listing> $listings */
@@ -109,9 +112,48 @@ class FFXIVServiceTest extends TestCase
         $expectedPrice = 400;
 
         // Act
-        $this->service->updateMarketPrice(Server::from('Goblin'), $item, $listings);
+        $this->service->updateMarketPrice($server, $item, $listings);
 
         // Assert
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
+        $this->assertDatabaseHas('market_prices', [
+            'item_id' => $item->id,
+            'price' => $expectedPrice
+        ]);
+        $this->assertDatabaseCount('market_prices', 1);
+    }
+
+    #[Test]
+    public function it_should_successfully_overwrite_any_existing_market_price(): void
+    {
+        // Arrange
+        $server = Server::from('Goblin');
+        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+
+        /** @var Collection<int, Listing> $listings */
+        $listings = collect([
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 400, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 400, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 500, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 500, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 500, 'quantity' => 1]),
+        ]);
+        /** @var Collection<int, Listing> $listings2 */
+        $listings2 = collect([
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 500, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 500, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 600, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 600, 'quantity' => 1]),
+            Listing::factory()->createOne(['item_id' => $item->id, 'price_per_unit' => 600, 'quantity' => 1]),
+        ]);
+        $expectedPrice = 560;
+
+        // Act
+        $this->service->updateMarketPrice($server, $item, $listings);
+        $this->service->updateMarketPrice($server, $item, $listings2);
+
+        // Assert
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => $expectedPrice

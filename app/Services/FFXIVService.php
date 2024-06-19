@@ -265,12 +265,15 @@ class FFXIVService
                 'item_id' => $item->id,
                 'price' => 0,
             ]);
+            $marketPrice->updated_at = now();
+            $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
             $item->marketPrices()->save($marketPrice);
             $item->load('marketPrices');
+        } else {
+            $marketPrice->updated_at = now();
+            $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
+            $marketPrice->save();
         }
-        $marketPrice->updated_at = now();
-        $marketPrice->price = intval(min($avg_cost, $median_cost)) ?: MarketPrice::DEFAULT_MARKET_PRICE;
-        $marketPrice->save();
     }
 
     private function updateOptimalCraftCost(Server $server, Recipe $recipe): void
