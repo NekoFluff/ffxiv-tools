@@ -13,5 +13,8 @@ static-analysis:
 models:
 	php artisan ide-helper:models
 
+test:
+	php artisan test
+
 coverage:
 	php artisan test --coverage-html=build/coverage
