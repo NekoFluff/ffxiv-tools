@@ -43,7 +43,69 @@ class GetRecipeControllerTest extends TestCase
                     $recipe->has('id')
                         ->has('item')
                         ->where('item_id', 24511)
-                        ->has('ingredients')
+                        ->has('ingredients', 5)
+                        ->has('ingredients.0', function (Assert $ingredients) {
+                            $ingredients->where('item_id', MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID)
+                                ->has('id')
+                                ->has('item', function (Assert $item) {
+                                    $item->has('name')
+                                        ->has('icon')
+                                        ->has('vendor_price')
+                                        ->missing('market_price')
+                                        ->etc();
+                                })
+                                ->where('amount', 3)
+                                ->has('crafting_recipe', function (Assert $craftingRecipe) {
+                                    $craftingRecipe->has('id')
+                                        ->has('item_id')
+                                        ->where('amount_result', 3)
+                                        ->where('purchase_cost', 297)
+                                        ->where('market_craft_cost', 270000000)
+                                        ->where('optimal_craft_cost', 27000)
+                                        ->has('crafting_costs')
+                                        ->etc();
+                                })
+                                ->etc();
+                        })
+                        ->has('ingredients.1', function (Assert $ingredients) {
+                            $ingredients->where('item_id', MockXIVClient::MYTHRIL_RIVETS_ITEM_ID)
+                                ->has('id')
+                                ->has('item', function (Assert $item) {
+                                    $item->has('name')
+                                        ->has('icon')
+                                        ->has('vendor_price')
+                                        ->missing('market_price')
+                                        ->etc();
+                                })
+                                ->where('amount', 2)
+                                ->etc();
+                        })
+                        ->has('ingredients.2', function (Assert $ingredients) {
+                            $ingredients->where('item_id', MockXIVClient::VARNISH_ITEM_ID)
+                                ->has('id')
+                                ->has('item', function (Assert $item) {
+                                    $item->has('name')
+                                        ->has('icon')
+                                        ->has('vendor_price')
+                                        ->missing('market_price')
+                                        ->etc();
+                                })
+                                ->where('amount', 2)
+                                ->etc();
+                        })
+                        ->has('ingredients.3', function (Assert $ingredients) {
+                            $ingredients->where('item_id', 4)
+                                ->has('id')
+                                ->has('item', function (Assert $item) {
+                                    $item->has('name')
+                                        ->has('icon')
+                                        ->has('vendor_price')
+                                        ->where('market_price', 10000000)
+                                        ->etc();
+                                })
+                                ->where('amount', 6)
+                                ->etc();
+                        })
                         ->has('amount_result')
                         ->has('class_job')
                         ->has('class_job_level')
@@ -63,10 +125,10 @@ class GetRecipeControllerTest extends TestCase
                         ->where('id', 24511)
                         ->has('created_at')
                         ->has('updated_at')
-                        ->has('market_prices');
+                        ->has('market_prices', 1);
                 })
-                ->has('history')
-                ->has('listings')
+                ->has('history', 8)
+                ->has('listings', 1)
                 ->has('lastUpdated')
         );
     }
