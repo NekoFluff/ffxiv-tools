@@ -28,6 +28,7 @@ interface UniversalisClientInterface
 
     /**
      * Fetch the most recently updated items
+     *
      * @return array<int,array<mixed>>
      */
     public function fetchMostRecentlyUpdatedItems(Server $server): array;

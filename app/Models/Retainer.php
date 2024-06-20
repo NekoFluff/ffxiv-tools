@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- *
- *
  * @property int $id
  * @property int $user_id
  * @property string $name
@@ -22,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Item> $items
  * @property-read int|null $items_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer query()
@@ -32,9 +31,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer whereServer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Retainer whereUserId($value)
+ *
  * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Listing> $listings
  * @property-read int|null $listings_count
+ *
  * @mixin \Eloquent
  */
 class Retainer extends Model
@@ -62,6 +63,7 @@ class Retainer extends Model
 
     /**
      * Get the listings for the retainer.
+     *
      * @return HasMany<Listing>
      */
     public function listings(): HasMany

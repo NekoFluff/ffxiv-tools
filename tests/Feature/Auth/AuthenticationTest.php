@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
-use PHPUnit\Framework\Attributes\Test;
 use App\Models\User;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase

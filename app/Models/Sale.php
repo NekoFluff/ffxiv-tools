@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Sale newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sale newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sale query()
@@ -34,11 +35,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sale whereUpdatedAt($value)
+ *
  * @property DataCenter $data_center
  * @property Server $server
+ *
  * @method static Builder|Sale fromServer(Server $server)
  * @method static Builder|Sale whereDataCenter($value)
  * @method static Builder|Sale whereServer($value)
+ *
  * @mixin \Eloquent
  */
 class Sale extends Model
@@ -66,8 +70,7 @@ class Sale extends Model
     /**
      * Scope a query to only include sales from a specific server.
      *
-     * @param Builder<self> $query
-     * @param Server $server
+     * @param  Builder<self>  $query
      */
     public function scopeFromServer(Builder $query, Server $server): void
     {

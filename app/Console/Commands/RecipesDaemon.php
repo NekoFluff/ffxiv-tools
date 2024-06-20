@@ -67,7 +67,7 @@ class RecipesDaemon extends Command
         $recipes = Recipe::with('item')
             ->leftJoin('market_prices', function ($join) use ($server) {
                 $join->on('recipes.item_id', '=', 'market_prices.item_id')
-                     ->where('market_prices.server', '=', $server);
+                    ->where('market_prices.server', '=', $server);
             })
             ->select('recipes.*')
             ->where('market_prices.updated_at', '<', now()->subHours(24))

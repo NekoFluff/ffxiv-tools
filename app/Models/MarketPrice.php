@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
- *
  * @property int $id
  * @property int $item_id
  * @property DataCenter $data_center
@@ -19,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice query()
@@ -29,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice whereServer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class MarketPrice extends Model

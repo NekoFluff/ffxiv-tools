@@ -3,7 +3,6 @@
 namespace Tests\Feature\Services;
 
 use App\Http\Clients\Universalis\MockUniversalisClient;
-use App\Services\FFXIVService;
 use App\Http\Clients\XIV\MockXIVClient;
 use App\Models\Enums\Server;
 use App\Models\Ingredient;
@@ -11,12 +10,12 @@ use App\Models\Item;
 use App\Models\Listing;
 use App\Models\MarketPrice;
 use App\Models\Recipe;
-use App\Models\Sale;
+use App\Services\FFXIVService;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class FFXIVServiceTest extends TestCase
 {
@@ -92,7 +91,7 @@ class FFXIVServiceTest extends TestCase
         $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
-            'price' => $expectedPrice
+            'price' => $expectedPrice,
         ]);
         $this->assertDatabaseCount('market_prices', 1);
     }
@@ -121,7 +120,7 @@ class FFXIVServiceTest extends TestCase
         $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
-            'price' => $expectedPrice
+            'price' => $expectedPrice,
         ]);
         $this->assertDatabaseCount('market_prices', 1);
     }
@@ -159,7 +158,7 @@ class FFXIVServiceTest extends TestCase
         $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
-            'price' => $expectedPrice
+            'price' => $expectedPrice,
         ]);
         $this->assertDatabaseCount('market_prices', 1);
     }
@@ -178,7 +177,7 @@ class FFXIVServiceTest extends TestCase
         $this->assertEquals(MarketPrice::DEFAULT_MARKET_PRICE, $item->marketPrice($server)->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
-            'price' => MarketPrice::DEFAULT_MARKET_PRICE
+            'price' => MarketPrice::DEFAULT_MARKET_PRICE,
         ]);
         $this->assertDatabaseCount('market_prices', 1);
     }
@@ -193,7 +192,7 @@ class FFXIVServiceTest extends TestCase
         Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
         Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
 
-        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3, 'recipe_id' => $recipe->id]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4, 'recipe_id' => $recipe->id]);
@@ -225,12 +224,12 @@ class FFXIVServiceTest extends TestCase
         Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
         Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
 
-        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2]);
         Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3]);
         Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4]);
 
-        $recipe2 = Recipe::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID,]);
+        $recipe2 = Recipe::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
         $cheapItem = Item::factory()->has(MarketPrice::factory()->state(['price' => 7]))->create(['id' => 1]);
         Ingredient::factory()->for($recipe2)->create(['item_id' => $cheapItem->id, 'amount' => 1]);
 
@@ -272,7 +271,7 @@ class FFXIVServiceTest extends TestCase
         Item::factory()->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
         Item::factory()->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
 
-        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID,]);
+        $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'amount' => 3, 'recipe_id' => $recipe->id]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::VARNISH_ITEM_ID, 'amount' => 4, 'recipe_id' => $recipe->id]);

@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
- *
  * @property int $id
  * @property int $recipe_id
  * @property DataCenter $data_center
@@ -21,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Recipe $recipe
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost query()
@@ -33,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost whereRecipeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost whereServer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CraftingCost whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CraftingCost extends Model

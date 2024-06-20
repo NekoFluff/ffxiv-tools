@@ -5,9 +5,9 @@ namespace Tests\Feature\Http\Controllers;
 use App\Http\Clients\XIV\MockXIVClient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class GetRecipeControllerTest extends TestCase
 {

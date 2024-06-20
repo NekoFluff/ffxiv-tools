@@ -15,7 +15,6 @@ use App\Models\Sale;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FFXIVService
@@ -235,7 +234,7 @@ class FFXIVService
     /**
      * Updates the market price of an item.
      *
-     * @param  Server $server The server
+     * @param  Server  $server  The server
      * @param  Item  $item  The item to update the market price for
      * @param  Collection<int, Listing>  $listings  The market board listings
      */
@@ -324,18 +323,17 @@ class FFXIVService
     }
 
     /**
-     * @param array<int> $itemIDs
+     * @param  array<int>  $itemIDs
      * @return array<mixed>
-    */
+     */
     public function fetchMarketboardListings(Server $server, array $itemIDs): array
     {
         return $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
     }
 
     /**
-     * @param array<int> $itemIDs
-     * @return void
-    */
+     * @param  array<int>  $itemIDs
+     */
     public function refreshMarketboardListings(Server $server, array $itemIDs): void
     {
         if (empty($itemIDs)) {
@@ -387,8 +385,8 @@ class FFXIVService
     /**
      * Process the market board listings data from Universalis.
      *
-     * @param Server $server The server
-     * @param array<mixed> $listingsData The listings data
+     * @param  Server  $server  The server
+     * @param  array<mixed>  $listingsData  The listings data
      */
     private function processMarketBoardListings(Server $server, array $listingsData): void
     {
@@ -436,8 +434,8 @@ class FFXIVService
     /**
      * Retrieves the market board sales for a specific server and item.
      *
-     * @param Server $server The server name.
-     * @param int $itemID  The ID of the item.
+     * @param  Server  $server  The server name.
+     * @param  int  $itemID  The ID of the item.
      */
     public function refreshMarketBoardSales(Server $server, int $itemID): void
     {
@@ -469,7 +467,7 @@ class FFXIVService
     /**
      * Returns Sales aggregated daily for the last week
      *
-     * @param  Collection<int, Sale> $sales
+     * @param  Collection<int, Sale>  $sales
      * @return Collection<int, array{date: (int|string), quantity: mixed, avg_price: float|int|null, median_price: float|int|null, min_price: mixed, max_price: mixed}>
      */
     public function aggregateSales(Collection $sales): Collection

@@ -4,10 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Enums\Server;
 use App\Models\Listing;
-use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -30,6 +28,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
     protected FFXIVService $ffxivService;
 
     protected int $totalCount = 0;
+
     protected int $timestamp = 0;
 
     /**

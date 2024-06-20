@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\Recipe|null $recipe
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sale> $sales
  * @property-read int|null $sales_count
+ *
  * @method static \Database\Factories\ItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Item newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Item newQuery()
@@ -36,10 +37,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereVendorPrice($value)
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MarketPrice> $marketPrices
  * @property-read int|null $market_prices_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Retainer> $retainers
  * @property-read int|null $retainers_count
+ *
  * @mixin \Eloquent
  */
 class Item extends Model

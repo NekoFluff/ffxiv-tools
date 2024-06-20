@@ -15,6 +15,7 @@ class DestroyRetainerRequest extends FormRequest
     {
         /** @var User $user */
         $user = Auth::user();
+
         return $user->retainers()->find($this->route('retainerID')) != null;
     }
 }

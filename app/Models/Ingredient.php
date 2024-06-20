@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @property-read \App\Models\Recipe|null $craftingRecipe
  * @property-read \App\Models\Item $item
  * @property-read \App\Models\Recipe $recipe
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient query()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereItemId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereRecipeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Ingredient extends Model

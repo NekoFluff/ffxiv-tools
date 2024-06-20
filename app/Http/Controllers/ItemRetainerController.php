@@ -38,6 +38,7 @@ class ItemRetainerController extends Controller
             'server' => $retainer->server,
             'items' => $retainer->items()->where('id', $request->input('item_id'))->get()->map(function ($item) use ($retainerListings) {
                 $lowestListingPrice = Listing::where('item_id', $item->id)->orderBy('price_per_unit', 'asc')->first()?->price_per_unit;
+
                 return [
                     'item_id' => $item->id,
                     'item_name' => $item->name,

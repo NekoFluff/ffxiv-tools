@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Enums\Server;
-use App\Models\Item;
 use App\Models\Listing;
 use App\Models\MarketPrice;
 use App\Models\Recipe;

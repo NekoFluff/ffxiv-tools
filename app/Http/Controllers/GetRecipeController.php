@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Enums\Server;
 use App\Models\Item;
 use App\Models\Listing;
-use App\Models\MarketPrice;
 use App\Models\Retainer;
 use App\Models\Sale;
 use App\Services\FFXIVService;
@@ -34,7 +33,7 @@ class GetRecipeController extends Controller
         $recipe = $this->service->getRecipeByItemID($itemID);
         $item = $recipe->item ?? Item::find($itemID);
         if ($recipe) {
-            $marketPrice =  $recipe->item->marketPrice($server);
+            $marketPrice = $recipe->item->marketPrice($server);
 
             if ($recalculate || $marketPrice === null || $marketPrice->updated_at?->diffInMinutes(now()) > 15) {
                 $this->service->refreshMarketboardListings($server, $recipe->itemIDs());

@@ -64,7 +64,7 @@ class StoreItemRetainerRequest extends FormRequest
                 if ($retainer->items->count() >= 20) {
                     $validator->errors()->add('item_id', 'The retainer can only have 20 items');
                 }
-            }
+            },
         ];
     }
 }

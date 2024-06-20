@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\Enums\Server;
-use App\Services\FFXIVService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -59,7 +58,7 @@ class StoreRetainerRequest extends FormRequest
                 if ($user->retainers->contains('name', $this->input('name'))) {
                     $validator->errors()->add('name', 'You already have a retainer with that name');
                 }
-            }
+            },
         ];
     }
 }

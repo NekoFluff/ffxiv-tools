@@ -16,12 +16,13 @@ class MockUniversalisClient implements UniversalisClientInterface
     {
         $json = (string) file_get_contents('app\Http\Clients\Universalis\24511_5376.json');
         $data = json_decode($json, true)['items'];
-        if (!in_array(24511, $itemIDs)) {
+        if (! in_array(24511, $itemIDs)) {
             unset($data['24511']);
         }
-        if (!in_array(5376, $itemIDs)) {
+        if (! in_array(5376, $itemIDs)) {
             unset($data['5376']);
         }
+
         return $data;
     }
 
@@ -30,7 +31,6 @@ class MockUniversalisClient implements UniversalisClientInterface
     {
         return [];
     }
-
 
     public function fetchLastWeekSaleCount(Server $server, int $itemID): int
     {

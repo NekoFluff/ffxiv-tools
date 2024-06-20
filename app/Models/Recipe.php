@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ingredient> $ingredients
  * @property-read int|null $ingredients_count
  * @property-read \App\Models\Item $item
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe query()
@@ -36,8 +37,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereOptimalCraftCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe wherePurchaseCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Recipe whereUpdatedAt($value)
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CraftingCost> $craftingCosts
  * @property-read int|null $crafting_costs_count
+ *
  * @mixin \Eloquent
  */
 class Recipe extends Model
@@ -49,7 +52,7 @@ class Recipe extends Model
         'ingredients',
         'ingredients.item',
         'ingredients.craftingRecipe',
-        'craftingCosts'
+        'craftingCosts',
     ];
 
     protected $fillable = [

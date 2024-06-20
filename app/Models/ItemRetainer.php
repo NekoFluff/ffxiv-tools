@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
- *
  * @property-read \App\Models\Item|null $item
  * @property-read \App\Models\Retainer|null $retainer
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ItemRetainer query()
+ *
  * @mixin \Eloquent
  */
 class ItemRetainer extends Model
