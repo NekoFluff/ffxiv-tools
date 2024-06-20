@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Enums\Server;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
