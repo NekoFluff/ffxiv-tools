@@ -46,21 +46,6 @@ parameters:
 			path: app/Http/Requests/ProfileUpdateRequest.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Item\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Item\\>\\:\\:\\$name\\.$#"
-			count: 1
-			path: app/Http/Requests/StoreItemRetainerRequest.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Requests\\\\StoreItemRetainerRequest\\:\\:after\\(\\) has invalid return type App\\\\Http\\\\Requests\\\\Closure\\.$#"
-			count: 1
-			path: app/Http/Requests/StoreItemRetainerRequest.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Requests\\\\StoreItemRetainerRequest\\:\\:after\\(\\) should return array\\<int, App\\\\Http\\\\Requests\\\\Closure\\> but returns array\\<int, Closure\\>\\.$#"
-			count: 1
-			path: app/Http/Requests/StoreItemRetainerRequest.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Requests\\\\StoreRetainerRequest\\:\\:after\\(\\) has invalid return type App\\\\Http\\\\Requests\\\\Closure\\.$#"
 			count: 1
 			path: app/Http/Requests/StoreRetainerRequest.php

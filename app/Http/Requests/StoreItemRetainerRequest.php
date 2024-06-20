@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Retainer;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
@@ -57,7 +58,8 @@ class StoreItemRetainerRequest extends FormRequest
                 /** @var Retainer $retainer */
                 $retainer = Auth::user()->retainers->find($this->route('retainerID'));
                 if ($retainer->items->contains($this->input('item_id'))) {
-                    $item = $retainer->items->find($this->input('item_id'));
+                    /** @var \App\Models\Item $item */
+                    $item = $retainer->items->get($this->input('item_id'));
                     $validator->errors()->add('item_id', $item->name.' is already linked to the retainer');
                 }
 
