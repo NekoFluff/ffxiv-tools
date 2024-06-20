@@ -56,6 +56,7 @@ class Item extends Model
         'vendor_price',
     ];
 
+    /** @var array{vendor_price:int} */
     protected $attributes = [
         'vendor_price' => 0,
     ];

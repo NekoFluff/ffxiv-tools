@@ -51,11 +51,6 @@ parameters:
 			path: app/Models/CraftingCost.php
 
 		-
-			message: "#^Property App\\\\Models\\\\Item\\:\\:\\$attributes type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Models/Item.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Item\\:\\:\\$market_price\\.$#"
 			count: 2
 			path: app/Models/Recipe.php
