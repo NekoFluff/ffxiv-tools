@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice whereServer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MarketPrice whereUpdatedAt($value)
+ * @method static \Database\Factories\MarketPriceFactory factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */

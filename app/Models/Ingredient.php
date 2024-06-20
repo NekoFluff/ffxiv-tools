@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereItemId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereRecipeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ingredient whereUpdatedAt($value)
+ * @method static \Database\Factories\IngredientFactory factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */

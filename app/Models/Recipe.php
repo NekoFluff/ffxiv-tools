@@ -41,6 +41,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CraftingCost> $craftingCosts
  * @property-read int|null $crafting_costs_count
  *
+ * @method static \Database\Factories\RecipeFactory factory($count = null, $state = [])
+ *
  * @mixin \Eloquent
  */
 class Recipe extends Model
