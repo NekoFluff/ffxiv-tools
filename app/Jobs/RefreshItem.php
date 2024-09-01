@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RefreshItem implements ShouldBeUnique, ShouldQueue
 {
@@ -26,7 +27,6 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
      */
     public function __construct(public int $itemID, public Server $server = Server::GOBLIN)
     {
-        //
     }
 
     /**
@@ -34,6 +34,8 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
      */
     public function handle(FFXIVService $service): void
     {
+        Log::withContext(['itemID' => $this->itemID, 'server' => $this->server]);
+
         DB::transaction(function () use ($service) {
             $recipe = $service->getRecipeByItemID($this->itemID);
 

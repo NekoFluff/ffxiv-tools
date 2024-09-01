@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Services\FFXIVService;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Telescope\Telescope;
+use UnitEnum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Telescope::tag(function ($entry) {
+            if ($entry->type === 'job') {
+                return array_filter([
+                    $entry->content['name'] ? 'job:'.$entry->content['name'] : '',
+                    $entry->content['data']['itemID'] ? 'itemID:'.$entry->content['data']['itemID'] : '',
+                    $entry->content['data']['server']['properties'] ? 'server:'.$entry->content['data']['server']['properties'] : '',
+                ]);
+            } elseif ($entry->type === 'log') {
+                return collect($entry->content['context'])->map(function ($value, $key) {
+                    if ($value instanceof UnitEnum) {
+                        return $key.':'.$value->value;
+                    } else {
+                        return $key.':'.$value;
+                    }
+                })->toArray();
+            }
+        });
     }
 }
