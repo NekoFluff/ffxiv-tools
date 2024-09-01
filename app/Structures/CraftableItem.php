@@ -2,7 +2,6 @@
 
 namespace App\Structures;
 
-use App\Models\CraftingCost;
 use App\Models\Enums\Server;
 use App\Models\Ingredient;
 use App\Models\MarketPrice;
@@ -47,7 +46,6 @@ class CraftableItem implements Wireable
     {
         $ratio = $target_amount / $recipe->amount_result;
 
-        /** @var CraftingCost */
         $craftingCost = $recipe->craftingCost($server);
 
         $item = new CraftableItem();
@@ -66,9 +64,11 @@ class CraftableItem implements Wireable
         $item->class_job_level = $recipe->class_job_level;
         $item->class_job_icon = $recipe->class_job_icon;
 
-        $item->purchase_cost = intval($craftingCost->purchase_cost * $target_amount);
-        $item->market_craft_cost = intval($craftingCost->market_craft_cost * $ratio);
-        $item->optimal_craft_cost = intval($craftingCost->optimal_craft_cost * $ratio);
+        if ($craftingCost) {
+            $item->purchase_cost = intval($craftingCost->purchase_cost * $target_amount);
+            $item->market_craft_cost = intval($craftingCost->market_craft_cost * $ratio);
+            $item->optimal_craft_cost = intval($craftingCost->optimal_craft_cost * $ratio);
+        }
         $item->market_price = $recipe->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
         $item->market_price_updated_at = intval($recipe->item->marketPrice($server)?->updated_at?->timestamp);
         $item->vendor_price = $recipe->item->vendor_price;

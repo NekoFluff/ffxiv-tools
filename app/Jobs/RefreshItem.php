@@ -34,36 +34,25 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
      */
     public function handle(FFXIVService $service): void
     {
-        $recipe = $service->getRecipeByItemID($this->itemID);
+        DB::transaction(function () use ($service) {
+            $recipe = $service->getRecipeByItemID($this->itemID);
 
-        $item = $recipe->item ?? Item::find($this->itemID);
-        if ($recipe) {
-            $service->refreshMarketboardListings($this->server, $recipe->itemIDs());
-            DB::transaction(function () use ($recipe, $service) {
+            $item = $recipe->item ?? Item::find($this->itemID);
+            if ($recipe) {
+                $service->refreshMarketboardListings($this->server, $recipe->itemIDs());
                 $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                 $service->updateMarketPrices($this->server, $recipe, $listings);
                 $service->updateRecipeCosts($this->server, $recipe);
                 $service->refreshMarketBoardSales($this->server, $recipe->item_id);
-            });
-        } elseif ($item) {
-            $service->refreshMarketboardListings($this->server, [$item->id]);
-            DB::transaction(function () use ($item, $service) {
+            } elseif ($item) {
+                $service->refreshMarketboardListings($this->server, [$item->id]);
                 $listings = Listing::where('item_id', $item->id)->get();
                 if (! $listings->isEmpty()) {
                     $service->updateMarketPrice($this->server, $item, $listings);
                 }
                 $service->refreshMarketBoardSales($this->server, $item->id);
-            });
-        }
-
-        // if ($recipe) {
-        //     $recipe->alignAmounts($this->server, 1);
-        // }
-
-        // $item = $recipe?->item ?? $item;
-
-        // $item?->fresh();
-        // $lastUpdated = $item?->marketPrice($this->server)?->updated_at?->diffForHumans() ?? '';
+            }
+        });
 
         // return inertia(
         //     'Dashboard',
