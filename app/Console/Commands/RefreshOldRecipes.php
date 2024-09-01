@@ -73,8 +73,8 @@ class RefreshOldRecipes extends Command
             foreach ($recipes as $recipe) {
                 $count += 1;
                 Log::info('['.$count.'/'.$recipesCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-                $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
                 DB::transaction(function () use ($recipe, $server) {
+                    $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
                     $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                     $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
                     $this->ffxivService->updateRecipeCosts($server, $recipe);

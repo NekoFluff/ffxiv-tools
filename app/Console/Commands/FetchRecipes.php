@@ -69,8 +69,8 @@ class FetchRecipes extends Command
                 }
 
                 if ($recipe) {
-                    $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
                     DB::transaction(function () use ($recipe, $server) {
+                        $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
                         $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                         $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
                         $this->ffxivService->updateRecipeCosts($server, $recipe);
