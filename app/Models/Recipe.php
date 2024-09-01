@@ -83,6 +83,7 @@ class Recipe extends Model
         return $this->belongsTo(Item::class);
     }
 
+    // TODO: Remove
     public function alignAmounts(Server $server, float $target_amount): void
     {
         $ratio = $target_amount / $this->amount_result;

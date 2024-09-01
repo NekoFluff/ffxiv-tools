@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GetRecipeController;
 use App\Http\Controllers\ProfileController;
+use App\Livewire\ItemDashboard;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,6 +15,7 @@ use Inertia\Inertia;
 //     ]);
 // });
 
+// TODO: Uninstall intertia and vue
 Route::get('/', function () {
     return Inertia::render('Dashboard', [
         'recipe' => null,
@@ -25,6 +27,7 @@ Route::get('/', function () {
 })->middleware([])->name('dashboard');
 
 Route::get('/items/{itemID}', GetRecipeController::class)->where('itemID', '\d*')->name('recipe.get');
+Route::get('/v2/items/{id}', ItemDashboard::class)->where('id', '\d*')->name('item.get');
 
 Route::get('/retainers', function () {
     return Inertia::render('Retainers', []);

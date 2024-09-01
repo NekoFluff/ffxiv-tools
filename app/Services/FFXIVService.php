@@ -42,6 +42,9 @@ class FFXIVService
         }
 
         $item = $this->xivClient->fetchItem($itemID);
+        if (! $item) {
+            return null;
+        }
         Item::updateOrCreate([
             'id' => intval($item->ID),
         ], [
@@ -105,7 +108,7 @@ class FFXIVService
         ]);
 
         for ($i = 0; $i <= 9; $i++) {
-            $amount = $json["AmountIngredient{$i}"];
+            $amount = $json["AmountIngredient{$i}"] ?? 0;
             if ($amount === 0) {
                 continue;
             }
@@ -465,6 +468,10 @@ class FFXIVService
     }
 
     /**
+     * TODO: Remove this function
+     *
+     * @deprecated Use AggregatedSalesByDay Action
+     *
      * Returns Sales aggregated daily for the last week
      *
      * @param  Collection<int, Sale>  $sales
