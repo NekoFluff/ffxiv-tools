@@ -24,7 +24,9 @@ class ItemBox extends Component
     #[Computed]
     public function profit(): string
     {
-        return number_format($this->craftableItem->market_price * $this->craftableItem->crafting_output_count - $this->craftableItem->optimal_craft_cost, 0);
+        $totalProfit = $this->craftableItem->market_price * $this->craftableItem->crafting_output_count - $this->craftableItem->optimal_craft_cost;
+
+        return number_format($totalProfit, 0).' gil ('.number_format($totalProfit / $this->craftableItem->crafting_output_count, 0).' ea.)';
     }
 
     #[Computed]
@@ -35,6 +37,46 @@ class ItemBox extends Component
         }
 
         return number_format((($this->craftableItem->market_price * $this->craftableItem->crafting_output_count) / $this->craftableItem->optimal_craft_cost) * 100 - 100, 2).'%';
+    }
+
+    public function jobToBackgroundColor(string $job): string
+    {
+        $colors = [
+            'Alchemist' => 'red',
+            'Armorer' => 'slate',
+            'Blacksmith' => 'slate',
+            'Carpenter' => 'amber',
+            'Culinarian' => 'red',
+            'Goldsmith' => 'yellow',
+            'Leatherworker' => 'amber',
+            'Weaver' => 'indigo',
+            'Botanist' => 'green',
+            'Fisher' => 'blue',
+            'Miner' => 'purple',
+        ];
+
+        return $colors[$job] ?? 'slate';
+    }
+
+    public function levelToBackgroundColor(int $level): string
+    {
+        if ($level < 0) {
+            return 'slate';
+        } elseif ($level <= 50) {
+            return 'blue';
+        } elseif ($level <= 60) {
+            return 'green';
+        } elseif ($level <= 70) {
+            return 'yellow';
+        } elseif ($level <= 80) {
+            return 'indigo';
+        } elseif ($level <= 90) {
+            return 'purple';
+        } elseif ($level <= 100) {
+            return 'red';
+        } else {
+            return 'red';
+        }
     }
 
     /**

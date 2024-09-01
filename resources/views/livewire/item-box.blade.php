@@ -1,42 +1,33 @@
-<section
-    class="py-3 pl-5 pr-1 ml-5 mr-1 bg-white border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500">
+<section class="py-3 pl-5 pr-1 ml-5 mr-1 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500">
     {{-- Icon and Title --}}
-    <div class="flex flex-row">
+    <div class="flex flex-row items-center">
         <img src="{{ 'https://xivapi.com/' . $craftableItem->icon }}" class="w-6 h-6" />&nbsp;
         <a href="{{ "/v2/items/$craftableItem->item_id" }}" target="_blank">
             <span class="font-bold text-md">
                 {{ $craftableItem->name }}
             </span>
         </a>
-        <span class="ml-1 text-sm text-gray-500">(x{{ $craftableItem->crafting_output_count }})&nbsp;</span>
+        <span class="ml-1 text-sm text-gray-700 bg-">(x{{ $craftableItem->crafting_output_count }})&nbsp;</span>
+
+        <x-pill class="ml-2" label="Market Board Price" :value="number_format($craftableItem->market_price) . ' gil'" color="yellow" />
+        @if ($craftableItem->vendor_price > 0)
+            <x-pill class="ml-2" label="Vendor Price" :value="number_format($craftableItem->vendor_price) . ' gil'" color="yellow"
+                href="{{ 'http://www.garlandtools.org/db/#item/' . $craftableItem->item_id }}" target="_blank" />
+        @endif
+
+        @if ($craftableItem->class_job_level > 0)
+            <x-pill class="ml-2" label="Job" :value="$craftableItem->class_job" :color="$this->jobToBackgroundColor($craftableItem->class_job)" />
+            <x-pill class="ml-2" label="Level" :value="$craftableItem->class_job_level" :color="$this->levelToBackgroundColor($craftableItem->class_job_level)" />
+        @endif
+
+        <x-pill class="ml-2" label="Updated" :value="Carbon\Carbon::parse($craftableItem->market_price_updated_at)->diffForHumans()" color="slate" />
     </div>
 
-    <div class="flex flex-row mt-2 space-x-3">
-        {{-- First column --}}
-        <div class="p-3 space-y-2 border rounded-md shadow-md">
-            <div class="text-xs font-medium text-left text-gray-500">
-                Market Board Price: <b>{{ $craftableItem->market_price }} gil</b>
-                <span class=text-gray-400 x-data="{ date: new Date($wire.craftableItem.market_price_updated_at * 1000) }" x-text="'['+date.toLocaleString()+']'"></span>
-            </div>
-
-            @if ($craftableItem->vendor_price > 0)
-                <div class="text-xs font-medium text-left text-gray-500">
-                    <a href="{{ 'http://www.garlandtools.org/db/#item/' . $craftableItem->item_id }}" target="_blank">
-                        Vendor Price: {{ $craftableItem->vendor_price }} gil
-                    </a>
-                </div>
-            @endif
-
-            @if ($craftableItem->class_job_level > 0)
-                <div class="text-xs font-medium text-left text-gray-400">Req.
-                    {{ $craftableItem->class_job }}
-                    lvl.{{ $craftableItem->class_job_level }}</div>
-            @endif
-        </div>
-
-        @if ($craftableItem->optimal_craft_cost != 0)
-            {{-- Second Column --}}
-            <div class="p-3 space-y-2 border rounded-md shadow-md">
+    {{-- Profit and Cost --}}
+    @if ($craftableItem->optimal_craft_cost != 0)
+        <div class="flex flex-row mt-2 space-x-3">
+            {{-- First Column --}}
+            <div class="p-2.5 space-y-1 border rounded-md shadow-md flex-1">
                 <div @class([
                     'text-xs font-medium',
                     $this->craftOrBuyColors()['Purchase Cost'],
@@ -71,26 +62,30 @@
                 </div>
             </div>
 
-            {{-- Third Column --}}
-            <div class="p-3 space-y-2 border rounded-md shadow-md">
-                <div @class([
-                    'text-xs font-medium',
-                    'text-green-500' => $this->profit() > 0,
-                    'text-red-500' => $this->profit() < 0,
-                    'text-orange-400' => $this->profit() == 0,
-                ])>
-                    Profit: {{ $this->profit() }} gil</div>
-
-                <div @class([
-                    'text-xs font-medium',
-                    'text-green-500' => $this->profit() > 0,
-                    'text-red-500' => $this->profit() < 0,
-                    'text-orange-400' => $this->profit() == 0,
-                ])>
-                    Profit Ratio: {{ $this->profitRatio() }}&nbsp;</div>
+            {{-- Second Column --}}
+            <div class="p-2.5 space-y-2 border rounded-md shadow-md flex flex-col justify-center flex-1">
+                <div class="text-xs font-medium">
+                    Profit if Crafted:
+                    <span @class([
+                        'text-green-500' => $this->profit() > 0,
+                        'text-red-500' => $this->profit() < 0,
+                        'text-orange-400' => $this->profit() == 0,
+                    ])>
+                        {{ $this->profit() }}</span>
+                </div>
+                <div class="text-xs font-medium">
+                    Profit Ratio:
+                    <span @class([
+                        'text-green-500' => $this->profit() > 0,
+                        'text-red-500' => $this->profit() < 0,
+                        'text-orange-400' => $this->profit() == 0,
+                    ])>
+                        {{ $this->profitRatio() }}&nbsp;</span>
+                </div>
             </div>
-        @endif
-    </div>
+
+        </div>
+    @endif
 
     @foreach ($craftableItem->crafting_materials as $craftingMaterial)
         <div class="mt-3 ml-4">
