@@ -1,4 +1,4 @@
-<section class="py-3 pl-5 pr-1 ml-5 mr-1 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500">
+<section class="py-3 pl-3 pr-1 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500">
     {{-- Icon and Title --}}
     <div class="flex flex-row items-center">
         <img src="{{ 'https://xivapi.com/' . $craftableItem->icon }}" class="w-6 h-6" />&nbsp;
@@ -27,7 +27,7 @@
     @if ($craftableItem->optimal_craft_cost != 0)
         <div class="flex flex-row mt-2 space-x-3">
             {{-- First Column --}}
-            <div class="p-2.5 space-y-1 border rounded-md shadow-md flex-1">
+            <div class="flex-1 p-2 space-y-1 border rounded-md shadow-md">
                 <div @class([
                     'text-xs font-medium',
                     $this->craftOrBuyColors()['Purchase Cost'],
@@ -63,7 +63,7 @@
             </div>
 
             {{-- Second Column --}}
-            <div class="p-2.5 space-y-2 border rounded-md shadow-md flex flex-col justify-center flex-1">
+            <div class="flex flex-col justify-center flex-1 p-2 space-y-2 border rounded-md shadow-md">
                 <div class="text-xs font-medium">
                     Profit if Crafted:
                     <span @class([
@@ -88,7 +88,7 @@
     @endif
 
     @foreach ($craftableItem->crafting_materials as $craftingMaterial)
-        <div class="mt-3 ml-4">
+        <div class="mt-2 ml-5">
             <livewire:item-box :craftableItem="$craftingMaterial" />
         </div>
     @endforeach
