@@ -344,7 +344,6 @@ class FFXIVService
         }
 
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
-        Listing::whereIn('item_id', $itemIDs)->delete();
 
         $this->processMarketBoardListings($server, $listingsData);
 
@@ -421,6 +420,8 @@ class FFXIVService
                 );
             }
         )->flatten(1);
+
+        Listing::whereNotIn('id', $listings->pluck('id'))->delete();
 
         // Upsert in chunks of 100
         $listings->chunk(100)->each(
