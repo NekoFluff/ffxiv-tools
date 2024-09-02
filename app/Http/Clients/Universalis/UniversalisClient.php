@@ -4,6 +4,7 @@ namespace App\Http\Clients\Universalis;
 
 use App\Models\Enums\Server;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\Facades\Log;
@@ -44,8 +45,16 @@ class UniversalisClient implements UniversalisClientInterface
                 'server' => $server->value,
                 'items' => $itemIDs,
             ]);
+        } catch (ServerException $ex) {
+            Log::error('A server exception occurred while retrieving the market board listings', [
+                'server' => $server->value,
+                'items' => $itemIDs,
+                'exception' => $ex,
+            ]);
+
+            return [];
         } catch (\Exception $ex) {
-            Log::error('Failed to retrieve market board listings', [
+            Log::error('Unknown exception occurred while and failed to retrieve market board listings', [
                 'server' => $server->value,
                 'items' => $itemIDs,
                 'exception' => $ex,
