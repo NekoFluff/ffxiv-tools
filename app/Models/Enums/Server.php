@@ -72,6 +72,82 @@ enum Server: string
     case LEVIATHAN = 'Leviathan';
     case ULTROS = 'Ultros';
 
+    /**
+     * @return array<string>
+     */
+    public static function all(): array
+    {
+        return collect([
+            Server::ADAMANTOISE->value,
+            Server::CACTUAR->value,
+            Server::FAERIE->value,
+            Server::GILGAMESH->value,
+            Server::JENOVA->value,
+            Server::MIDGARDSORMR->value,
+            Server::SARGATANAS->value,
+            Server::SIREN->value,
+            Server::CERBERUS->value,
+            Server::LOUISOIX->value,
+            Server::MOOGLE->value,
+            Server::OMEGA->value,
+            Server::RAGNAROK->value,
+            Server::SPRIGGAN->value,
+            Server::BALMUNG->value,
+            Server::BRYNHILDR->value,
+            Server::COEURL->value,
+            Server::DIABOLOS->value,
+            Server::GOBLIN->value,
+            Server::MALBORO->value,
+            Server::MATEUS->value,
+            Server::ZALERA->value,
+            Server::AEGIS->value,
+            Server::ATOMOS->value,
+            Server::CARBUNCLE->value,
+            Server::GARUDA->value,
+            Server::GUNGNIR->value,
+            Server::KUJATA->value,
+            Server::RAMUH->value,
+            Server::TONBERRY->value,
+            Server::TYPHON->value,
+            Server::UNICORN->value,
+            Server::ALEXANDER->value,
+            Server::BAHAMUT->value,
+            Server::DURANDAL->value,
+            Server::FENRIR->value,
+            Server::IFRIT->value,
+            Server::RIDILL->value,
+            Server::TIAMAT->value,
+            Server::ULTIMA->value,
+            Server::VALEFOR->value,
+            Server::YOJIMBO->value,
+            Server::ZEROMUS->value,
+            Server::LICH->value,
+            Server::ODIN->value,
+            Server::PHOENIX->value,
+            Server::SHIVA->value,
+            Server::ZODIARK->value,
+            Server::ANIMA->value,
+            Server::ASURA->value,
+            Server::BELIAS->value,
+            Server::CHOCOBO->value,
+            Server::HADES->value,
+            Server::IXION->value,
+            Server::MANDRAGORA->value,
+            Server::MASAMUNE->value,
+            Server::PANDAEMONIUM->value,
+            Server::SHINRYU->value,
+            Server::TITAN->value,
+            Server::BEHEMOTH->value,
+            Server::EXCALIBUR->value,
+            Server::EXODUS->value,
+            Server::FAMFRIT->value,
+            Server::HYPERION->value,
+            Server::LAMIA->value,
+            Server::LEVIATHAN->value,
+            Server::ULTROS->value,
+        ])->sort()->all();
+    }
+
     public function dataCenter(): DataCenter
     {
         return match ($this) {

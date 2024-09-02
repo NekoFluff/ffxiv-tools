@@ -31,7 +31,7 @@ class RetainerCards extends Component
         /** @var User $user */
         $user = auth()->user();
 
-        $this->retainers = $user->retainers()->with('listings')->get();
+        $this->retainers = $user->retainers()->with('listings', 'items')->get();
     }
 
     public function placeholder(): View
