@@ -30,7 +30,8 @@
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
                                 wire:model="server">
                                 @foreach ($this->servers() as $server)
-                                    <option value="{{ $server }}">{{ $server }}</option>
+                                    <option wire:key="{{ $server }}" value="{{ $server }}">{{ $server }}
+                                    </option>
                                 @endforeach
                             </select>
                             <div class="mt-1 mb-4">

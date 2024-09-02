@@ -18,7 +18,7 @@
             @endif
 
             @foreach ($listings as $listing)
-                <tr class="border-b border-gray-600 dark:border-gray-200">
+                <tr wire:key="{{ $listing['id'] }}" class="border-b border-gray-600 dark:border-gray-200">
                     <td class="px-4 py-2 text-center dark:text-white">{{ $listing['price_per_unit'] }}</td>
                     <td class="px-4 py-2 text-center dark:text-white">{{ $listing['quantity'] }}</td>
                     <td class="px-4 py-2 text-center dark:text-white">{{ $listing['hq'] ? 'Yes' : 'No' }}</td>

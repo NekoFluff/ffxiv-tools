@@ -107,7 +107,7 @@
     @endif
 
     @foreach ($craftableItem->crafting_materials as $craftingMaterial)
-        <div class="mt-2 ml-5">
+        <div wire:key="{{ $craftingMaterial->item_id }}" class="mt-2 ml-5">
             <livewire:item-box :craftableItem="$craftingMaterial" />
         </div>
     @endforeach

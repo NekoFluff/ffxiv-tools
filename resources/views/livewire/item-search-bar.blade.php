@@ -6,7 +6,8 @@
     <div class="relative z-10">
         <div class="absolute w-full overflow-auto bg-blue-500 max-h-96 scrollbar">
             @foreach ($items as $item)
-                <a class="flex flex-row items-center w-full p-3 rounded-md hover:bg-blue-600"
+                <a wire:key="{{ $item->id }}"
+                    class="flex flex-row items-center w-full p-3 rounded-md hover:bg-blue-600"
                     href="{{ route('item.show', $item->id) }}">
                     <img class="inline w-6 h-6" src="{{ 'https://xivapi.com/' . $item->icon }}" />
                     <span class="ml-2 text-sm text-white">{{ $item->name }}</span>

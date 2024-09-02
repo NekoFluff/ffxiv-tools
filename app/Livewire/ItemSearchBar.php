@@ -21,7 +21,7 @@ class ItemSearchBar extends Component
 
     public function updatedSearch(): void
     {
-        $this->items = Item::where('name', 'like', '%'.trim(htmlspecialchars($this->search)).'%')->get();
+        $this->items = Item::where('name', 'like', '%'.trim(htmlspecialchars($this->search)).'%')->limit(20)->get();
     }
 
     public function render(): View
