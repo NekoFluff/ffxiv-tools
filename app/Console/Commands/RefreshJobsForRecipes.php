@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Recipe;
 use Illuminate\Console\Command;
+use Laravel\Telescope\Telescope;
 
 class RefreshJobsForRecipes extends Command
 {
@@ -12,7 +13,7 @@ class RefreshJobsForRecipes extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:refreshJobs';
+    protected $signature = 'recipes:refresh-jobs';
 
     /**
      * The console command description.
@@ -26,6 +27,8 @@ class RefreshJobsForRecipes extends Command
      */
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:recipes:refresh-jobs', 'start:'.now()->timestamp]);
+
         $recipes = Recipe::all();
         $recipes->each(
             function (Recipe $recipe) {

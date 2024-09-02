@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\Telescope;
 
 class RecipesDaemon extends Command
 {
@@ -48,6 +49,8 @@ class RecipesDaemon extends Command
      */
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:recipes:daemon', 'start:'.now()->timestamp]);
+
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;

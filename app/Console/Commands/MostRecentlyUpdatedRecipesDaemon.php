@@ -8,6 +8,7 @@ use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\Telescope;
 
 class MostRecentlyUpdatedRecipesDaemon extends Command
 {
@@ -48,6 +49,8 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
      */
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:recipes:mru-daemon', 'start:'.now()->timestamp]);
+
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;

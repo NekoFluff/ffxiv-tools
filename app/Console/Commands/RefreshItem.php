@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\RefreshItem as JobsRefreshItem;
 use Illuminate\Console\Command;
+use Laravel\Telescope\Telescope;
 
 class RefreshItem extends Command
 {
@@ -13,6 +14,8 @@ class RefreshItem extends Command
 
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:app:refresh-item', 'start:'.now()->timestamp]);
+
         $itemID = intval($this->argument('itemID'));
 
         JobsRefreshItem::dispatch($itemID);

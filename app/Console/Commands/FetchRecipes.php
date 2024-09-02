@@ -8,6 +8,7 @@ use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\Telescope;
 
 class FetchRecipes extends Command
 {
@@ -44,6 +45,8 @@ class FetchRecipes extends Command
      */
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:recipes:fetch', 'start:'.now()->timestamp]);
+
         $page = 1;
         $recipesStr = '';
         $server = Server::GOBLIN;

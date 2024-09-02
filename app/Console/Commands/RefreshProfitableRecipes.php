@@ -9,6 +9,7 @@ use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\Telescope;
 
 class RefreshProfitableRecipes extends Command
 {
@@ -17,7 +18,7 @@ class RefreshProfitableRecipes extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:refreshProfitable';
+    protected $signature = 'recipes:refresh-profitable';
 
     /**
      * The console command description.
@@ -45,6 +46,8 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle(): void
     {
+        Telescope::tag(fn () => ['command:recipes:refresh-profitable', 'start:'.now()->timestamp]);
+
         $server = Server::GOBLIN;
 
         $recipes = Recipe::with('item')
