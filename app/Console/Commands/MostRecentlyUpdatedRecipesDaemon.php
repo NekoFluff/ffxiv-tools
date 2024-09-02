@@ -93,8 +93,8 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
                     }
 
                     $this->ffxivService->updateRecipeCosts($server, $recipe);
-                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                 });
+                $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
 
                 echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$itemsCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
                 $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
