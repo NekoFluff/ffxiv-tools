@@ -78,7 +78,7 @@ class UniversalisClient implements UniversalisClientInterface
 
             return json_decode($response->getBody(), true)['entries'] ?? [];
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board history for item {$itemID}. Exception: ".$ex->getMessage());
+            Log::error("Failed to retrieve market board history for item {$itemID}", ['exception' => $ex]);
         }
 
         return [];
@@ -115,7 +115,7 @@ class UniversalisClient implements UniversalisClientInterface
 
             return json_decode($response->getBody(), true)['items'] ?? [];
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve most recently updated items for server {$server->value}. Exception: ".$ex->getMessage());
+            Log::error("Failed to retrieve most recently updated items for server {$server->value}", ['exception' => $ex]);
         }
 
         return [];
