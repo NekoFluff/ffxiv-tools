@@ -35,16 +35,8 @@ class UniversalisClient implements UniversalisClientInterface
         $itemIDs = array_unique($itemIDs);
         sort($itemIDs);
 
-        Log::debug('Fetching market board listings', [
-            'server' => $server->value,
-            'items' => $itemIDs,
-        ]);
         try {
             $mbListings = $this->client->get("{$server->value}/".implode(',', $itemIDs).'?listings=40');
-            Log::debug('Retrieved market board listings', [
-                'server' => $server->value,
-                'items' => $itemIDs,
-            ]);
         } catch (ServerException $ex) {
             Log::error('A server exception occurred while retrieving the market board listings', [
                 'server' => $server->value,
@@ -74,20 +66,31 @@ class UniversalisClient implements UniversalisClientInterface
             $mbListings = $body['items'] ?? [];
         }
 
+        Log::debug('Retrieved market board listings', [
+            'server' => $server->value,
+            'items' => $itemIDs,
+            'response' => $mbListings,
+        ]);
+
         return $mbListings;
     }
 
     /** @return array<mixed> */
     public function fetchMarketBoardSales(Server $server, int $itemID): array
     {
-        Log::debug("Fetching market board history for item {$itemID}");
         try {
             $response = $this->client->get("history/{$server->value}/{$itemID}");
-            Log::debug("Retrieved market board history for item {$itemID}");
 
-            return json_decode($response->getBody(), true)['entries'] ?? [];
+            $sales = json_decode($response->getBody(), true)['entries'] ?? [];
+            Log::debug('Retrieved market board history', [
+                'server' => $server->value,
+                'itemID' => $itemID,
+                'response' => $sales,
+            ]);
+
+            return $sales;
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board history for item {$itemID}", ['exception' => $ex]);
+            Log::error('Failed to retrieve market board history', ['exception' => $ex, 'server' => $server->value, 'itemID' => $itemID]);
         }
 
         return [];
@@ -97,18 +100,20 @@ class UniversalisClient implements UniversalisClientInterface
     {
         try {
             $response = $this->client->get("history/{$server->value}/{$itemID}");
-            Log::debug("Retrieved market board history for item {$itemID}");
 
             /** @var array $mbSales */
             $mbSales = json_decode($response->getBody(), true)['entries'] ?? [];
 
-            return collect($mbSales)->map(
+            $count = collect($mbSales)->map(
                 function ($entry) {
                     return $entry['quantity'];
                 }
             )->sum();
+
+            Log::debug('Retrieved last week sale count', ['server' => $server->value, 'itemID' => $itemID, 'count' => $count]);
+
         } catch (\Exception) {
-            Log::error("Failed to retrieve last week sale count for item {$itemID}");
+            Log::error('Failed to retrieve last week sale count', ['server' => $server->value, 'itemID' => $itemID]);
         }
 
         return 0;
@@ -117,14 +122,14 @@ class UniversalisClient implements UniversalisClientInterface
     /** @return array<mixed> */
     public function fetchMostRecentlyUpdatedItems(Server $server): array
     {
-        Log::debug("Fetching most recently updated items for server {$server->value}");
+        Log::debug('Fetching most recently updated items', ['server' => $server->value]);
         try {
             $response = $this->client->get("https://universalis.app/api/v2/extra/stats/most-recently-updated?world={$server->value}");
-            Log::debug("Retrieved most recently updated items for server {$server->value}");
+            Log::debug('Retrieved most recently updated items', ['server' => $server->value]);
 
             return json_decode($response->getBody(), true)['items'] ?? [];
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve most recently updated items for server {$server->value}", ['exception' => $ex]);
+            Log::error('Failed to retrieve most recently updated items', ['exception' => $ex, 'server' => $server->value]);
         }
 
         return [];
