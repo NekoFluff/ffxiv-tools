@@ -29,15 +29,16 @@ class AppServiceProvider extends ServiceProvider
                     $entry->content['data']['itemID'] ? 'itemID:'.$entry->content['data']['itemID'] : '',
                     $entry->content['data']['server']['properties'] ? 'server:'.$entry->content['data']['server']['properties'] : '',
                 ]);
-            } elseif ($entry->type === 'log') {
-                return collect($entry->content['context'])->map(function ($value, $key) {
-                    if ($value instanceof UnitEnum) {
-                        return $key.':'.$value->value;
-                    } elseif (! is_array($value)) {
-                        return $key.':'.$value;
-                    }
-                })->toArray();
             }
+            // elseif ($entry->type === 'log') {
+            //     return collect($entry->content['context'])->map(function ($value, $key) {
+            //         if ($value instanceof UnitEnum) {
+            //             return $key.':'.$value->value;
+            //         } elseif (! is_array($value)) {
+            //             return $key.':'.$value;
+            //         }
+            //     })->toArray();
+            // }
         });
     }
 }
