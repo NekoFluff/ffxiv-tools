@@ -34,12 +34,22 @@ class UniversalisClient implements UniversalisClientInterface
         $itemIDs = array_unique($itemIDs);
         sort($itemIDs);
 
-        Log::debug("Fetching market board listings for server {$server->value}.".' | Items: '.implode(',', $itemIDs));
+        Log::debug('Fetching market board listings', [
+            'server' => $server->value,
+            'items' => $itemIDs,
+        ]);
         try {
             $mbListings = $this->client->get("{$server->value}/".implode(',', $itemIDs).'?listings=40');
-            Log::debug("Retrieved market board listings for server {$server->value} | Items: ".implode(',', $itemIDs));
+            Log::debug('Retrieved market board listings', [
+                'server' => $server->value,
+                'items' => $itemIDs,
+            ]);
         } catch (\Exception $ex) {
-            Log::error("Failed to retrieve market board listings for server {$server->value}. Exception: ".$ex->getMessage());
+            Log::error('Failed to retrieve market board listings', [
+                'server' => $server->value,
+                'items' => $itemIDs,
+                'exception' => $ex,
+            ]);
 
             return [];
         }
