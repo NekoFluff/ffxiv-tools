@@ -41,8 +41,8 @@ class GetRecipeController extends Controller
                     $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                     $this->service->updateMarketPrices($server, $recipe, $listings);
                     $this->service->updateRecipeCosts($server, $recipe);
-                    $this->service->refreshMarketBoardSales($server, $recipe->item_id);
                 });
+                $this->service->refreshMarketBoardSales($server, $recipe->item_id);
             }
         } else {
             $marketPrice = $item->marketPrice($server);
@@ -53,8 +53,8 @@ class GetRecipeController extends Controller
                     if (! $listings->isEmpty()) {
                         $this->service->updateMarketPrice($server, $item, $listings);
                     }
-                    $this->service->refreshMarketBoardSales($server, $item->id);
                 });
+                $this->service->refreshMarketBoardSales($server, $item->id);
             }
         }
 

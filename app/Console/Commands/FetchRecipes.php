@@ -74,8 +74,8 @@ class FetchRecipes extends Command
                         $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
                         $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
                         $this->ffxivService->updateRecipeCosts($server, $recipe);
-                        $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                     });
+                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
                 } else {
                     Log::error('Failed to retrieve recipe ID '.$recipeObj['ID']);
                 }
