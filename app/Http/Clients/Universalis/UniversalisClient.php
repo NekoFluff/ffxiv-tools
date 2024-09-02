@@ -69,7 +69,7 @@ class UniversalisClient implements UniversalisClientInterface
         Log::debug('Retrieved market board listings', [
             'server' => $server->value,
             'items' => $itemIDs,
-            'response' => $mbListings,
+            // 'response' => $mbListings,
         ]);
 
         return $mbListings;
@@ -85,7 +85,7 @@ class UniversalisClient implements UniversalisClientInterface
             Log::debug('Retrieved market board history', [
                 'server' => $server->value,
                 'itemID' => $itemID,
-                'response' => $sales,
+                // 'response' => $sales,
             ]);
 
             return $sales;
