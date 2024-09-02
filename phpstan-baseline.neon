@@ -31,16 +31,6 @@ parameters:
 			path: app/Http/Controllers/Auth/VerifyEmailController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Requests\\\\Auth\\\\LoginRequest\\:\\:rules\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Http/Requests/Auth/LoginRequest.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Requests\\\\ProfileUpdateRequest\\:\\:rules\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Http/Requests/ProfileUpdateRequest.php
-
-		-
 			message: "#^Property App\\\\Models\\\\CraftingCost\\:\\:\\$attributes type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Models/CraftingCost.php
@@ -69,48 +59,3 @@ parameters:
 			message: "#^Method App\\\\Models\\\\Recipe\\:\\:itemIDs\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Models/Recipe.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 3
-			path: tests/Feature/Auth/EmailVerificationTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 3
-			path: tests/Feature/Auth/PasswordConfirmationTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 6
-			path: tests/Feature/Auth/PasswordResetTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 3
-			path: tests/Feature/Auth/PasswordUpdateTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 3
-			path: tests/Feature/Auth/RegistrationTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 1
-			path: tests/Feature/ExampleTest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 12
-			path: tests/Feature/ProfileTest.php
-
-		-
-			message: "#^Function something\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Pest.php
-
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 1
-			path: tests/Pest.php
