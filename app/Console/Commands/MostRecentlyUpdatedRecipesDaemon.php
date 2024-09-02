@@ -82,6 +82,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
             if ($recipe) {
                 $this->totalCount += 1;
                 Log::info('['.$count.'/'.$itemsCount.']'.' Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
+                echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id."\n";
 
                 RefreshItem::dispatch($recipe->item_id, $server);
             } else {
