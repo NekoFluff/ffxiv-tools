@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method App\\\\Console\\\\Commands\\\\RecalculateCostsForRecipe\\:\\:promptForMissingArguments\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Console/Commands/RecalculateCostsForRecipe.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$mbSales has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Http/Clients/Universalis/UniversalisClient.php

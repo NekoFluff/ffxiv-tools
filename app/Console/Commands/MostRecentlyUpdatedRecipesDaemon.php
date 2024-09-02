@@ -55,7 +55,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
         /** @phpstan-ignore-next-line */
         while (true) {
             $this->refreshRecipes($server);
-            sleep(10);
+            sleep(60);
         }
     }
 
@@ -90,6 +90,5 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
             }
             sleep(2);
         }
-
     }
 }
