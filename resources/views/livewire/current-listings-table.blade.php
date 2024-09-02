@@ -1,7 +1,7 @@
-<div>
-    <h2 class="mb-2 font-bold text-center text-slate-600">Active Listings</h2>
+<div class="text-gray-600 dark:text-gray-200">
+    <h2 class="mb-2 font-bold text-center ">Active Listings</h2>
     <table class="table w-full border border-collapse">
-        <thead>
+        <thead class="text-gray-800">
             <tr>
                 <th class="px-4 py-2 bg-white border-b">Price</th>
                 <th class="px-4 py-2 bg-white border-b">Amount</th>
@@ -11,13 +11,19 @@
             </tr>
         </thead>
         <tbody>
+            @if (empty($listings))
+                <tr>
+                    <td class="px-4 py-2 text-center dark:text-white" colspan="5">No listings found.</td>
+                </tr>
+            @endif
+
             @foreach ($listings as $listing)
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-center">{{ $listing['price_per_unit'] }}</td>
-                    <td class="px-4 py-2 text-center">{{ $listing['quantity'] }}</td>
-                    <td class="px-4 py-2 text-center">{{ $listing['hq'] ? 'Yes' : 'No' }}</td>
-                    <td class="px-4 py-2 text-center">{{ $listing['retainer_name'] }}</td>
-                    <td class="px-4 py-2 text-center"
+                <tr class="border-b border-gray-600 dark:border-gray-200">
+                    <td class="px-4 py-2 text-center dark:text-white">{{ $listing['price_per_unit'] }}</td>
+                    <td class="px-4 py-2 text-center dark:text-white">{{ $listing['quantity'] }}</td>
+                    <td class="px-4 py-2 text-center dark:text-white">{{ $listing['hq'] ? 'Yes' : 'No' }}</td>
+                    <td class="px-4 py-2 text-center dark:text-white">{{ $listing['retainer_name'] }}</td>
+                    <td class="px-4 py-2 text-center dark:text-white"
                         x-text="new Date('{{ $listing['last_review_time'] }}').toLocaleString()">
                     </td>
                 </tr>

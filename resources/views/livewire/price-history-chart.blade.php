@@ -1,9 +1,50 @@
-<div>
+<div class="min-h-60">
     <canvas id="price-history-chart" x-refs="price-history-chart-ref"></canvas>
 
-    <div x-data="{
-        init() {
+    <div x-on:dark-mode-toggled.window="refresh()" x-data="{
+        chartColors: {
+            dark: {
+                averagePrice: '#f5bc42',
+                minPrice: '#2abf3b',
+                maxPrice: '#bf2a2a',
+                gridColor: '#4a5568',
+                fontColor: '#e2e8f0'
+            },
+            light: {
+                averagePrice: '#f5bc42',
+                minPrice: '#2abf3b',
+                maxPrice: '#bf2a2a',
+                gridColor: '#e2e8f0',
+                fontColor: '#2d3748'
+            }
+        },
+        refresh: function() {
             const ctx = document.getElementById('price-history-chart');
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+            const chart = Chart.getChart(ctx);
+            const chartColors = this.chartColors[isDarkMode ? 'dark' : 'light'];
+    
+            chart.data.datasets[0].borderColor = chartColors.averagePrice;
+            chart.data.datasets[0].backgroundColor = chartColors.averagePrice;
+            chart.data.datasets[1].borderColor = chartColors.minPrice;
+            chart.data.datasets[1].backgroundColor = chartColors.minPrice;
+            chart.data.datasets[2].borderColor = chartColors.maxPrice;
+            chart.data.datasets[2].backgroundColor = chartColors.maxPrice;
+            chart.options.scales.x.grid.color = chartColors.gridColor;
+            chart.options.scales.x.ticks.color = chartColors.fontColor;
+            chart.options.scales.y.grid.color = chartColors.gridColor;
+            chart.options.scales.y.ticks.color = chartColors.fontColor;
+            chart.options.plugins.title.color = chartColors.fontColor;
+    
+            chart.update();
+            chart.resize();
+        },
+        init: function() {
+            const ctx = document.getElementById('price-history-chart');
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+            const chartColors = this.chartColors[isDarkMode ? 'dark' : 'light'];
     
             new Chart(ctx, {
                 type: 'line',
@@ -13,8 +54,8 @@
                         label: 'Average Price',
                         data: Object.values($wire.averagePrice),
                         borderWidth: 3,
-                        borderColor: '#6b46c1',
-                        backgroundColor: '#6b46c1',
+                        borderColor: chartColors.averagePrice,
+                        backgroundColor: chartColors.averagePrice,
                         fill: false,
                         tension: 0.3,
                         pointRadius: 0,
@@ -23,32 +64,36 @@
                         label: 'Min Price',
                         data: Object.values($wire.minPrice),
                         borderWidth: 3,
-                        borderColor: '#f56565',
-                        backgroundColor: '#f56565',
+                        borderColor: chartColors.minPrice,
+                        backgroundColor: chartColors.minPrice,
                         showLine: true,
                     }, {
                         label: 'Max Price',
                         data: Object.values($wire.maxPrice),
                         borderWidth: 3,
-                        borderColor: '#48bb78',
-                        backgroundColor: '#48bb78',
+                        borderColor: chartColors.maxPrice,
+                        backgroundColor: chartColors.maxPrice,
                         showLine: true,
-                    }, {
-                        label: 'Median Price',
-                        data: Object.values($wire.medianPrice),
-                        borderWidth: 3,
-                        borderColor: '#63b3ed',
-                        backgroundColor: '#63b3ed',
-                        showLine: true,
-                    }],
+                    }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            type: 'linear',
+                        x: {
+                            grid: {
+                                color: chartColors.gridColor
+                            },
                             ticks: {
-                                precision: 0,
+                                color: chartColors.fontColor
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: chartColors.gridColor
+                            },
+                            ticks: {
+                                color: chartColors.fontColor
                             }
                         }
                     },
@@ -63,15 +108,17 @@
                             text: 'Price History',
                             font: {
                                 size: 16
-                            }
+                            },
+                            color: chartColors.fontColor
                         }
                     },
                     interaction: {
                         mode: 'index',
                         intersect: false,
-                    },
+                    }
                 }
             });
         }
-    }"></div>
+    }">
+    </div>
 </div>

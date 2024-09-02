@@ -21,7 +21,7 @@ class MarketPriceFactory extends Factory
         return [
             'data_center' => DataCenter::CRYSTAL,
             'server' => Server::GOBLIN,
-            'price' => 1,
+            'price' => $this->faker->numberBetween(100, 1000000),
         ];
     }
 }

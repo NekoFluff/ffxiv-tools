@@ -2,9 +2,12 @@
     @if ($this->craftableItem())
         <livewire:item-box :craftableItem="$this->craftableItem()" />
     @else
-        <div>
-            <h2 class="text-lg ">The item <span class="font-bold">{{ $item->id }}</span> cannot be crafted.</h2>
-            <p>If you believe this is an error, please contact me on discord @crazyfluff</p>
+        <div class="dark:text-gray-200">
+            <h2 class="text-lg ">It doesn't look like <span class="font-bold">{{ $item->name }}</span>
+                (#{{ $item->id }}) can be crafted.</h2>
+            <p class="text-sm">If you believe this is an error, feel free to contact me on discord
+                <i><b>@crazyfluff</b></i>
+            </p>
         </div>
     @endif
 </div>

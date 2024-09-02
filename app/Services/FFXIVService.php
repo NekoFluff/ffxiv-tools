@@ -421,8 +421,6 @@ class FFXIVService
             }
         )->flatten(1);
 
-        Listing::whereNotIn('id', $listings->pluck('id'))->delete();
-
         // Upsert in chunks of 100
         $listings->chunk(100)->each(
             function ($chunk) {
@@ -433,6 +431,10 @@ class FFXIVService
                 );
             }
         );
+
+        // Prune old listings
+        Listing::whereIn('item_id', $listings->pluck('item_id')->unique())
+            ->whereNotIn('id', $listings->pluck('id'))->delete();
     }
 
     /**

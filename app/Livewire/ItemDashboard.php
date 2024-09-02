@@ -6,9 +6,11 @@ use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
 use App\Models\Item;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
+#[Layout('layouts.app', ['title' => 'Item Dashboard'])]
 class ItemDashboard extends Component
 {
     #[Locked]

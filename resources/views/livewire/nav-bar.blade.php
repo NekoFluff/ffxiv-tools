@@ -34,8 +34,8 @@
                             </button>
                         </span>
 
-                        <DropdownLink href="{{ route('profile.edit') }}"> Profile </DropdownLink>
-                        <DropdownLink href="{{ route('logout') }}" method="post" as="button"> Log Out
+                        <DropdownLink href="{{ route('profile') }}"> Profile </DropdownLink>
+                        {{-- <DropdownLink href="{{ route('logout') }}" method="post" as="button"> Log Out --}}
                     </Dropdown>
                 </div>
             </div>

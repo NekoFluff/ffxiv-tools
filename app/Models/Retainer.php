@@ -70,4 +70,9 @@ class Retainer extends Model
     {
         return $this->hasMany(Listing::class, 'retainer_name', 'name')->orderBy('price_per_unit', 'asc');
     }
+
+    public function getListingPrice(Item $item): ?int
+    {
+        return $this->listings()->where('item_id', $item->id)->first()?->price_per_unit;
+    }
 }

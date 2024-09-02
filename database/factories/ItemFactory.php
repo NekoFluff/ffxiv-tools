@@ -19,6 +19,7 @@ class ItemFactory extends Factory
         return [
             'name' => $this->faker->word,
             'icon' => 'test-icon.png',
+            'vendor_price' => $this->faker->numberBetween(50, 10000),
         ];
     }
 }

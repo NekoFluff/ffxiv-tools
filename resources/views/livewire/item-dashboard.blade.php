@@ -5,36 +5,44 @@
     @endpush
 @endonce
 
-<div>
+<div class="text-gray-800 dark:text-gray-200">
+    <x-slot name="header">
+        <div class="flex items-center">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                {{ $item ? $item->name : 'Search for an Item' }}
+            </h2>
+            <div class="flex-1 mx-7">
+                <livewire:item-search-bar />
+            </div>
+        </div>
+    </x-slot>
+
     <div class="mx-auto mt-5 max-w-7xl sm:px-6 lg:px-8">
         @if ($item)
             <div class="mb-10">
                 <livewire:item-boxes :$item />
             </div>
-            <div class="flex mb-10">
-                <div class="flex-1">
+            <div class="grid grid-cols-1 gap-10 mb-10 lg:grid-cols-2">
+                <div>
                     {{-- TODO: Pass through server --}}
                     <livewire:quantity-sold-chart :itemID="$item->id" server="Goblin" />
                 </div>
-                <div class="flex-1">
+                <div>
                     {{-- TODO: Pass through server --}}
                     <livewire:price-history-chart :itemID="$item->id" server="Goblin" />
                 </div>
             </div>
-            <div class="mb-20">
+            <div class="pb-20">
                 {{-- TODO: Pass through server --}}
                 <livewire:current-listings-table :itemID="$item->id" server="Goblin" />
             </div>
         @else
             <div>
-                <h2 class="text-lg ">The item <span class="font-bold">{{ $id }}</span> doesn't seem to exist in
-                    our
-                    system.</h2>
-                <p>We'll try to fetch the item data for you. If there is an actual item associated with the ID you
-                    provided,
-                    you should be able to refresh the page in a minute and additional data will appear. Otherwise check
-                    to
-                    make sure you've input the correct item ID.</p>
+                <h2 class="text-lg ">The item <span class="font-bold">{{ $id }}</span> doesn't seem to exist
+                    in our system.</h2>
+                <p class="text-sm">We'll try to fetch the item data for you. If there is an actual item associated with
+                    the ID you provided, you should be able to refresh the page in a minute and additional data will
+                    appear. Otherwise check to make sure you've input the correct item ID.</p>
             </div>
         @endif
     </div>

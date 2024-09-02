@@ -31,6 +31,11 @@ class ItemBoxes extends Component
         });
     }
 
+    public function placeholder(): View
+    {
+        return view('livewire.placeholders.item-boxes');
+    }
+
     public function render(): View
     {
         return view('livewire.item-boxes');

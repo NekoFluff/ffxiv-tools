@@ -10,5 +10,6 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     excludePaths:
         - %currentWorkingDirectory%/app/Providers/*
+        - %currentWorkingDirectory%/tests/*
     ignoreErrors:
 
