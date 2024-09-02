@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
-use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
@@ -80,24 +80,10 @@ class RecipesDaemon extends Command
         foreach ($recipes as $recipe) {
             $count += 1;
             $this->totalCount += 1;
-            Log::info('['.$count.'/'.$recipesCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-            $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-            DB::transaction(function () use ($recipe, $server) {
-                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
-                $marketPrice = $recipe->item->marketPrice($server);
-                if ($marketPrice !== null) {
-                    $marketPrice->updated_at = now();
-                    $marketPrice->save();
-                }
+            Log::info('['.$count.'/'.$recipesCount.']'.' Dispatching job to proccess recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
 
-                $this->ffxivService->updateRecipeCosts($server, $recipe);
-            });
-            $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
+            RefreshItem::dispatch($recipe->item_id, $server);
 
-            echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$recipesCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
-            $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
-            echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->craftingCost($server)->optimal_craft_cost."\n";
             sleep(2);
         }
     }

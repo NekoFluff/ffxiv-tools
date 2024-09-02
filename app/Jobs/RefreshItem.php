@@ -22,16 +22,10 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(public int $itemID, public Server $server = Server::GOBLIN)
     {
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(FFXIVService $service): void
     {
         Log::withContext(['itemID' => $this->itemID, 'server' => $this->server]);
@@ -55,26 +49,8 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
                 $service->refreshMarketBoardSales($this->server, $item->id);
             }
         });
-
-        // return inertia(
-        //     'Dashboard',
-        //     [
-        //         'canLogin' => Route::has('login'),
-        //         'canRegister' => Route::has('register'),
-        //         'retainers' => Retainer::where('user_id', auth()->id())->where('server', $this->server)->whereRelation('items', 'id', $recipe?->item->id)->get(),
-        //         'recipe' => $recipe,
-        //         'item' => $item,
-        //         'history' => $aggregatedSales,
-        //         'listings' => $listings,
-        //         'lastUpdated' => $lastUpdated,
-        //     ]
-        // );
-        // return CraftableItem::fromRecipe($recipe);
     }
 
-    /**
-     * Calculate a unique ID for the job.
-     */
     public function uniqueId(): string
     {
         return 'refresh-item-'.$this->itemID;

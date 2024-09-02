@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
-use App\Models\Listing;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -81,24 +81,9 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
             if ($recipe) {
                 $this->totalCount += 1;
-                Log::info('['.$count.'/'.$itemsCount.']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-                $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-                DB::transaction(function () use ($recipe, $server) {
-                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                    $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
-                    $marketPrice = $recipe->item->marketPrice($server);
-                    if ($marketPrice !== null) {
-                        $marketPrice->updated_at = now();
-                        $marketPrice->save();
-                    }
+                Log::info('['.$count.'/'.$itemsCount.']'.' Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
 
-                    $this->ffxivService->updateRecipeCosts($server, $recipe);
-                });
-                $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
-
-                echo '['.now()->toDateTimeString().'] #'.$this->totalCount.' ['.$count.'/'.$itemsCount.'] Processing recipe '.$recipe->item->name.' | Mem Usage: '.intval(memory_get_usage(true) / 1024)." KB \n";
-                $profit = $recipe->item->marketPrice($server)?->price - $recipe->craftingCost($server)->optimal_craft_cost;
-                echo 'Profit: '.$profit.' | Optimal Craft Cost: '.$recipe->craftingCost($server)->optimal_craft_cost."\n";
+                RefreshItem::dispatch($recipe->item_id, $server);
             } else {
                 Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item ID '.$item['itemID']);
                 echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Recipe not found for item ID '.$item['itemID']."\n";

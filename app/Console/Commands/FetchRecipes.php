@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
-use App\Models\Listing;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FetchRecipes extends Command
@@ -68,20 +67,10 @@ class FetchRecipes extends Command
                     continue;
                 }
 
-                if ($recipe) {
-                    $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-                    DB::transaction(function () use ($recipe, $server) {
-                        $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                        $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
-                        $this->ffxivService->updateRecipeCosts($server, $recipe);
-                    });
-                    $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
-                } else {
-                    Log::error('Failed to retrieve recipe ID '.$recipeObj['ID']);
-                }
+                RefreshItem::dispatch($recipe->item_id, $server);
 
                 Log::info('Sleeping for 3 seconds');
-                sleep(2);
+                sleep(5);
             }
 
             $page += 1;

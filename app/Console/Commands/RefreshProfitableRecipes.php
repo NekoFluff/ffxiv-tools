@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
-use App\Models\Listing;
 use App\Models\MarketPrice;
 use App\Models\Recipe;
 use App\Services\FFXIVService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RefreshProfitableRecipes extends Command
@@ -65,15 +64,11 @@ class RefreshProfitableRecipes extends Command
                 continue;
             }
 
-            Log::info('['.($index + 1).'/'.count($recipes).']'.' Processing recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-            $this->ffxivService->refreshMarketboardListings($server, $recipe->itemIDs());
-            DB::transaction(function () use ($recipe, $server) {
-                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                $this->ffxivService->updateMarketPrices($server, $recipe, $listings);
-                $this->ffxivService->updateRecipeCosts($server, $recipe);
-            });
-            $this->ffxivService->refreshMarketBoardSales($server, $recipe->item_id);
-            sleep(1);
+            Log::info('['.($index + 1).'/'.count($recipes).']'.' Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
+
+            RefreshItem::dispatch($recipe->item_id, $server);
+
+            sleep(10);
         }
     }
 }
