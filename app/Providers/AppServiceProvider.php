@@ -33,10 +33,9 @@ class AppServiceProvider extends ServiceProvider
                 return collect($entry->content['context'])->map(function ($value, $key) {
                     if ($value instanceof UnitEnum) {
                         return $key.':'.$value->value;
+                    } elseif (! is_array($value)) {
+                        return $key.':'.$value;
                     }
-                    // elseif (! is_array($value)) {
-                    //     return $key.':'.$value;
-                    // }
                 })->toArray();
             }
         });
