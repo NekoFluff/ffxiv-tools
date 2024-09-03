@@ -24,7 +24,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the most recently updated items from universalis';
+    protected $description = 'Refreshes the most recently updated items from universalis (actively checks for a duration of 15 minutes)';
 
     protected FFXIVService $ffxivService;
 
@@ -43,6 +43,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
         $this->ffxivService = $ffxivService;
 
+        $this->timestamp = now()->subSeconds(30)->getTimestampMs();
     }
 
     /**
@@ -50,15 +51,19 @@ class RefreshMostRecentlyUpdatedItems extends Command
      */
     public function handle(): void
     {
-        $startTime = intval(now()->timestamp);
+        $startTime = now()->getTimestamp();
         Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$startTime]);
 
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        $this->timestamp = intval(now()->subMinutes(5)->timestamp);
-        $this->refresh($server);
+        $fifteenMinutesFromNow = now()->addMinutes(15);
+
+        while (now() < $fifteenMinutesFromNow) {
+            $this->refresh($server);
+            sleep(30);
+        }
     }
 
     private function refresh(Server $server): void
