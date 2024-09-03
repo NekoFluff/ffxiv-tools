@@ -24,7 +24,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the most recently updated items from universalis (actively checks for a duration of 15 minutes)';
+    protected $description = 'Refreshes the most recently updated items (last 3 minutes) from universalis';
 
     protected FFXIVService $ffxivService;
 
@@ -43,7 +43,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
         $this->ffxivService = $ffxivService;
 
-        $this->timestamp = now()->subSeconds(30)->getTimestampMs();
+        $this->timestamp = now()->subMinutes(3)->subSeconds(5)->getTimestampMs();
     }
 
     /**
@@ -58,12 +58,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        $fifteenMinutesFromNow = now()->addMinutes(15);
-
-        while (now() < $fifteenMinutesFromNow) {
-            $this->refresh($server);
-            sleep(30);
-        }
+        $this->refresh($server);
     }
 
     private function refresh(Server $server): void

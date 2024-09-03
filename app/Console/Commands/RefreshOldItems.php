@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Telescope\Telescope;
 
-class RecipesRefreshOldItems extends Command
+class RefreshOldItems extends Command
 {
     /**
      * The name and signature of the console command.

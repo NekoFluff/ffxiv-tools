@@ -1,8 +1,12 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\RefreshMostRecentlyUpdatedItems;
+use App\Console\Commands\RefreshOldItems;
+use App\Console\Commands\RefreshProfitableRecipes;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
+Schedule::command(RefreshOldItems::class)->cron('*/15 * * * *');
+
+Schedule::command(RefreshMostRecentlyUpdatedItems::class)->cron('*/3 * * * *');
+
+Schedule::command(RefreshProfitableRecipes::class)->cron('0 9 * * *');
