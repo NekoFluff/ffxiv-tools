@@ -55,8 +55,9 @@ class RecipesDaemon extends Command
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        /** @phpstan-ignore-next-line */
-        while (true) {
+        $fifteenMinutesFromNow = now()->addMinutes(15);
+
+        while (now() < $fifteenMinutesFromNow) {
             $this->refreshOldRecipes($server);
             sleep(60 * 5);
         }
