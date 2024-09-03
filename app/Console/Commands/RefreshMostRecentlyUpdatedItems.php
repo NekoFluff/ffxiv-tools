@@ -82,14 +82,18 @@ class RefreshMostRecentlyUpdatedItems extends Command
             $count += 1;
 
             if ($recipe) {
+                if ($recipe->item->marketPrice($server)->updated_at >= now()->subMinutes(3)) {
+                    Log::info('['.$count.'/'.$itemsCount.']'.' Skipping. Recipe for item '.$recipe->item->name.' ('.$recipe->id.') has been updated in the last 3 minutes.');
+
+                    continue;
+                }
+
                 $this->totalCount += 1;
                 Log::info('['.$count.'/'.$itemsCount.']'.' Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id);
-                echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Dispatching job to process recipe '.$recipe->item->name.' ('.$recipe->id.') | Item ID: '.$recipe->item_id."\n";
 
                 RefreshItem::dispatch($recipe->item_id, $server);
             } else {
                 Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item ID '.$item['itemID']);
-                echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Recipe not found for item ID '.$item['itemID']."\n";
             }
             sleep(1);
         }
