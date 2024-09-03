@@ -17,7 +17,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:mru-daemon';
+    protected $signature = 'recipes:refresh-most-recently-updated-items';
 
     /**
      * The console command description.
@@ -32,8 +32,6 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
     protected int $timestamp = 0;
 
-    protected int $startTime;
-
     /**
      * Create a new command instance.
      *
@@ -45,7 +43,6 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
         $this->ffxivService = $ffxivService;
 
-        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -53,21 +50,18 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
+        $startTime = intval(now()->timestamp);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$startTime]);
 
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        $fifteenMinutesFromNow = now()->addMinutes(15);
-
-        while (now() < $fifteenMinutesFromNow) {
-            $this->refreshRecipes($server);
-            sleep(60);
-        }
+        $this->timestamp = intval(now()->subMinutes(5)->timestamp);
+        $this->refresh($server);
     }
 
-    private function refreshRecipes(Server $server): void
+    private function refresh(Server $server): void
     {
         $count = 0;
 
@@ -97,7 +91,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
                 Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item ID '.$item['itemID']);
                 echo '['.now()->toDateTimeString().'] ['.$count.'/'.$itemsCount.'] Recipe not found for item ID '.$item['itemID']."\n";
             }
-            sleep(2);
+            sleep(1);
         }
     }
 }

@@ -19,14 +19,14 @@ class RecipesDaemon extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:daemon';
+    protected $signature = 'recipes:refresh-old-items';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refreshes the market board current listings and sale history for recipes';
+    protected $description = 'Refreshes the last 50 items that have not been updated in the last 7 days';
 
     protected FFXIVService $ffxivService;
 
@@ -45,7 +45,6 @@ class RecipesDaemon extends Command
 
         $this->ffxivService = $ffxivService;
 
-        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -53,17 +52,17 @@ class RecipesDaemon extends Command
      */
     public function handle(): void
     {
-        sleep(60 * 5);
-        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
+        $startTime = intval(now()->timestamp);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$startTime]);
 
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        $this->refreshOldRecipes($server);
+        $this->refresh($server);
     }
 
-    private function refreshOldRecipes(Server $server): void
+    private function refresh(Server $server): void
     {
         $count = 0;
 
@@ -77,7 +76,7 @@ class RecipesDaemon extends Command
             ->where('market_prices.updated_at', '<', now()->subDays(7))
             ->groupBy('recipes.id')
             ->orderByRaw('MIN(market_prices.updated_at) ASC')
-            ->limit(10)
+            ->limit(50)
             ->get();
         $recipesCount = $recipes->count();
 
@@ -88,7 +87,7 @@ class RecipesDaemon extends Command
 
             RefreshItem::dispatch($recipe->item_id, $server);
 
-            sleep(2);
+            sleep(1);
         }
     }
 }
