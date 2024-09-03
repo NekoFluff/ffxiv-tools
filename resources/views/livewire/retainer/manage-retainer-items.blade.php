@@ -49,7 +49,7 @@ new class extends Component
                 <div class="flex items-center justify-between">
                     <div class="flex">
                         <img class="w-6 h-6" src="{{ 'https://xivapi.com/' . $item->icon }}" />
-                        <span class="ml-2">{{ $item->name }}</span>
+                        <span class="ml-2 dark:text-white">{{ $item->name }}</span>
                     </div>
                     <div>
                         <x-danger-button wire:click="removeItem({{ $item->id }})">Remove</x-danger-button>
