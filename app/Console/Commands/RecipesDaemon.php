@@ -49,6 +49,7 @@ class RecipesDaemon extends Command
      */
     public function handle(): void
     {
+        sleep(60 * 5);
         Telescope::tag(fn () => ['command:recipes:daemon', 'start:'.now()->timestamp]);
 
         DB::disableQueryLog();
@@ -56,7 +57,6 @@ class RecipesDaemon extends Command
         $server = Server::GOBLIN;
 
         $this->refreshOldRecipes($server);
-        sleep(60 * 5);
     }
 
     private function refreshOldRecipes(Server $server): void
