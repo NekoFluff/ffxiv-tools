@@ -55,12 +55,8 @@ class RecipesDaemon extends Command
         ini_set('memory_limit', '256M');
         $server = Server::GOBLIN;
 
-        $fifteenMinutesFromNow = now()->addMinutes(15);
-
-        while (now() < $fifteenMinutesFromNow) {
-            $this->refreshOldRecipes($server);
-            sleep(60 * 5);
-        }
+        $this->refreshOldRecipes($server);
+        sleep(60 * 5);
     }
 
     private function refreshOldRecipes(Server $server): void
@@ -74,10 +70,10 @@ class RecipesDaemon extends Command
                     ->where('market_prices.server', '=', $server);
             })
             ->select('recipes.*')
-            ->where('market_prices.updated_at', '<', now()->subHours(24))
+            ->where('market_prices.updated_at', '<', now()->subDays(7))
             ->groupBy('recipes.id')
             ->orderByRaw('MIN(market_prices.updated_at) ASC')
-            ->limit(100)
+            ->limit(10)
             ->get();
         $recipesCount = $recipes->count();
 
