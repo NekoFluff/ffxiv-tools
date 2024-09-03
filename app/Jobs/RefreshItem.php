@@ -36,7 +36,7 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
         try {
             Log::withContext(['itemID' => $this->itemID, 'server' => $this->server]);
 
-            DB::transaction(function () use ($service) {
+            $item = DB::transaction(function () use ($service) {
                 $recipe = $service->getRecipeByItemID($this->itemID);
 
                 $item = $recipe->item ?? Item::find($this->itemID);
@@ -54,7 +54,12 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
                     }
                     $service->refreshMarketBoardSales($this->server, $item->id);
                 }
+
+                return $item;
             });
+
+            Log::info(sprintf('%s refreshed', $item->name));
+
         } catch (\Exception $e) {
             Log::error('Failed to refresh item', ['itemID' => $this->itemID, 'server' => $this->server, 'exception' => $e]);
             $this->release(60);
