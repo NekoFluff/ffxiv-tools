@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Telescope\Telescope;
 
-class RecipesDaemon extends Command
+class RecipesRefreshOldItems extends Command
 {
     /**
      * The name and signature of the console command.
@@ -26,7 +26,7 @@ class RecipesDaemon extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the last 50 items that have not been updated in the last 7 days';
+    protected $description = 'Refreshes the last 50 items (with recipes) that have not been updated in the last 7 days';
 
     protected FFXIVService $ffxivService;
 

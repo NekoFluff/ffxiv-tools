@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Telescope\Telescope;
 
-class MostRecentlyUpdatedRecipesDaemon extends Command
+class RefreshMostRecentlyUpdatedItems extends Command
 {
     /**
      * The name and signature of the console command.
