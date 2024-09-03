@@ -6,7 +6,6 @@ use App\Models\Enums\Server;
 use App\Models\Ingredient;
 use App\Models\MarketPrice;
 use App\Models\Recipe;
-use Illuminate\Support\Collection;
 use Livewire\Wireable;
 
 class CraftableItem implements Wireable
@@ -17,8 +16,8 @@ class CraftableItem implements Wireable
 
     public string $icon;
 
-    /** @var Collection<int,CraftableItem> */
-    public Collection $crafting_materials;
+    /** @var array<CraftableItem> */
+    public array $crafting_materials;
 
     public float $crafting_output_count = -1;
 
@@ -42,6 +41,8 @@ class CraftableItem implements Wireable
 
     public int $vendor_price = -1;
 
+    public string $server;
+
     public static function fromRecipe(Recipe $recipe, Server $server, float $target_amount): CraftableItem
     {
         $ratio = $target_amount / $recipe->amount_result;
@@ -54,11 +55,11 @@ class CraftableItem implements Wireable
         $item->icon = $recipe->item->icon;
         $item->crafting_output_count = $target_amount;
         $item->number_needed_per_craft = $ratio * $recipe->amount_result;
-        $item->crafting_materials = $recipe->ingredients->map(
+        $item->crafting_materials = collect($recipe->ingredients)->map(
             fn ($ingredient) => $ingredient->craftingRecipe
             ? CraftableItem::fromRecipe($ingredient->craftingRecipe, $server, $ingredient->amount * $ratio)
             : CraftableItem::fromIngredient($ingredient, $server, $ingredient->amount * $ratio)
-        );
+        )->all();
 
         $item->class_job = $recipe->class_job;
         $item->class_job_level = $recipe->class_job_level;
@@ -72,6 +73,7 @@ class CraftableItem implements Wireable
         $item->market_price = $recipe->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
         $item->market_price_updated_at = intval($recipe->item->marketPrice($server)?->updated_at?->timestamp);
         $item->vendor_price = $recipe->item->vendor_price;
+        $item->server = $server->value;
 
         return $item;
     }
@@ -83,7 +85,7 @@ class CraftableItem implements Wireable
         $item->item_id = $ingredient->item->id;
         $item->icon = $ingredient->item->icon;
         $item->crafting_output_count = $target_amount;
-        $item->crafting_materials = collect();
+        $item->crafting_materials = [];
 
         $item->purchase_cost = 0;
         $item->market_craft_cost = 0;
@@ -91,6 +93,7 @@ class CraftableItem implements Wireable
         $item->market_price = $ingredient->item->marketPrice($server)?->price ?: MarketPrice::DEFAULT_MARKET_PRICE;
         $item->market_price_updated_at = intval($ingredient->item->marketPrice($server)?->updated_at?->timestamp);
         $item->vendor_price = $ingredient->item->vendor_price;
+        $item->server = $server->value;
 
         return $item;
     }
@@ -104,7 +107,7 @@ class CraftableItem implements Wireable
             'name' => $this->name,
             'item_id' => $this->item_id,
             'icon' => $this->icon,
-            'crafting_materials' => $this->crafting_materials->map(fn ($item) => $item->toLivewire()),
+            'crafting_materials' => collect($this->crafting_materials)->map(fn ($item) => $item->toLivewire())->all(),
             'crafting_output_count' => $this->crafting_output_count,
             'number_needed_per_craft' => $this->number_needed_per_craft,
             'class_job' => $this->class_job,
@@ -116,6 +119,7 @@ class CraftableItem implements Wireable
             'market_price' => $this->market_price,
             'market_price_updated_at' => $this->market_price_updated_at,
             'vendor_price' => $this->vendor_price,
+            'server' => $this->server,
         ];
     }
 
@@ -125,7 +129,7 @@ class CraftableItem implements Wireable
         $item->name = $value['name'];
         $item->item_id = $value['item_id'];
         $item->icon = $value['icon'];
-        $item->crafting_materials = collect(array_map(fn (mixed $item) => CraftableItem::fromLivewire($item), $value['crafting_materials']));
+        $item->crafting_materials = array_map(fn (mixed $item) => CraftableItem::fromLivewire($item), $value['crafting_materials']);
         $item->crafting_output_count = $value['crafting_output_count'];
         $item->number_needed_per_craft = $value['number_needed_per_craft'];
         $item->class_job = $value['class_job'];
@@ -137,6 +141,7 @@ class CraftableItem implements Wireable
         $item->market_price = $value['market_price'];
         $item->market_price_updated_at = $value['market_price_updated_at'];
         $item->vendor_price = $value['vendor_price'];
+        $item->server = $value['server'];
 
         return $item;
     }

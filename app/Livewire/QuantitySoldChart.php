@@ -9,31 +9,44 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class QuantitySoldChart extends Component
 {
-    /**
-     * The quantity sold for the item over the last 7 days.
-     *
-     * @var array<string,int>
-     */
+    #[Reactive]
+    public int $itemID;
+
+    public Server $server;
+
+    /** @var array<string,int> */
     #[Locked]
     public array $quantitySold;
 
-    public function mount(int $itemID, string $server): void
+    public function mount(int $itemID): void
     {
-        $sales = Sale::fromServer(Server::from($server))->where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
-        $this->quantitySold = (new AggregateSalesByDay())($sales)->mapWithKeys(function ($item) {
-            return [$item['date'] => $item['quantity']];
-        })->toArray();
+        $this->itemID = $itemID;
+
+        $this->server = session('server') ?? Server::GOBLIN;
+    }
+
+    #[On('server-changed')]
+    public function updateServer(string $server): void
+    {
+        $this->server = Server::from($server);
     }
 
     public function render(): View
     {
-        return view('livewire.quantity-sold-chart', [
-            'quantitySold' => $this->quantitySold,
-        ]);
+        $sales = Sale::fromServer($this->server)->where('item_id', $this->itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+        $this->quantitySold = (new AggregateSalesByDay())($sales)->mapWithKeys(function ($sale) {
+            return [$sale['date'] => $sale['quantity']];
+        })->toArray();
+
+        $this->dispatch('refresh-quantity-sold-chart');
+
+        return view('livewire.quantity-sold-chart');
     }
 }

@@ -14,6 +14,7 @@
             <div class="flex-1 mx-7">
                 <livewire:item-search-bar />
             </div>
+            <livewire:server-dropdown />
         </div>
     </x-slot>
 
@@ -24,17 +25,14 @@
             </div>
             <div class="grid grid-cols-1 gap-10 mb-10 lg:grid-cols-2">
                 <div>
-                    {{-- TODO: Pass through server --}}
-                    <livewire:quantity-sold-chart :itemID="$item->id" server="Goblin" />
+                    <livewire:quantity-sold-chart :itemID="$item->id" />
                 </div>
                 <div>
-                    {{-- TODO: Pass through server --}}
-                    <livewire:price-history-chart :itemID="$item->id" server="Goblin" />
+                    <livewire:price-history-chart :itemID="$item->id" />
                 </div>
             </div>
             <div class="pb-20">
-                {{-- TODO: Pass through server --}}
-                <livewire:current-listings-table :itemID="$item->id" server="Goblin" />
+                <livewire:current-listings-table :itemID="$item->id" />
             </div>
         @else
             <div>

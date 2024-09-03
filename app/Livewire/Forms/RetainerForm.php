@@ -12,7 +12,12 @@ class RetainerForm extends Form
 {
     public string $name = '';
 
-    public Server $server = Server::GOBLIN;
+    public Server $server;
+
+    public function mount(): void
+    {
+        $this->server = session('server') ?? Server::GOBLIN;
+    }
 
     /**
      * @return array<string,mixed>

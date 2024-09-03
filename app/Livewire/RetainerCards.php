@@ -10,7 +10,7 @@ use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class RetainerCards extends Component
 {
     /**

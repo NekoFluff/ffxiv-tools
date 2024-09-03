@@ -9,11 +9,18 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class PriceHistoryChart extends Component
 {
+    #[Reactive]
+    public int $itemID;
+
+    public Server $server;
+
     /**
      * The average price for the item over the last 7 days.
      *
@@ -46,9 +53,22 @@ class PriceHistoryChart extends Component
     #[Locked]
     public array $medianPrice;
 
-    public function mount(int $itemID, string $server): void
+    public function mount(int $itemID): void
     {
-        $sales = Sale::fromServer(Server::from($server))->where('item_id', $itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
+        $this->itemID = $itemID;
+
+        $this->server = session('server') ?? Server::GOBLIN;
+    }
+
+    #[On('server-changed')]
+    public function updateServer(string $server): void
+    {
+        $this->server = Server::from($server);
+    }
+
+    public function render(): View
+    {
+        $sales = Sale::fromServer($this->server)->where('item_id', $this->itemID)->where('timestamp', '>=', Carbon::now()->subDays(7))->latest()->get();
         $aggregatedSales = (new AggregateSalesByDay())($sales);
         $this->averagePrice = $aggregatedSales->mapWithKeys(function ($item) {
             return [$item['date'] => $item['avg_price']];
@@ -65,15 +85,9 @@ class PriceHistoryChart extends Component
         $this->medianPrice = $aggregatedSales->mapWithKeys(function ($item) {
             return [$item['date'] => $item['median_price']];
         })->toArray();
-    }
 
-    public function render(): View
-    {
-        return view('livewire.price-history-chart', [
-            'averagePrice' => $this->averagePrice,
-            'minPrice' => $this->minPrice,
-            'maxPrice' => $this->maxPrice,
-            'medianPrice' => $this->medianPrice,
-        ]);
+        $this->dispatch('refresh-price-history-chart');
+
+        return view('livewire.price-history-chart');
     }
 }

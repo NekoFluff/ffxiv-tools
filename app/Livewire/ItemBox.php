@@ -5,10 +5,12 @@ namespace App\Livewire;
 use App\Structures\CraftableItem;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 class ItemBox extends Component
 {
+    #[Reactive]
     public CraftableItem $craftableItem;
 
     public function mount(CraftableItem $craftableItem): void

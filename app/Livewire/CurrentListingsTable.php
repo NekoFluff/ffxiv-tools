@@ -7,11 +7,18 @@ use App\Models\Listing;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class CurrentListingsTable extends Component
 {
+    #[Reactive]
+    public int $itemID;
+
+    public ?Server $server = null;
+
     /**
      * The listings for the item.
      *
@@ -20,13 +27,27 @@ class CurrentListingsTable extends Component
     #[Locked]
     public array $listings;
 
-    public function mount(int $itemID, string $server): void
+    public function mount(int $itemID): void
     {
-        $this->listings = Listing::fromServer(Server::from($server))->where('item_id', $itemID)->orderBy('price_per_unit', 'asc')->limit(10)->get()->toArray();
+        $this->itemID = $itemID;
+
+        $this->server = session('server') ?? Server::GOBLIN;
+    }
+
+    #[On('server-changed')]
+    public function updateServer(string $server): void
+    {
+        $this->server = Server::from($server);
     }
 
     public function render(): View
     {
+        if (! $this->server) {
+            $this->server = session('server') ?? Server::GOBLIN;
+        }
+
+        $this->listings = Listing::fromServer($this->server)->where('item_id', $this->itemID)->orderBy('price_per_unit', 'asc')->limit(10)->get()->toArray();
+
         return view('livewire.current-listings-table');
     }
 }

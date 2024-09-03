@@ -1,5 +1,5 @@
 <section
-    class="py-3 pl-3 pr-1 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500 dark:border-slate-100">
+    class="py-3 pl-3 pr-1 mt-2 ml-5 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500 dark:border-slate-100">
     {{-- Icon and Title --}}
     <div class="flex flex-row items-center">
         <img src="{{ 'https://xivapi.com/' . $craftableItem->icon }}" class="w-6 h-6" />&nbsp;
@@ -107,9 +107,7 @@
     @endif
 
     @foreach ($craftableItem->crafting_materials as $craftingMaterial)
-        <div wire:key="{{ $craftingMaterial->item_id }}" class="mt-2 ml-5">
-            <livewire:item-box :craftableItem="$craftingMaterial" />
-        </div>
+        <livewire:item-box :key="$craftingMaterial->item_id . '.' . $craftableItem->name" :craftableItem="$craftingMaterial" />
     @endforeach
 
 </section>

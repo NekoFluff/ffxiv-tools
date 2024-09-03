@@ -11,6 +11,7 @@
             <div class="flex-1 mx-7">
                 <livewire:item-search-bar />
             </div>
+            <livewire:server-dropdown />
         </div>
     </x-slot>
 

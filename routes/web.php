@@ -8,7 +8,7 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('/items/{id}', App\Livewire\ItemDashboard::class)->where('id', '\d*')->name('item.show');
+Route::get('/items/{id}', App\Livewire\ItemDashboard::class)->middleware(['web'])->where('id', '\d*')->name('item.show');
 
 Route::get('/retainers', App\Livewire\RetainersDashboard::class)
     ->middleware(['auth', 'verified'])
