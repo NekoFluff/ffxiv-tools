@@ -32,6 +32,8 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
 
     protected int $timestamp = 0;
 
+    protected int $startTime;
+
     /**
      * Create a new command instance.
      *
@@ -42,6 +44,8 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
         parent::__construct();
 
         $this->ffxivService = $ffxivService;
+
+        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -49,7 +53,7 @@ class MostRecentlyUpdatedRecipesDaemon extends Command
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:recipes:mru-daemon', 'start:'.now()->timestamp]);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');

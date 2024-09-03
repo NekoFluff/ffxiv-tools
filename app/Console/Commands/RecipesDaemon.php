@@ -32,6 +32,8 @@ class RecipesDaemon extends Command
 
     protected int $totalCount = 0;
 
+    protected int $startTime = 0;
+
     /**
      * Create a new command instance.
      *
@@ -42,6 +44,8 @@ class RecipesDaemon extends Command
         parent::__construct();
 
         $this->ffxivService = $ffxivService;
+
+        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -50,7 +54,7 @@ class RecipesDaemon extends Command
     public function handle(): void
     {
         sleep(60 * 5);
-        Telescope::tag(fn () => ['command:recipes:daemon', 'start:'.now()->timestamp]);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         DB::disableQueryLog();
         ini_set('memory_limit', '256M');

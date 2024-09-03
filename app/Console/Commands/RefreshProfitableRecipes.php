@@ -29,6 +29,8 @@ class RefreshProfitableRecipes extends Command
 
     protected FFXIVService $ffxivService;
 
+    protected int $startTime = 0;
+
     /**
      * Create a new command instance.
      *
@@ -39,6 +41,8 @@ class RefreshProfitableRecipes extends Command
         parent::__construct();
 
         $this->ffxivService = $ffxivService;
+
+        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -46,7 +50,7 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:recipes:refresh-profitable', 'start:'.now()->timestamp]);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         $server = Server::GOBLIN;
 

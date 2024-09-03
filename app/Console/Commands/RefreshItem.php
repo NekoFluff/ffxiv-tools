@@ -12,9 +12,18 @@ class RefreshItem extends Command
 
     protected $description = 'Dispatch a job to refresh an item in the database.';
 
+    protected int $startTime;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->startTime = intval(now()->timestamp);
+    }
+
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:app:refresh-item', 'start:'.now()->timestamp]);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         $itemID = intval($this->argument('itemID'));
 

@@ -22,12 +22,21 @@ class RefreshJobsForRecipes extends Command
      */
     protected $description = 'Refreshes the class job data for all recipes';
 
+    protected int $startTime;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->startTime = intval(now()->timestamp);
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:recipes:refresh-jobs', 'start:'.now()->timestamp]);
+        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         $recipes = Recipe::all();
         $recipes->each(
