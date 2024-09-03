@@ -43,7 +43,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
         $this->ffxivService = $ffxivService;
 
-        $this->timestamp = now()->subMinutes(3)->subSeconds(5)->getTimestampMs();
+        $this->timestamp = now()->subMinutes(2)->subSeconds(5)->getTimestampMs();
     }
 
     /**
@@ -67,7 +67,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
         $items = $this->ffxivService->fetchMostRecentlyUpdatedItems($server);
         $items = collect($items)->filter(function ($item) {
-            return $item['lastUploadTime'] > $this->timestamp;
+            return $item['lastUploadTime'] >= $this->timestamp;
         });
 
         if ($items->isEmpty()) {
