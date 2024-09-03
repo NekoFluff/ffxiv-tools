@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
                     $entry->content['data']['server']['properties'] ? 'server:'.$entry->content['data']['server']['properties'] : '',
                 ]);
             } elseif ($entry->type === 'log') {
-                return collect($entry->content['context'])->map(function ($value, $key) {
+                $context = collect($entry->content['context'])->map(function ($value, $key) {
                     if ($value instanceof UnitEnum) {
                         return $key.':'.$value->value;
                     } elseif (is_numeric($value) || is_string($value)) {
@@ -39,6 +39,10 @@ class AppServiceProvider extends ServiceProvider
                         return '';
                     }
                 })->values()->filter()->toArray();
+
+                return array_merge([
+                    'level:'.$entry->content['level'] ?? 'unknown',
+                ], $context);
             }
         });
     }
