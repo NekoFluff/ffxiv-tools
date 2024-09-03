@@ -4,6 +4,7 @@ namespace App\Http\Clients\Universalis;
 
 use App\Models\Enums\Server;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
@@ -17,15 +18,15 @@ class UniversalisClient implements UniversalisClientInterface
     {
         $stack = HandlerStack::create();
         $stack->push(GuzzleRetryMiddleware::factory([
-            'retry_on_status' => [429, 503],
+            'retry_on_status' => [429, 500, 503],
             'retry_on_timeout' => true,
-            'delay' => 1000,
+            'delay' => 3000,
             'max_retry_attempts' => 3,
         ]));
 
         $this->client = new Client([
             'base_uri' => 'https://universalis.app/api/v2/',
-            'timeout' => 10.0,
+            'timeout' => 20.0,
             'handler' => $stack,
         ]);
     }
@@ -45,7 +46,15 @@ class UniversalisClient implements UniversalisClientInterface
             ]);
 
             return [];
-        } catch (\Exception $ex) {
+        } catch (GuzzleException $ex) {
+            Log::error('A Guzzle exception occurred while retrieving the market board listings', [
+                'server' => $server->value,
+                'items' => $itemIDs,
+                'exception' => $ex,
+            ]);
+
+            return [];
+        } catch (\Throwable $ex) {
             Log::error('Unknown exception occurred while and failed to retrieve market board listings', [
                 'server' => $server->value,
                 'items' => $itemIDs,
