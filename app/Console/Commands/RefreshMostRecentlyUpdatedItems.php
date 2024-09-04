@@ -97,7 +97,9 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
                 RefreshItem::dispatch($recipe->item_id, $server);
             } else {
-                Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item ID '.$item['itemID']);
+                Log::info('['.$count.'/'.$itemsCount.'] '.'Recipe not found for item '.$item->name.' ('.$item->id.')', [
+                    'itemID' => $item->id,
+                ]);
             }
             sleep(1);
         }
