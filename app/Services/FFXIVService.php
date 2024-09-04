@@ -433,7 +433,7 @@ class FFXIVService
                             ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
                         );
 
-                        Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())->lockForUpdate()->get();
+                        Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())->sharedLock()->get();
 
                         // Prune old listings
                         Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())
