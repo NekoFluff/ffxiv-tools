@@ -15,6 +15,7 @@ use App\Models\Sale;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FFXIVService
@@ -421,20 +422,27 @@ class FFXIVService
             }
         )->flatten(1);
 
-        // Upsert in chunks of 100
+        // Upsert and deletein chunks of 100
         $listings->chunk(100)->each(
             function ($chunk) {
-                Listing::upsert(
-                    $chunk->toArray(),
-                    ['id'],
-                    ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+                DB::transaction(
+                    function () use ($chunk) {
+                        Listing::where('id', $chunk->pluck('id'))->sharedLock()->get();
+
+                        Listing::upsert(
+                            $chunk->toArray(),
+                            ['id'],
+                            ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+                        );
+
+                        // Prune old listings
+                        Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())
+                            ->whereNotIn('id', $chunk->pluck('id'))->delete();
+                    }
                 );
             }
         );
 
-        // Prune old listings
-        Listing::whereIn('item_id', $listings->pluck('item_id')->unique())
-            ->whereNotIn('id', $listings->pluck('id'))->delete();
     }
 
     /**
