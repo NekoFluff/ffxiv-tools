@@ -24,7 +24,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
      *
      * @var string
      */
-    protected $description = 'Refreshes the most recently updated items (last 3 minutes) from universalis';
+    protected $description = 'Refreshes the most recently updated items (last minute) from universalis';
 
     protected FFXIVService $ffxivService;
 
@@ -43,7 +43,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
 
         $this->ffxivService = $ffxivService;
 
-        $this->timestamp = now()->subMinutes(2)->subSeconds(5)->getTimestampMs();
+        $this->timestamp = now()->subMinutes(1)->subSeconds(5)->getTimestampMs();
     }
 
     /**
