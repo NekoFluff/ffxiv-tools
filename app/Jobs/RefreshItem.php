@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RefreshItem implements ShouldBeUnique, ShouldQueue
@@ -36,28 +35,23 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
         try {
             Log::withContext(['itemID' => $this->itemID, 'server' => $this->server]);
 
-            /** @var Item|null $item */
-            $item = DB::transaction(function () use ($service) {
-                $recipe = $service->getRecipeByItemID($this->itemID);
+            $recipe = $service->getRecipeByItemID($this->itemID);
 
-                $item = $recipe->item ?? Item::find($this->itemID);
-                if ($recipe) {
-                    $service->refreshMarketboardListings($this->server, $recipe->itemIDs());
-                    $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
-                    $service->updateMarketPrices($this->server, $recipe, $listings);
-                    $service->updateRecipeCosts($this->server, $recipe);
-                    $service->refreshMarketBoardSales($this->server, $recipe->item_id);
-                } elseif ($item) {
-                    $service->refreshMarketboardListings($this->server, [$item->id]);
-                    $listings = Listing::where('item_id', $item->id)->get();
-                    if (! $listings->isEmpty()) {
-                        $service->updateMarketPrice($this->server, $item, $listings);
-                    }
-                    $service->refreshMarketBoardSales($this->server, $item->id);
+            $item = $recipe->item ?? Item::find($this->itemID);
+            if ($recipe) {
+                $service->refreshMarketboardListings($this->server, $recipe->itemIDs());
+                $listings = Listing::whereIn('item_id', $recipe->itemIDs())->get()->groupBy('item_id');
+                $service->updateMarketPrices($this->server, $recipe, $listings);
+                $service->updateRecipeCosts($this->server, $recipe);
+                $service->refreshMarketBoardSales($this->server, $recipe->item_id);
+            } elseif ($item) {
+                $service->refreshMarketboardListings($this->server, [$item->id]);
+                $listings = Listing::where('item_id', $item->id)->get();
+                if (! $listings->isEmpty()) {
+                    $service->updateMarketPrice($this->server, $item, $listings);
                 }
-
-                return $item;
-            });
+                $service->refreshMarketBoardSales($this->server, $item->id);
+            }
 
             if ($item) {
                 Log::info(sprintf('(#%d) %s refreshed', $item->id, $item->name));
