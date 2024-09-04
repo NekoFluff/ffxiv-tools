@@ -88,7 +88,7 @@ class FFXIVService
     }
 
     /** @param array<mixed,mixed> $json */
-    public function parseRecipeJson(array $json): ?Recipe
+    private function parseRecipeJson(array $json): Recipe
     {
         $item = Item::updateOrCreate([
             'id' => intval($json['ItemResult']['ID']),
