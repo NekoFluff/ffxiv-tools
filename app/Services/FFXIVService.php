@@ -424,10 +424,13 @@ class FFXIVService
 
         // Upsert and deletein chunks of 100
         $listings->chunk(100)->each(
-            function ($chunk) {
+            function ($chunk) use ($server) {
                 DB::transaction(
-                    function () use ($chunk) {
-                        Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())->sharedLock()->get();
+                    function () use ($chunk, $server) {
+                        Listing::where('server', $server)
+                            ->whereIn('item_id', $chunk->pluck('item_id')->unique())
+                            ->sharedLock()
+                            ->get();
 
                         Listing::upsert(
                             $chunk->toArray(),
@@ -436,8 +439,10 @@ class FFXIVService
                         );
 
                         // Prune old listings
-                        Listing::whereIn('item_id', $chunk->pluck('item_id')->unique())
-                            ->whereNotIn('id', $chunk->pluck('id'))->delete();
+                        Listing::where('server', $server)
+                            ->whereIn('item_id', $chunk->pluck('item_id')->unique())
+                            ->whereNotIn('id', $chunk->pluck('id'))
+                            ->delete();
                     }
                 );
             }
