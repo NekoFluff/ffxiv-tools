@@ -427,9 +427,9 @@ class FFXIVService
             function ($chunk) {
                 DB::transaction(
                     function () use ($chunk) {
-                        // Listing::whereIn('id', $chunk->pluck('id'))->sharedLock()->get();
+                        Listing::whereIn('id', $chunk->pluck('id'))->sharedLock()->get();
 
-                        Listing::sharedLock()->upsert(
+                        Listing::upsert(
                             $chunk->toArray(),
                             ['id'],
                             ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
