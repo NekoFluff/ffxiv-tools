@@ -427,7 +427,7 @@ class FFXIVService
             function ($chunk) {
                 DB::transaction(
                     function () use ($chunk) {
-                        Item::where('id', $chunk->pluck('item_id')->unique())->sharedLock()->get();
+                        Item::whereIn('id', $chunk->pluck('item_id')->unique())->sharedLock()->get();
                         Listing::whereIn('id', $chunk->pluck('id'))->sharedLock()->get();
 
                         Listing::upsert(
