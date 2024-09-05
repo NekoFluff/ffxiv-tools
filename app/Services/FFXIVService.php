@@ -442,13 +442,15 @@ class FFXIVService
                         ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
                     );
 
-                    // Prune old listings
-                    Listing::where('server', $server)
-                        ->where('item_id', $itemID)
-                        ->whereNotIn('id', array_column($listings, 'id'))
-                        ->delete();
                 }
             );
+
+            // Prune old listings
+            Listing::where('server', $server)
+                ->where('item_id', $itemID)
+                ->whereNotIn('id', array_column($listings, 'id'))
+                ->delete();
+
         });
     }
 
