@@ -394,11 +394,11 @@ class FFXIVService
     private function processMarketBoardListings(Server $server, array $listingsData): void
     {
         $dataCenter = $server->dataCenter();
-        $listings = collect($listingsData)->map(
+        $listingsData = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server): array {
 
-                /** @var array<mixed> $l */
-                $l = $listingData['listings'] ?? [];
+                /** @var array<mixed> $listings */
+                $listings = $listingData['listings'] ?? [];
 
                 return array_map(
                     function ($entry) use ($dataCenter, $server, $itemID): array {
@@ -417,37 +417,33 @@ class FFXIVService
                             'last_review_time' => Carbon::createFromTimestamp($entry['lastReviewTime']),
                         ];
                     },
-                    $l
-                );
-            }
-        )->flatten(1);
-
-        // Upsert and deletein chunks of 100
-        $listings->chunk(100)->each(
-            function ($chunk) use ($server) {
-                DB::transaction(
-                    function () use ($chunk, $server) {
-                        Listing::where('server', $server)
-                            ->whereIn('item_id', $chunk->pluck('item_id')->unique())
-                            ->lockForUpdate()
-                            ->get();
-
-                        Listing::upsert(
-                            $chunk->toArray(),
-                            ['id'],
-                            ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
-                        );
-
-                        // Prune old listings
-                        Listing::where('server', $server)
-                            ->whereIn('item_id', $chunk->pluck('item_id')->unique())
-                            ->whereNotIn('id', $chunk->pluck('id'))
-                            ->delete();
-                    }
+                    $listings
                 );
             }
         );
 
+        $listingsData->each(function ($listings, $itemID) use ($server) {
+            DB::transaction(
+                function () use ($listings, $itemID, $server) {
+                    Listing::where('server', $server)
+                        ->whereIn('item_id', $itemID)
+                        ->lockForUpdate()
+                        ->get();
+
+                    Listing::upsert(
+                        $listings,
+                        ['id'],
+                        ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
+                    );
+
+                    // Prune old listings
+                    Listing::where('server', $server)
+                        ->whereIn('item_id', $itemID)
+                        ->whereNotIn('id', array_column($listings, 'id'))
+                        ->delete();
+                }
+            );
+        });
     }
 
     /**
