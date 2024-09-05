@@ -381,7 +381,7 @@ class FFXIVService
                         ->lockForUpdate()
                         ->get();
 
-                    Sale::upsert(
+                    Sale::lockForUpdate()->upsert(
                         $sales,
                         ['item_id', 'timestamp', 'buyer_name'],
                         ['quantity', 'price_per_unit', 'hq']
@@ -436,7 +436,7 @@ class FFXIVService
                         ->lockForUpdate()
                         ->get();
 
-                    Listing::upsert(
+                    Listing::lockForUpdate()->upsert(
                         $listings,
                         ['id'],
                         ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
