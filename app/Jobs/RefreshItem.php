@@ -31,7 +31,6 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
 
     public function handle(FFXIVService $service): void
     {
-
         try {
             Log::withContext(['itemID' => $this->itemID, 'server' => $this->server]);
 

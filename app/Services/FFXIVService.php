@@ -349,7 +349,7 @@ class FFXIVService
         $this->processMarketBoardListings($server, $listingsData);
 
         $dataCenter = $server->dataCenter();
-        $sales = collect($listingsData)->map(
+        $salesData = collect($listingsData)->map(
             function ($listingData, $itemID) use ($dataCenter, $server) {
 
                 /** @var array<mixed> $l */
@@ -371,18 +371,24 @@ class FFXIVService
                     $l
                 );
             }
-        )->flatten(1);
-
-        // Upsert in chunks of 100
-        $sales->chunk(100)->each(
-            function ($chunk) {
-                Sale::upsert(
-                    $chunk->toArray(),
-                    ['item_id', 'timestamp', 'buyer_name'],
-                    ['quantity', 'price_per_unit', 'hq']
-                );
-            }
         );
+
+        $salesData->each(function ($sales, $itemID) use ($server) {
+            DB::transaction(
+                function () use ($sales, $itemID, $server) {
+                    Sale::where('server', $server)
+                        ->where('item_id', $itemID)
+                        ->lockForUpdate()
+                        ->get();
+
+                    Sale::upsert(
+                        $sales,
+                        ['item_id', 'timestamp', 'buyer_name'],
+                        ['quantity', 'price_per_unit', 'hq']
+                    );
+                }
+            );
+        });
     }
 
     /**
