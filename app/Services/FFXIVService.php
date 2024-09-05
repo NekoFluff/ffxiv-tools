@@ -459,7 +459,7 @@ class FFXIVService
             }
         );
 
-        Sale::upsert(
+        Sale::lockForUpdate()->upsert(
             $sales->toArray(),
             ['item_id', 'timestamp', 'buyer_name'],
             ['quantity', 'price_per_unit', 'hq']
