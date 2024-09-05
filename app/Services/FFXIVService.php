@@ -429,7 +429,7 @@ class FFXIVService
                     function () use ($chunk, $server) {
                         Listing::where('server', $server)
                             ->whereIn('item_id', $chunk->pluck('item_id')->unique())
-                            ->sharedLock()
+                            ->lockForUpdate()
                             ->get();
 
                         Listing::upsert(
