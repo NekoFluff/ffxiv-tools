@@ -72,7 +72,7 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
 
         /** @var Collection<int, Listing> $listings */
         $listings = collect([
@@ -101,7 +101,7 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
 
         /** @var Collection<int, Listing> $listings */
         $listings = collect([
@@ -130,7 +130,7 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
+        $item = Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
 
         /** @var Collection<int, Listing> $listings */
         $listings = collect([
@@ -187,10 +187,10 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID, 'vendor_price' => 0]);
 
         $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);
@@ -219,10 +219,10 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
-        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 500]))->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 100]))->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 200]))->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->has(MarketPrice::factory()->state(['price' => 300]))->create(['id' => MockXIVClient::VARNISH_ITEM_ID, 'vendor_price' => 0]);
 
         $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->for($recipe)->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2]);
@@ -266,10 +266,10 @@ class FFXIVServiceTest extends TestCase
     {
         // Arrange
         $server = Server::GOBLIN;
-        Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
-        Item::factory()->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID]);
-        Item::factory()->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID]);
-        Item::factory()->create(['id' => MockXIVClient::VARNISH_ITEM_ID]);
+        Item::factory()->create(['id' => MockXIVClient::WOODEN_LOFT_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->create(['id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->create(['id' => MockXIVClient::MYTHRIL_RIVETS_ITEM_ID, 'vendor_price' => 0]);
+        Item::factory()->create(['id' => MockXIVClient::VARNISH_ITEM_ID, 'vendor_price' => 0]);
 
         $recipe = Recipe::factory()->create(['item_id' => MockXIVClient::WOODEN_LOFT_ITEM_ID]);
         Ingredient::factory()->create(['item_id' => MockXIVClient::ROSEWOOD_LUMBER_ITEM_ID, 'amount' => 2, 'recipe_id' => $recipe->id]);

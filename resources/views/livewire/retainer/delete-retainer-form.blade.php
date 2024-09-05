@@ -1,6 +1,5 @@
 <?php
 
-use App\Livewire\Actions\Logout;
 use App\Models\Retainer;
 use Livewire\Volt\Component;
 
@@ -18,13 +17,13 @@ new class extends Component
     /**
      * Delete the retainer.
      */
-    public function deleteRetainer(Logout $logout): void
+    public function deleteRetainer(): void
     {
-        $this->authorize('delete', $this->retainer);
-
         $this->validate([
             'name' => ['required', 'string', 'in:'.$this->retainer->name],
         ]);
+
+        $this->authorize('delete', $this->retainer);
 
         $this->retainer->delete();
 

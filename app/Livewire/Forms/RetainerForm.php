@@ -56,6 +56,12 @@ class RetainerForm extends Form
             return false;
         }
 
+        if ($user->retainers()->where('name', $this->name)->where('server', $this->server)->exists()) {
+            $this->addError('name', 'You already have a retainer with that name.');
+
+            return false;
+        }
+
         $user->retainers()->save(new Retainer([
             'name' => $this->name,
             'server' => $this->server,
