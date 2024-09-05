@@ -15,7 +15,6 @@ use App\Models\Sale;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FFXIVService
@@ -373,20 +372,11 @@ class FFXIVService
             }
         );
 
-        $salesData->each(function ($sales, $itemID) use ($server) {
-            DB::transaction(
-                function () use ($sales, $itemID, $server) {
-                    Sale::where('server', $server)
-                        ->where('item_id', $itemID)
-                        ->lockForUpdate()
-                        ->get();
-
-                    Sale::lockForUpdate()->upsert(
-                        $sales,
-                        ['item_id', 'timestamp', 'buyer_name'],
-                        ['quantity', 'price_per_unit', 'hq']
-                    );
-                }
+        $salesData->each(function ($sales) {
+            Sale::lockForUpdate()->upsert(
+                $sales,
+                ['item_id', 'timestamp', 'buyer_name'],
+                ['quantity', 'price_per_unit', 'hq']
             );
         });
     }
@@ -429,20 +419,10 @@ class FFXIVService
         );
 
         $listingsData->each(function ($listings, $itemID) use ($server) {
-            DB::transaction(
-                function () use ($listings, $itemID, $server) {
-                    Listing::where('server', $server)
-                        ->where('item_id', $itemID)
-                        ->lockForUpdate()
-                        ->get();
-
-                    Listing::lockForUpdate()->upsert(
-                        $listings,
-                        ['id'],
-                        ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
-                    );
-
-                }
+            Listing::lockForUpdate()->upsert(
+                $listings,
+                ['id'],
+                ['retainer_name', 'retainer_city', 'quantity', 'price_per_unit', 'hq', 'total', 'tax', 'last_review_time']
             );
 
             // Prune old listings
@@ -450,7 +430,6 @@ class FFXIVService
                 ->where('item_id', $itemID)
                 ->whereNotIn('id', array_column($listings, 'id'))
                 ->delete();
-
         });
     }
 
