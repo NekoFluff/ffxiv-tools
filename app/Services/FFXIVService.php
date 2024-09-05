@@ -426,7 +426,7 @@ class FFXIVService
             DB::transaction(
                 function () use ($listings, $itemID, $server) {
                     Listing::where('server', $server)
-                        ->whereIn('item_id', $itemID)
+                        ->where('item_id', $itemID)
                         ->lockForUpdate()
                         ->get();
 
@@ -438,7 +438,7 @@ class FFXIVService
 
                     // Prune old listings
                     Listing::where('server', $server)
-                        ->whereIn('item_id', $itemID)
+                        ->where('item_id', $itemID)
                         ->whereNotIn('id', array_column($listings, 'id'))
                         ->delete();
                 }
