@@ -346,39 +346,6 @@ class FFXIVService
         $listingsData = $this->universalisClient->fetchMarketBoardListings($server, $itemIDs);
 
         $this->processMarketBoardListings($server, $listingsData);
-
-        $dataCenter = $server->dataCenter();
-        $salesData = collect($listingsData)->map(
-            function ($listingData, $itemID) use ($dataCenter, $server) {
-
-                /** @var array<mixed> $l */
-                $l = $listingData['recentHistory'] ?? [];
-
-                return array_map(
-                    function ($entry) use ($dataCenter, $server, $itemID): array {
-                        return [
-                            'item_id' => $itemID,
-                            'data_center' => $dataCenter,
-                            'server' => $server,
-                            'quantity' => $entry['quantity'],
-                            'price_per_unit' => $entry['pricePerUnit'],
-                            'buyer_name' => $entry['buyerName'],
-                            'timestamp' => Carbon::createFromTimestamp($entry['timestamp']),
-                            'hq' => $entry['hq'],
-                        ];
-                    },
-                    $l
-                );
-            }
-        );
-
-        $salesData->each(function ($sales) {
-            Sale::lockForUpdate()->upsert(
-                $sales,
-                ['item_id', 'timestamp', 'buyer_name'],
-                ['quantity', 'price_per_unit', 'hq']
-            );
-        });
     }
 
     /**
