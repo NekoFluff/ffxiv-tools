@@ -29,8 +29,6 @@ class RefreshProfitableRecipes extends Command
 
     protected FFXIVService $ffxivService;
 
-    protected int $startTime = 0;
-
     /**
      * Create a new command instance.
      *
@@ -41,8 +39,6 @@ class RefreshProfitableRecipes extends Command
         parent::__construct();
 
         $this->ffxivService = $ffxivService;
-
-        $this->startTime = intval(now()->timestamp);
     }
 
     /**
@@ -50,7 +46,9 @@ class RefreshProfitableRecipes extends Command
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
+        $startTime = intval(now()->timestamp);
+
+        Telescope::tag(fn () => ['command:refresh-profitable', 'start:'.$startTime]);
 
         $server = Server::GOBLIN;
 
@@ -58,12 +56,13 @@ class RefreshProfitableRecipes extends Command
             ->leftJoin('items', 'recipes.item_id', '=', 'items.id')
             ->leftJoin('sales', 'items.id', '=', 'sales.item_id')
             ->leftJoin('market_prices', 'items.id', '=', 'market_prices.item_id')
+            ->leftJoin('crafting_costs', 'recipes.id', '=', 'crafting_costs.recipe_id')
             ->select('recipes.*')
-            ->where('market_prices.price', '>', 'recipes.optimal_craft_cost')
+            ->where('market_prices.price', '>', 'crafting_costs.optimal_craft_cost')
             ->where('market_prices.price', '!=', MarketPrice::DEFAULT_MARKET_PRICE)
             ->whereRaw('DATE(sales.timestamp) > (NOW() - INTERVAL 7 DAY)')
             ->groupBy('recipes.id')
-            ->orderByRaw('(market_price - optimal_craft_cost) * SUM(sales.quantity) desc')
+            ->orderByRaw('(MAX(market_prices.price) - MAX(crafting_costs.optimal_craft_cost)) * SUM(sales.quantity) desc')
             ->limit(1000)->get();
 
         foreach ($recipes as $index => $recipe) {
