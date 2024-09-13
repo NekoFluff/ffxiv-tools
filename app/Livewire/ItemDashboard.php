@@ -6,6 +6,7 @@ use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
 use App\Models\Item;
 use Illuminate\Contracts\View\View;
+use Laravel\Telescope\Telescope;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -40,7 +41,9 @@ class ItemDashboard extends Component
         $this->server = Server::from($server);
 
         if ($this->item && ($this->item->marketPrice($this->server) === null || $this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()) > 15)) {
+            Telescope::startRecording();
             RefreshItem::dispatch($this->item->id, $this->server);
+            Telescope::stopRecording();
         }
     }
 
