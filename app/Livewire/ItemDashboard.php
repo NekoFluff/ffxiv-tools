@@ -31,8 +31,6 @@ class ItemDashboard extends Component
 
         if ($recalculate || ! $this->item || $this->item->marketPrice($this->server) === null || $this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()) > 15) {
             RefreshItem::dispatch($id, $this->server);
-
-            return;
         }
     }
 
@@ -40,6 +38,10 @@ class ItemDashboard extends Component
     public function updateServer(string $server): void
     {
         $this->server = Server::from($server);
+
+        if ($this->item && ($this->item->marketPrice($this->server) === null || $this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()) > 15)) {
+            RefreshItem::dispatch($this->item->id, $this->server);
+        }
     }
 
     public function render(): View
