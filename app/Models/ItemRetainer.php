@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Database\Factories\ItemRetainerFactory;
 
 /**
  * @property-read \App\Models\Item|null $item
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ItemRetainer extends Model
 {
+    /** @use HasFactory<ItemRetainerFactory> */
     use HasFactory;
 
     protected $fillable = ['retainer_id', 'item_id'];

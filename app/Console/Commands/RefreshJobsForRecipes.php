@@ -42,6 +42,7 @@ class RefreshJobsForRecipes extends Command
         $recipes->each(
             function (Recipe $recipe) {
                 $id = $recipe->id;
+                /** @var string|false $recipeData */
                 $recipeData = cache()->remember('recipe_'.$id, now()->addMinutes(30), function () use ($id) {
                     logger("Fetching recipe {$id}");
 

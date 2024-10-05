@@ -7,6 +7,7 @@ use App\Models\Enums\Server;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Database\Factories\MarketPriceFactory;
 
 /**
  * @property int $id
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class MarketPrice extends Model
 {
+    /** @use HasFactory<MarketPriceFactory> */
     use HasFactory;
 
     public const DEFAULT_MARKET_PRICE = 10000000;

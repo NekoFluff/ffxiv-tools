@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Database\Factories\RecipeFactory;
 
 /**
  * App\Models\Recipe
@@ -47,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Recipe extends Model
 {
+    /** @use HasFactory<RecipeFactory> */
     use HasFactory;
 
     protected $with = [
