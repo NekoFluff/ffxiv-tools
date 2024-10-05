@@ -1,13 +1,15 @@
-<select id="server-dropdown"
-    class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-    wire:model="server"
-    x-on:change="function () {
-        $dispatch('server-changed', { server: $event.target.value });
-        $wire.updateServer($event.target.value);
-    }">
+<flux:dropdown id="server-dropdown">
+    <flux:button icon-trailing="chevron-down">{{ $server }}</flux:button>
 
-    @foreach (\App\Models\Enums\Server::all() as $server)
-        <option wire:key="{{ $server }}" value="{{ $server }}">{{ $server }}
-        </option>
-    @endforeach
-</select>
+    <flux:menu class="max-h-96">
+        @foreach (\App\Models\Enums\Server::all() as $server)
+            <flux:menu.item wire:key="{{ $server }}"
+                x-on:click="function () {
+                    $dispatch('server-changed', { server: '{{ $server }}'});
+                    $wire.updateServer('{{ $server }}');
+                }">
+                {{ $server }}
+            </flux:menu.item>
+        @endforeach
+    </flux:menu>
+</flux:dropdown>

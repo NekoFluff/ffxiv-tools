@@ -17,6 +17,7 @@ class ServerDropdown extends Component
 
     public function updateServer(string $server): void
     {
+        $this->server = Server::from($server);
         session(['server' => Server::from($server)]);
     }
 
