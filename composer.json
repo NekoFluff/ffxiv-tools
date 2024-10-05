@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.9",
+        "livewire/flux-pro": "^1.0",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
         "symfony/http-client": "^7.0",
@@ -80,5 +81,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "flux-pro": {
+            "type": "composer",
+            "url": "https://composer.fluxui.dev"
+        }
+    }
 }
