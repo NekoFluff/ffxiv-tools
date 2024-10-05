@@ -4,8 +4,7 @@ use App\Models\Item;
 use App\Models\Retainer;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Retainer $retainer;
 
     /**
@@ -17,6 +16,8 @@ new class extends Component
 
     public string $search = '';
 
+    public bool $showItems = false;
+
     public function mount($retainer): void
     {
         $this->retainer = $retainer;
@@ -24,6 +25,7 @@ new class extends Component
 
     public function addItem(): void
     {
+        $this->showItems = false;
         $this->selectableItems = [];
 
         $this->authorize('update', $this->retainer);
@@ -68,35 +70,37 @@ new class extends Component
             ->limit(10)
             ->get()
             ->toArray();
+        $this->showItems = !empty($this->selectableItems);
     }
 }; ?>
 
-<section x-data="{
+<section class="mt-4 mb-8 mr-2" x-data="{
     selectItem(item) {
         $wire.selectedItemID = item.id;
         $wire.selectableItems = [];
         $wire.search = item.name;
+        $wire.showItems = false;
     }
 }">
-    <form wire:submit="addItem" class="flex items-center justify-between mt-4 mb-8 mr-2">
+    <form wire:submit="addItem" class="flex items-center justify-between">
         <div class="flex-grow">
-            <input
-                class="w-full p-2 text-black bg-white border-gray-300 rounded-md shadow-md outline-none placeholder-slate-700 shadow-grey-900"
-                type="text" placeholder="Search..." wire:model.live.debounce.250ms="search" />
+            <flux:input type="text" placeholder="Search..." wire:model.live.debounce.250ms="search" />
 
-            <div class="relative z-10">
-                <div class="absolute w-full overflow-auto bg-blue-500 max-h-96 scrollbar">
+            <div x-data="{ open: $wire.entangle('showItems') }" class="relative z-10">
+                <div x-show="open"
+                    class="absolute w-full p-2 mt-2 overflow-auto bg-white rounded-md max-h-96 scrollbar"
+                    @click.outside="open = false; console.log(open); console.log($wire.items)">
                     <template x-for="item in $wire.selectableItems" :key="item.id">
-                        <button x-on:click="selectItem(item)"
-                            class="flex flex-row items-center w-full p-3 rounded-md hover:bg-blue-600">
+                        <button x-on:click="selectItem(item); open = false"
+                            class="flex flex-row items-center w-full p-2 rounded-md hover:bg-zinc-100">
                             <img class="inline w-6 h-6" :src="'https://xivapi.com/' + item.icon" />
-                            <span class="ml-2 text-sm text-white" x-text="item.name"></span>
+                            <span class="ml-2 text-sm text-black" x-text="item.name"></span>
                         </button>
                     </template>
                 </div>
             </div>
         </div>
-        <x-primary-button class="ml-5 px-7">Add</x-primary-button>
-        <x-input-error class="mt-1" :messages="$errors->get('search')" />
+        <flux:button type="submit" variant="primary" class="ml-5 px-7">ADD</flux:button>
     </form>
+    <flux:error class="mt-1" name="search" />
 </section>
