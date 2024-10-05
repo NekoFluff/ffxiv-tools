@@ -14,6 +14,8 @@ class ItemSearchBar extends Component
     /** @var Collection<int,Item> */
     public Collection $items;
 
+    public bool $showItems = false;
+
     public function mount(): void
     {
         $this->items = collect();
@@ -22,6 +24,7 @@ class ItemSearchBar extends Component
     public function updatedSearch(): void
     {
         $this->items = Item::where('name', 'like', '%'.trim(htmlspecialchars($this->search)).'%')->limit(20)->get();
+        $this->showItems = $this->items->isNotEmpty();
     }
 
     public function render(): View
