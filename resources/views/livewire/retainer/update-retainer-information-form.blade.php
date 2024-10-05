@@ -6,8 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Retainer $retainer;
 
     public RetainerForm $form;
@@ -20,7 +19,7 @@ new class extends Component
         $this->retainer = $retainer;
 
         $this->form->name = $retainer->name;
-        $this->form->server = $retainer->server;
+        $this->form->server = $retainer->server->value;
     }
 
     /**
@@ -50,18 +49,13 @@ new class extends Component
         </p>
     </header>
 
-    <form wire:submit="updateRetainerInformation" class="mt-6 space-y-6">
+    <form wire:submit="updateRetainerInformation" class="mt-6 space-y-4">
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="form.name" id="name" name="name" type="text" class="block w-full mt-1"
-                required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <flux:input wire:model="form.name" :label="__('Name')" type="text" required autofocus />
         </div>
 
         <div>
-            <x-input-label for="server" value="{{ __('Server') }}" />
             <x-server-dropdown class="w-full" wire:model="form.server" />
-            <x-input-error :messages="$errors->get('server')" class="mt-2" />
         </div>
 
         <div class="flex items-center gap-4">

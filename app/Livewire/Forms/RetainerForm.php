@@ -12,7 +12,7 @@ class RetainerForm extends Form
 {
     public string $name = '';
 
-    public Server $server;
+    public string $server;
 
     public function mount(): void
     {
@@ -37,7 +37,7 @@ class RetainerForm extends Form
         $retainer->fill([
             'name' => $this->name,
             'server' => $this->server,
-            'data_center' => $this->server->dataCenter(),
+            'data_center' => Server::from($this->server)->dataCenter(),
         ]);
 
         $retainer->save();
@@ -65,7 +65,7 @@ class RetainerForm extends Form
         $user->retainers()->save(new Retainer([
             'name' => $this->name,
             'server' => $this->server,
-            'data_center' => $this->server->dataCenter(),
+            'data_center' => Server::from($this->server)->dataCenter(),
         ]));
 
         // TODO: Remove

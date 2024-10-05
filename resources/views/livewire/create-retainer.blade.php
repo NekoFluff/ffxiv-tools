@@ -14,17 +14,12 @@
                 {{ __('Keep track of your retainers and the items they\'re selling. You can create a new retainer by providing a name and selecting a server.') }}
             </p>
 
-            <div class="mt-6">
-                <x-input-label for="name" value="{{ __('Name') }}" class="sr-only" />
-                <x-text-input wire:model="form.name" id="name" name="name" class="block w-3/4 mt-1"
-                    placeholder="{{ __('Name') }}" />
-                <x-input-error :messages="$errors->get('form.name')" class="mt-2" />
+            <div class="mt-4">
+                <flux:input wire:model="form.name" :label="__('Name')" type="text" required autofocus />
             </div>
 
-            <div class="mt-6">
-                <x-input-label for="server" value="{{ __('Server') }}" class="sr-only" />
-                <x-server-dropdown class="w-3/4" wire:model="form.server" />
-                <x-input-error :messages="$errors->get('form.server')" class="mt-2" />
+            <div class="mt-4">
+                <x-server-dropdown class="w-full" wire:model="form.server" />
             </div>
 
             <div class="flex justify-end mt-6" wire:loading.class="opacity-75 disabled">
