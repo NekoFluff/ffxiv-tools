@@ -6,11 +6,11 @@
 
     <x-modal name="create-retainer-modal" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="createRetainer" class="p-6">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg font-medium text-zinc-900 dark:text-zinc-100">
                 {{ __('Create a new retainer') }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                 {{ __('Keep track of your retainers and the items they\'re selling. You can create a new retainer by providing a name and selecting a server.') }}
             </p>
 

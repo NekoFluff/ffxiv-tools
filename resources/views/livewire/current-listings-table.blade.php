@@ -1,7 +1,7 @@
-<div class="text-gray-600 dark:text-gray-200">
+<div class="text-zinc-600 dark:text-zinc-200">
     <h2 class="mb-2 font-bold text-center ">Active Listings</h2>
     <table class="table w-full border border-collapse">
-        <thead class="text-gray-800">
+        <thead class="text-zinc-800">
             <tr>
                 <th class="px-4 py-2 bg-white border-b">Price</th>
                 <th class="px-4 py-2 bg-white border-b">Amount</th>

@@ -9,7 +9,7 @@
             </span>
         </a>
         <span
-            class="ml-1 text-sm text-gray-700 dark:text-gray-300">(x{{ $craftableItem->crafting_output_count }})&nbsp;</span>
+            class="ml-1 text-sm text-zinc-700 dark:text-zinc-300">(x{{ $craftableItem->crafting_output_count }})&nbsp;</span>
 
         <div class="flex flex-col">
             <div class="flex flex-row ">

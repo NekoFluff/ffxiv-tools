@@ -5,10 +5,10 @@
     @endpush
 @endonce
 
-<div class="text-gray-800 dark:text-gray-200">
+<div class="text-zinc-800 dark:text-zinc-200">
     <x-slot name="header">
         <div class="flex items-center">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            <h2 class="text-xl font-semibold leading-tight text-zinc-800 dark:text-zinc-200">
                 {{ $item ? $item->name : 'Search for an Item' }}
             </h2>
             <div class="flex-1 mx-7">

@@ -66,9 +66,9 @@ const addItem = async () => {
 <template>
     <Modal :show="show" @close="closeModal">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900">Add a new item to {{ props.retainerName }}</h2>
+            <h2 class="text-lg font-medium text-zinc-900">Add a new item to {{ props.retainerName }}</h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-zinc-600">
                 You have a limit of 20 items per retainer. Please choose the item you would like to add to this retainer.
             </p>
 

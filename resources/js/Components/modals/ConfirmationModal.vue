@@ -28,11 +28,11 @@ defineExpose({ open, close });
 <template>
     <Modal :show="show" @close="close">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-zinc-900">
                 {{ title ?? "Are you sure?" }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-zinc-600">
                 {{ message }}
             </p>
 

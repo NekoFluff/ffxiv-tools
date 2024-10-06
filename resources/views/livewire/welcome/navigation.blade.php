@@ -3,8 +3,7 @@
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     /**
      * Log the current user out of the application.
      */
@@ -16,7 +15,7 @@ new class extends Component
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 dark:bg-zinc-800 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -24,7 +23,7 @@ new class extends Component
                 <!-- Logo -->
                 <div class="flex items-center shrink-0">
                     <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block w-auto text-gray-800 fill-current h-9 dark:text-gray-200" />
+                        <x-application-logo class="block w-auto text-zinc-800 fill-current h-9 dark:text-zinc-200" />
                     </a>
                 </div>
 

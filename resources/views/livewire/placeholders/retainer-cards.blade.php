@@ -1,5 +1,5 @@
 <div class="mt-10 h-[50vh] grid grid-cols-1 gap-5 mx-auto lg:grid-cols-3 max-w-7xl sm:px-6 lg:px-8">
-    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-zinc-800 sm:rounded-lg">
         <svg class="w-5 h-5 text-black animate-spin dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -8,7 +8,7 @@
             </path>
         </svg>
     </div>
-    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-zinc-800 sm:rounded-lg">
         <svg class="w-5 h-5 text-black animate-spin dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
@@ -18,7 +18,7 @@
             </path>
         </svg>
     </div>
-    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+    <div class="flex items-center justify-center overflow-hidden bg-white shadow-sm dark:bg-zinc-800 sm:rounded-lg">
         <svg class="w-5 h-5 text-black animate-spin dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">

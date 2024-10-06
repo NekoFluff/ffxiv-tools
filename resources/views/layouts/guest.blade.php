@@ -19,21 +19,21 @@
     @fluxStyles
 </head>
 
-<body class="font-sans antialiased text-gray-900">
-    <div class="flex flex-col min-h-screen pt-6 bg-gray-100 sm:pt-0 dark:bg-gray-900">
-        <div class="flex justify-end p-4 dark:bg-gray-900">
+<body class="font-sans antialiased text-zinc-900 bg-zinc-100 sm:pt-0 dark:bg-zinc-900">
+    <div class="flex flex-col min-h-screen pt-6 ">
+        <div class="flex justify-end p-4 dark:bg-zinc-900">
             <x-dark-mode-toggle />
         </div>
 
         <div class="flex flex-col items-center flex-1 sm:justify-center">
             <div>
                 <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 text-gray-500 fill-current" />
+                    <x-application-logo class="w-20 h-20 fill-current text-zinc-500" />
                 </a>
             </div>
 
             <div
-                class="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md dark:bg-gray-800 sm:rounded-lg">
+                class="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md dark:bg-zinc-800 sm:rounded-lg">
                 {{ $slot }}
             </div>
         </div>

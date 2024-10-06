@@ -21,8 +21,8 @@
     @fluxStyles
 </head>
 
-<body class="font-sans antialiased ">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+<body class="font-sans antialiased bg-zinc-100 dark:bg-zinc-900">
+    <div class="min-h-screen ">
         @if (auth()->user())
             <livewire:layout.navigation />
         @else
@@ -31,7 +31,7 @@
 
         <!-- Page Heading -->
         @if (isset($header))
-            <header class="bg-white shadow dark:bg-gray-800">
+            <header class="bg-white shadow dark:bg-zinc-800">
                 <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
