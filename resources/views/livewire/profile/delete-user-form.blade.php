@@ -48,12 +48,7 @@ new class extends Component {
             </p>
 
             <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-
-                <x-text-input wire:model="password" id="password" name="password" type="password"
-                    class="block w-3/4 mt-1" placeholder="{{ __('Password') }}" />
-
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                <flux:input wire:model="password" :label="__('Password')" type="password" required autofocus />
             </div>
 
             <div class="flex justify-end mt-6">
