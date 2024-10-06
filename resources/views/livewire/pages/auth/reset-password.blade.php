@@ -85,9 +85,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase">{{ __('Reset Password') }}</flux:button>
         </div>
     </form>
 </div>

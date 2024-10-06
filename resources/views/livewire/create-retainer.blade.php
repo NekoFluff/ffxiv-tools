@@ -1,8 +1,8 @@
 <div x-on:retainer-created.window="function () {
         $dispatch('close-modal', 'create-retainer-modal');
 }">
-    <x-primary-button
-        x-on:click.prevent="$dispatch('open-modal', 'create-retainer-modal')">{{ __('Create Retainer') }}</x-primary-button>
+    <flux:button type="submit" variant="primary" class="ml-5 uppercase px-7"
+        x-on:click.prevent="$dispatch('open-modal', 'create-retainer-modal')">{{ __('Create Retainer') }}</flux:button>
 
     <x-modal name="create-retainer-modal" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="createRetainer" class="p-6">
@@ -27,7 +27,8 @@
                     {{ __('Cancel') }}
                 </x-secondary-button>
 
-                <x-primary-button class="ms-3" wire:loading.class="opacity-75 disabled">
+                <flux:button type="submit" variant="primary" class="uppercase ms-3"
+                    wire:loading.class="opacity-75 disabled">
                     {{ __('Create Retainer') }}
 
                     <div wire:loading class="ml-3">
@@ -40,7 +41,7 @@
                             </path>
                         </svg>
                     </div>
-                </x-primary-button>
+                </flux:button>
             </div>
         </form>
     </x-modal>

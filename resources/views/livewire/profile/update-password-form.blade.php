@@ -63,7 +63,7 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase">{{ __('Save') }}</flux:button>
 
             <x-action-message class="me-3" on="password-updated">
                 {{ __('Saved.') }}

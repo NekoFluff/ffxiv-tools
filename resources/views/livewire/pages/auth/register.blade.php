@@ -66,9 +66,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase ms-4">{{ __('Register') }}</flux:button>
         </div>
     </form>
 </div>

@@ -55,9 +55,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase ms-3">{{ __('Log in') }}</flux:button>
         </div>
     </form>
 </div>

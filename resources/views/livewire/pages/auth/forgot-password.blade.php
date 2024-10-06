@@ -46,9 +46,9 @@ new #[Layout('layouts.guest')] class extends Component {
         <flux:input class="mt-1" wire:model="email" :label="__('Email')" type="email" required autofocus />
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase">
                 {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+            </flux:button>
         </div>
     </form>
 </div>

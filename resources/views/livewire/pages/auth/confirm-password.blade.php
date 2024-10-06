@@ -46,9 +46,9 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <div class="flex justify-end mt-4">
-            <x-primary-button>
+            <flux:button type="submit" variant="primary" class="uppercase">
                 {{ __('Confirm') }}
-            </x-primary-button>
+            </flux:button>
         </div>
     </form>
 </div>
