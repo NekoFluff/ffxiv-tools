@@ -15,7 +15,7 @@ new class extends Component {
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 dark:bg-zinc-800 dark:border-gray-700">
+<nav x-data="{ open: false }" class="bg-white border-b border-zinc-100 dark:bg-zinc-800 dark:border-zinc-700">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -111,7 +111,7 @@ new class extends Component {
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
+        <div class="pt-4 pb-1 border-t border-zinc-200 dark:border-zinc-600">
             <div class="px-4">
                 <div class="text-base font-medium text-zinc-800 dark:text-zinc-200" x-data="{{ json_encode(['name' => auth()->user()->name]) }}"
                     x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
