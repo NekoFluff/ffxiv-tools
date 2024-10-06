@@ -4,8 +4,7 @@ use App\Models\Retainer;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Retainer $retainer;
 
     public function mount($retainer): void
@@ -52,7 +51,8 @@ new class extends Component
                         <span class="ml-2 dark:text-white">{{ $item->name }}</span>
                     </div>
                     <div>
-                        <x-danger-button wire:click="removeItem({{ $item->id }})">Remove</x-danger-button>
+                        <flux:button type="submit" variant="danger" class="uppercase"
+                            wire:click="removeItem({{ $item->id }})">Remove</flux:button>
                     </div>
                 </div>
             </li>

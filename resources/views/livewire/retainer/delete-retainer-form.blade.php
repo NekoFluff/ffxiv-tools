@@ -3,8 +3,7 @@
 use App\Models\Retainer;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Retainer $retainer;
 
     public string $name = '';
@@ -20,7 +19,7 @@ new class extends Component
     public function deleteRetainer(): void
     {
         $this->validate([
-            'name' => ['required', 'string', 'in:'.$this->retainer->name],
+            'name' => ['required', 'string', 'in:' . $this->retainer->name],
         ]);
 
         $this->authorize('delete', $this->retainer);
@@ -42,8 +41,10 @@ new class extends Component
         </p>
     </header>
 
-    <x-danger-button x-data=""
-        x-on:click.prevent="$dispatch('open-modal', 'confirm-retainer-deletion')">{{ __('Delete Retainer') }}</x-danger-button>
+    <flux:button type="submit" variant="danger" class="uppercase"
+        x-on:click.prevent="$dispatch('open-modal', 'confirm-retainer-deletion')">
+        {{ __('Delete Retainer') }}
+    </flux:button>
 
     <x-modal name="confirm-retainer-deletion" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="deleteRetainer" class="p-6">
@@ -69,9 +70,9 @@ new class extends Component
                     {{ __('Cancel') }}
                 </x-secondary-button>
 
-                <x-danger-button class="ms-3">
+                <flux:button type="submit" variant="danger" class="uppercase ms-3">
                     {{ __('Delete Retainer') }}
-                </x-danger-button>
+                </flux:button>
             </div>
         </form>
     </x-modal>
