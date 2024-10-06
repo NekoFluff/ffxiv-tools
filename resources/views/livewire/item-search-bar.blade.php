@@ -1,7 +1,5 @@
 <div>
-    <input
-        class="w-full p-2 text-black bg-white border-gray-300 rounded-md shadow-md outline-none placeholder-slate-700 shadow-grey-900"
-        type="text" placeholder="Search..." wire:model.live.debounce.250ms="search" />
+    <flux:input type="text" placeholder="Search..." wire:model.live.debounce.250ms="search" />
 
     <div x-data="{ open: $wire.entangle('showItems').live }" class="relative z-10">
         <div x-show="open" class="absolute w-full p-2 mt-2 overflow-auto bg-white rounded-md max-h-96 scrollbar"
