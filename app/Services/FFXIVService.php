@@ -132,7 +132,7 @@ class FFXIVService
             if ($ingredient_recipe_id !== null) {
                 $ingredient_recipe = Recipe::where('id', $ingredient_recipe_id)->first();
                 if ($ingredient_recipe === null) {
-                    $this->getRecipe($ingredient_recipe_id);
+                    $this->getRecipe($ingredient_recipe_id, true);
                 }
             }
         }
