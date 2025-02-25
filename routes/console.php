@@ -12,3 +12,5 @@ Schedule::command(RefreshMostRecentlyUpdatedItems::class)->cron('* * * * *')->ru
 Schedule::command(RefreshProfitableRecipes::class)->cron('0 9 * * *')->runInBackground();
 
 Schedule::command('telescope:prune --hours=48')->daily();
+
+Schedule::command('horizon:snapshot')->everyFiveMinutes();
