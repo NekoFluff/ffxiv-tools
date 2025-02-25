@@ -38,32 +38,32 @@ class MockXIVClient implements XIVClientInterface
     public function fetchRecipe(int $recipeID): array
     {
         if ($recipeID === self::WOODEN_LOFT_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\3798.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/3798.json');
             $data = json_decode($json, true);
 
             return $data;
         } elseif ($recipeID === self::ROSEWOOD_LUMBER_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\1092.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/1092.json');
             $data = json_decode($json, true);
 
             return $data;
         } elseif ($recipeID === self::MYTHRIL_RIVETS_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\139.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/139.json');
             $data = json_decode($json, true);
 
             return $data;
         } elseif ($recipeID === self::MYTHRIL_INGOT_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\135.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/135.json');
             $data = json_decode($json, true);
 
             return $data;
         } elseif ($recipeID === self::VARNISH_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\1586.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/1586.json');
             $data = json_decode($json, true);
 
             return $data;
         } elseif ($recipeID === self::LINSEED_OIL_RECIPE_ID) {
-            $json = (string) file_get_contents('app\Http\Clients\XIV\data\recipe\1147.json');
+            $json = (string) file_get_contents('app/Http/Clients/XIV/data/recipe/1147.json');
             $data = json_decode($json, true);
 
             return $data;
