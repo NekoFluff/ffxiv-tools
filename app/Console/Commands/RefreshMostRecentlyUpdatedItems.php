@@ -82,7 +82,7 @@ class RefreshMostRecentlyUpdatedItems extends Command
             $count += 1;
 
             if ($recipe) {
-                if ($recipe->item->marketPrice($server)->updated_at >= now()->subMinutes(3)) {
+                if ($recipe->item->marketPrice($server)?->updated_at >= now()->subMinutes(3)) {
                     Log::info('['.$count.'/'.$itemsCount.']'.' Skipping. Recipe for item '.$recipe->item->name.' ('.$recipe->item->id.') has been updated in the last 3 minutes.', [
                         'itemID' => $recipe->item->id,
                     ]);

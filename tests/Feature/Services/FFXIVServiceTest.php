@@ -88,7 +88,7 @@ class FFXIVServiceTest extends TestCase
         $this->service->updateMarketPrice($server, $item, $listings);
 
         // Assert
-        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)?->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => $expectedPrice,
@@ -117,7 +117,7 @@ class FFXIVServiceTest extends TestCase
         $this->service->updateMarketPrice($server, $item, $listings);
 
         // Assert
-        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)?->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => $expectedPrice,
@@ -155,7 +155,7 @@ class FFXIVServiceTest extends TestCase
         $this->service->updateMarketPrice($server, $item, $listings2);
 
         // Assert
-        $this->assertEquals($expectedPrice, $item->marketPrice($server)->price);
+        $this->assertEquals($expectedPrice, $item->marketPrice($server)?->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => $expectedPrice,
@@ -174,7 +174,7 @@ class FFXIVServiceTest extends TestCase
         $this->service->updateMarketPrice($server, $item, collect());
 
         // Assert
-        $this->assertEquals(MarketPrice::DEFAULT_MARKET_PRICE, $item->marketPrice($server)->price);
+        $this->assertEquals(MarketPrice::DEFAULT_MARKET_PRICE, $item->marketPrice($server)?->price);
         $this->assertDatabaseHas('market_prices', [
             'item_id' => $item->id,
             'price' => MarketPrice::DEFAULT_MARKET_PRICE,
