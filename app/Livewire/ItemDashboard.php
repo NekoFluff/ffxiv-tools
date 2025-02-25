@@ -31,7 +31,8 @@ class ItemDashboard extends Component
 
         $recalculate = boolval(request()->query('recalculate', '0'));
         Log::info('Recalculate: '.$recalculate);
-        Log::info('Diff in minutes: '.$this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()));
+        Log::info('Server'. $this->server);
+        Log::info('Diff in minutes: '.$this->item->marketPrice($this->server)?->updated_at?->diffInMinutes(now()));
         if ($recalculate || ! $this->item || $this->item->marketPrice($this->server) === null || $this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()) > 15) {
             Log::info('Dispatch: '.$this->item);
             RefreshItem::dispatch($id, $this->server);
