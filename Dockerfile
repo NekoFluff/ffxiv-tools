@@ -5,8 +5,12 @@ RUN apt update && apt install -y \
     curl \
     libpng-dev \
     libonig-dev \
-    libxml2-dev
-RUN apt clean && rm -rf /var/lib/apt/lists/*
+    libxml2-dev \
+    default-mysql-client \
+    openssl \
+    zip \
+    unzip
+RUN rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 RUN pecl install xdebug redis pcov
 RUN docker-php-ext-enable xdebug redis pcov
