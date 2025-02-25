@@ -16,6 +16,7 @@
         "livewire/flux-pro": "^1.0",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
+        "predis/predis": "^2.3",
         "symfony/http-client": "^7.0",
         "symfony/mailgun-mailer": "^7.0",
         "tightenco/ziggy": "^2.0"

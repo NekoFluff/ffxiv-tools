@@ -64,6 +64,16 @@ services:
     networks:
       - ffxivnet
 
+  # Redis
+  redis:
+    image: redis:6
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - ffxivnet
+
 volumes:
   postgres-data: {}
   mysql-data: {}
