@@ -65,6 +65,6 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
 
     public function uniqueId(): string
     {
-        return 'refresh-item--'.$this->itemID;
+        return 'refresh-item-'.$this->itemID;
     }
 }

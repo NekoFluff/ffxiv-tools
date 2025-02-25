@@ -30,11 +30,7 @@ class ItemDashboard extends Component
         $this->server = session('server') ?? Server::GOBLIN;
 
         $recalculate = boolval(request()->query('recalculate', '0'));
-        Log::info('Recalculate: '.$recalculate);
-        Log::info('Server'. $this->server->name);
-        Log::info('Diff in minutes: '.$this->item->marketPrice($this->server)?->updated_at?->diffInMinutes(now()));
         if ($recalculate || ! $this->item || $this->item->marketPrice($this->server) === null || $this->item->marketPrice($this->server)->updated_at?->diffInMinutes(now()) > 15) {
-            Log::info('Dispatch: '.$this->item);
             RefreshItem::dispatch($id, $this->server);
         }
     }
