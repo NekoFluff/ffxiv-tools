@@ -36,10 +36,11 @@ class FFXIVService
             return $recipe;
         }
 
-        $item = Item::find($itemID);
-        if ($item) { // There are no recipes for this item
-            return null;
-        }
+        // TODO: Uncomment once I finish filling in all the recipes
+        // $item = Item::find($itemID);
+        // if ($item) { // There are no recipes for this item
+        //     return null;
+        // }
 
         $item = $this->xivClient->fetchItem($itemID);
         if (! $item) {
