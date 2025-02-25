@@ -31,20 +31,21 @@ class FFXIVService
 
     public function getRecipeByItemID(int $itemID): ?Recipe
     {
-        $recipe = Recipe::with('ingredients', 'craftingCosts')->where('item_id', $itemID)->first();
-        if ($recipe) {
-            return $recipe;
-        }
+        // $recipe = Recipe::with('ingredients', 'craftingCosts')->where('item_id', $itemID)->first();
+        // if ($recipe) {
+        //     return $recipe;
+        // }
 
-        $item = Item::find($itemID);
-        if ($item) { // There are no recipes for this item
-            return null;
-        }
+        // $item = Item::find($itemID);
+        // if ($item) { // There are no recipes for this item
+        //     return null;
+        // }
 
         $item = $this->xivClient->fetchItem($itemID);
         if (! $item) {
             return null;
         }
+
         Item::updateOrCreate([
             'id' => intval($item->ID),
         ], [
@@ -56,7 +57,7 @@ class FFXIVService
             return null;
         }
 
-        $recipe = $this->getRecipe($recipeObj['ID']);
+        $recipe = $this->getRecipe($recipeObj['ID'], true);
 
         Log::debug('Recipe: '.json_encode($recipe));
 
