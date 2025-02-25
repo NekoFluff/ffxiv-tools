@@ -8,6 +8,8 @@ RUN apt update && apt install -y \
     libxml2-dev
 RUN apt clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN pecl install xdebug redis pcov
+RUN docker-php-ext-enable xdebug redis pcov
 
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 COPY --from=node:20 /usr/local/bin/node /usr/local/bin/node

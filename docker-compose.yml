@@ -2,23 +2,26 @@ version: "3.1"
 
 services:
   # # Application
-  # app:
-  #   image: ffxivtools/app:dev
-  #   container_name: ffxivtools
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8000:8000"
-  #   working_dir: /var/www/
-  #   volumes:
-  #     - .:/var/www
-  #   networks:
-  #     - ffxivnet
-  #   depends_on:
-  #     - pgsql-db
-  #     - mysql-db
+  app:
+    image: ffxivtools/app:dev
+    container_name: ffxivtools
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /var/www/
+    volumes:
+      - .:/var/www
+    networks:
+      - ffxivnet
+    depends_on:
+      # - pgsql
+      - mysql
+      - redis
 
   # npm:
   #   image: ffxivtools/app:dev
@@ -33,10 +36,24 @@ services:
   #   depends_on:
   #     - app
 
+  # Horizon
+  horizon:
+    image: ffxivtools/app:dev
+    container_name: ffxivtools-horizon
+    # restart: unless-stopped
+    # working_dir: /var/www/
+    volumes:
+      - .:/var/www/html
+    networks:
+      - ffxivnet
+    command: "php artisan horizon"
+    depends_on:
+      - redis
+
   # Database
-  # pgsql-db:
+  # pgsql:
   #   image: postgres:13
-  #   container_name: pgsql-db
+  #   container_name: ffxivtools-pgsql
   #   restart: always
   #   environment:
   #     POSTGRES_DB: "forge"
@@ -48,9 +65,10 @@ services:
   #     - postgres-data:/var/lib/postgresql/data
   #   networks:
   #     - ffxivnet
-  mysql-db:
+
+  mysql:
     image: mysql:8.3
-    container_name: mysql-db
+    container_name: ffxivtools-mysql
     restart: always
     environment:
       MYSQL_DATABASE: "forge"
@@ -67,7 +85,7 @@ services:
   # Redis
   redis:
     image: redis:6
-    container_name: redis
+    container_name: ffxivtools-redis
     restart: always
     ports:
       - "6379:6379"
