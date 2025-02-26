@@ -17,7 +17,7 @@ class FetchRecipes extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:fetch';
+    protected $signature = 'recipes:fetch {--page=1}';
 
     /**
      * The console command description.
@@ -51,11 +51,12 @@ class FetchRecipes extends Command
     {
         Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
-        $page = 1;
+        $page = intval($this->option('page'));
         $recipesStr = '';
         $server = Server::GOBLIN;
         do {
             Log::info('Fetching recipes page '.$page);
+            error_log("Fetching recipes page ".$page);
 
             $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page) ?: '';
 
