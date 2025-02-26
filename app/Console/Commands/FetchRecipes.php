@@ -49,13 +49,12 @@ class FetchRecipes extends Command
      */
     public function handle(): void
     {
-        Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
+        // Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         $page = intval($this->option('page'));
         $recipesStr = '';
         $server = Server::GOBLIN;
         do {
-            Log::info('Fetching recipes page '.$page);
             error_log("Fetching recipes page ".$page);
 
             $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page) ?: '';
@@ -66,7 +65,7 @@ class FetchRecipes extends Command
                     continue;
                 }
 
-                Log::info('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
+                error_log('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
                 $recipe = Recipe::where('id', $recipeObj['ID'])->first();
 
                 if ($recipe === null) {
@@ -77,7 +76,7 @@ class FetchRecipes extends Command
 
                 RefreshItem::dispatch($recipe->item_id, $server);
 
-                Log::info('Sleeping for 3 seconds');
+                error_log('Sleeping for 5 seconds');
                 sleep(5);
             }
 
