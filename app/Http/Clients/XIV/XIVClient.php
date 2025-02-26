@@ -3,30 +3,28 @@
 namespace App\Http\Clients\XIV;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleRetry\GuzzleRetryMiddleware;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class XIVClient implements XIVClientInterface
 {
-    private $client;
+    public const BASE_URL = 'https://xivapi.com';
 
-    public function __construct()
+    private function request(): PendingRequest
     {
-        $stack = HandlerStack::create();
-        $stack->push(GuzzleRetryMiddleware::factory([
-            'retry_on_status' => [429, 503],
-            'retry_on_timeout' => true,
-            'delay' => 1000,
-            'max_retry_attempts' => 3,
-        ]));
+        return Http::baseUrl(self::BASE_URL)->retry(3, 1000, function (Exception $exception, PendingRequest $request) {
+            if ($exception instanceof ConnectionException) {
+                return true;
+            }
 
-        $this->client = new Client([
-            'base_uri' => 'https://xivapi.com/',
-            'timeout' => 10.0,
-            'handler' => $stack,
-        ]);
+            if ($exception instanceof RequestException) {
+                return $exception->response->status() === 429 ||
+                    $exception->response->status() == 503;
+            }
+        });
     }
 
     /** @return array<mixed> */
@@ -34,12 +32,11 @@ class XIVClient implements XIVClientInterface
     {
         Log::debug("Fetching recipe data for recipe {$recipeID}");
         try {
-            $response = $this->client->get("recipe/{$recipeID}");
-            // Log::debug("Retrieved recipe data {$response->getBody()}");
+            $response = $this->request()->get("/recipe/{$recipeID}");
             Log::debug('Retrieved recipe data');
 
             /** @var array<mixed> $recipeData */
-            $recipeData = json_decode($response->getBody(), true);
+            $recipeData = $response->json();
 
             return $recipeData;
         } catch (Exception $ex) {
@@ -67,11 +64,13 @@ class XIVClient implements XIVClientInterface
                 'PriceMid',
             ];
 
-            $response = $this->client->get("item/{$itemID}?columns=".implode(',', $filterColumns));
-            Log::debug("Retrieved item data {$response->getBody()}");
+            $response = $this->request()->get("/item/{$itemID}", [
+                'columns' => implode(',', $filterColumns),
+            ]);
+            Log::debug("Retrieved item data {$response->body()}");
 
             /** @var array<mixed> $itemData */
-            $itemData = json_decode($response->getBody(), true);
+            $itemData = $response->json();
 
             $xivItem = XIVItem::hydrate($itemData);
 
@@ -87,9 +86,11 @@ class XIVClient implements XIVClientInterface
     {
         Log::debug("Fetching vendor data for item {$itemID}");
         try {
-            $response = $this->client->get("item/{$itemID}?columns=GameContentLinks.GilShopItem.Item,PriceMid");
-            Log::debug("Retrieved vendor price data {$response->getBody()}");
-            $vendorData = json_decode($response->getBody(), true);
+            $response = Http::retry(3, 1000)->get("/item/{$itemID}", [
+                'columns' => 'GameContentLinks.GilShopItem.Item,PriceMid',
+        ]);
+            Log::debug("Retrieved vendor price data {$response->body()}");
+            $vendorData = $response->json();
 
             return $vendorData['GameContentLinks']['GilShopItem']['Item'] ? $vendorData['PriceMid'] : 0;
         } catch (Exception $ex) {

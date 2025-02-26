@@ -4,32 +4,31 @@ namespace App\Http\Clients\Universalis;
 
 use App\Models\Enums\Server;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\HandlerStack;
-use GuzzleRetry\GuzzleRetryMiddleware;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class UniversalisClient implements UniversalisClientInterface
 {
-    private $client;
+    public const BASE_URL = 'https://universalis.app/api/v2';
 
-    public function __construct()
+    private function request(): PendingRequest
     {
-        $stack = HandlerStack::create();
-        $stack->push(GuzzleRetryMiddleware::factory([
-            'retry_on_status' => [429, 500, 503],
-            'retry_on_timeout' => true,
-            'delay' => 3000,
-            'max_retry_attempts' => 3,
-        ]));
+        return Http::baseUrl(self::BASE_URL)
+            ->timeout(20)
+            ->retry(3, 3000, function (Exception $exception, PendingRequest $request) {
+                if ($exception instanceof ConnectionException) {
+                    return true;
+                }
 
-        $this->client = new Client([
-            'base_uri' => 'https://universalis.app/api/v2/',
-            'timeout' => 20.0,
-            'handler' => $stack,
-        ]);
+                if ($exception instanceof RequestException) {
+                    return in_array($exception->response->status(), [429, 500, 503]);
+                }
+
+                return false;
+            });
     }
 
     public function fetchMarketBoardListings(Server $server, array $itemIDs): array
@@ -38,25 +37,30 @@ class UniversalisClient implements UniversalisClientInterface
         sort($itemIDs);
 
         try {
-            $mbListings = $this->client->get("{$server->value}/".implode(',', $itemIDs).'?listings=40');
-        } catch (ServerException $ex) {
-            Log::error('A server exception occurred while retrieving the market board listings', [
-                'server' => $server->value,
-                'items' => $itemIDs,
-                'exception' => $ex,
+            $response = $this->request()->get("/{$server->value}/".implode(',', $itemIDs), [
+                'listings' => 40
             ]);
 
-            return [];
-        } catch (GuzzleException $ex) {
-            Log::error('A Guzzle exception occurred while retrieving the market board listings', [
+            /** @var array<mixed> $body */
+            $body = $response->json();
+
+            $mbListings = [];
+            if (isset($body['itemID'])) {
+                $mbListings = [
+                    $body['itemID'] => $body,
+                ];
+            } else {
+                $mbListings = $body['items'] ?? [];
+            }
+
+            Log::debug('Retrieved market board listings', [
                 'server' => $server->value,
                 'items' => $itemIDs,
-                'exception' => $ex,
             ]);
 
-            return [];
+            return $mbListings;
         } catch (\Throwable $ex) {
-            Log::error('Unknown exception occurred while and failed to retrieve market board listings', [
+            Log::error('Failed to retrieve market board listings', [
                 'server' => $server->value,
                 'items' => $itemIDs,
                 'exception' => $ex,
@@ -64,43 +68,27 @@ class UniversalisClient implements UniversalisClientInterface
 
             return [];
         }
-        /** @var array<mixed> $body */
-        $body = json_decode($mbListings->getBody(), true);
-
-        $mbListings = [];
-        if (isset($body['itemID'])) {
-            $mbListings = [
-                $body['itemID'] => $body,
-            ];
-        } else {
-            $mbListings = $body['items'] ?? [];
-        }
-
-        Log::debug('Retrieved market board listings', [
-            'server' => $server->value,
-            'items' => $itemIDs,
-            // 'response' => $mbListings,
-        ]);
-
-        return $mbListings;
     }
 
     /** @return array<mixed> */
     public function fetchMarketBoardSales(Server $server, int $itemID): array
     {
         try {
-            $response = $this->client->get("history/{$server->value}/{$itemID}");
+            $response = $this->request()->get("/history/{$server->value}/{$itemID}");
 
-            $sales = json_decode($response->getBody(), true)['entries'] ?? [];
+            $sales = $response->json()['entries'] ?? [];
             Log::debug('Retrieved market board history', [
                 'server' => $server->value,
                 'itemID' => $itemID,
-                // 'response' => $sales,
             ]);
 
             return $sales;
         } catch (Exception $ex) {
-            Log::error('Failed to retrieve market board history', ['exception' => $ex, 'server' => $server->value, 'itemID' => $itemID]);
+            Log::error('Failed to retrieve market board history', [
+                'exception' => $ex,
+                'server' => $server->value,
+                'itemID' => $itemID
+            ]);
         }
 
         return [];
@@ -109,21 +97,25 @@ class UniversalisClient implements UniversalisClientInterface
     public function fetchLastWeekSaleCount(Server $server, int $itemID): int
     {
         try {
-            $response = $this->client->get("history/{$server->value}/{$itemID}");
+            $response = $this->request()->get("/history/{$server->value}/{$itemID}");
 
             /** @var array $mbSales */
-            $mbSales = json_decode($response->getBody(), true)['entries'] ?? [];
+            $mbSales = $response->json()['entries'] ?? [];
 
-            $count = collect($mbSales)->map(
-                function ($entry) {
-                    return $entry['quantity'];
-                }
-            )->sum();
+            $count = collect($mbSales)->sum('quantity');
 
-            Log::debug('Retrieved last week sale count', ['server' => $server->value, 'itemID' => $itemID, 'count' => $count]);
+            Log::debug('Retrieved last week sale count', [
+                'server' => $server->value,
+                'itemID' => $itemID,
+                'count' => $count
+            ]);
 
+            return $count;
         } catch (Exception) {
-            Log::error('Failed to retrieve last week sale count', ['server' => $server->value, 'itemID' => $itemID]);
+            Log::error('Failed to retrieve last week sale count', [
+                'server' => $server->value,
+                'itemID' => $itemID
+            ]);
         }
 
         return 0;
@@ -134,12 +126,17 @@ class UniversalisClient implements UniversalisClientInterface
     {
         Log::debug('Fetching most recently updated items', ['server' => $server->value]);
         try {
-            $response = $this->client->get("https://universalis.app/api/v2/extra/stats/most-recently-updated?world={$server->value}");
-            Log::debug('Retrieved most recently updated items', ['server' => $server->value]);
+            $response = $this->request()->get("/extra/stats/most-recently-updated", [
+                'world' => $server->value
+            ]);
 
-            return json_decode($response->getBody(), true)['items'] ?? [];
+            Log::debug('Retrieved most recently updated items', ['server' => $server->value]);
+            return $response->json()['items'] ?? [];
         } catch (Exception $ex) {
-            Log::error('Failed to retrieve most recently updated items', ['exception' => $ex, 'server' => $server->value]);
+            Log::error('Failed to retrieve most recently updated items', [
+                'exception' => $ex,
+                'server' => $server->value
+            ]);
         }
 
         return [];
