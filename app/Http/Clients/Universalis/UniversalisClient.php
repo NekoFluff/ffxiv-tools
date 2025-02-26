@@ -3,6 +3,7 @@
 namespace App\Http\Clients\Universalis;
 
 use App\Models\Enums\Server;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
@@ -98,7 +99,7 @@ class UniversalisClient implements UniversalisClientInterface
             ]);
 
             return $sales;
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             Log::error('Failed to retrieve market board history', ['exception' => $ex, 'server' => $server->value, 'itemID' => $itemID]);
         }
 
@@ -121,7 +122,7 @@ class UniversalisClient implements UniversalisClientInterface
 
             Log::debug('Retrieved last week sale count', ['server' => $server->value, 'itemID' => $itemID, 'count' => $count]);
 
-        } catch (\Exception) {
+        } catch (Exception) {
             Log::error('Failed to retrieve last week sale count', ['server' => $server->value, 'itemID' => $itemID]);
         }
 
@@ -137,7 +138,7 @@ class UniversalisClient implements UniversalisClientInterface
             Log::debug('Retrieved most recently updated items', ['server' => $server->value]);
 
             return json_decode($response->getBody(), true)['items'] ?? [];
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             Log::error('Failed to retrieve most recently updated items', ['exception' => $ex, 'server' => $server->value]);
         }
 

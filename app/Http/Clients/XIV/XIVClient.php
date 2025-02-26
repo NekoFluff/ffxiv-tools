@@ -42,8 +42,8 @@ class XIVClient implements XIVClientInterface
             $recipeData = json_decode($response->getBody(), true);
 
             return $recipeData;
-        } catch (Exception) {
-            Log::error("Failed to retrieve recipe data for recipe {$recipeID}");
+        } catch (Exception $ex) {
+            Log::error("Failed to retrieve recipe data for recipe {$recipeID}", ['exception' => $ex, 'recipeID' => $recipeID]);
         }
 
         return [];
@@ -76,8 +76,8 @@ class XIVClient implements XIVClientInterface
             $xivItem = XIVItem::hydrate($itemData);
 
             return $xivItem;
-        } catch (Exception) {
-            Log::error("Failed to retrieve item data for item {$itemID}");
+        } catch (Exception $ex) {
+            Log::error("Failed to retrieve item data for item {$itemID}", ['exception' => $ex, 'itemID' => $itemID]);
         }
 
         return null;
@@ -92,8 +92,8 @@ class XIVClient implements XIVClientInterface
             $vendorData = json_decode($response->getBody(), true);
 
             return $vendorData['GameContentLinks']['GilShopItem']['Item'] ? $vendorData['PriceMid'] : 0;
-        } catch (Exception) {
-            Log::error("Failed to retrieve vendor data for item {$itemID}");
+        } catch (Exception $ex) {
+            Log::error("Failed to retrieve vendor data for item {$itemID}", ['exception' => $ex, 'itemID' => $itemID]);
         }
 
         return 0;
