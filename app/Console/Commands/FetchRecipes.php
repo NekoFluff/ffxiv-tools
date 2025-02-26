@@ -65,7 +65,7 @@ class FetchRecipes extends Command
                     continue;
                 }
 
-                error_log('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
+                // error_log('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
                 $recipe = Recipe::where('id', $recipeObj['ID'])->first();
 
                 if ($recipe === null) {
@@ -76,7 +76,7 @@ class FetchRecipes extends Command
 
                 RefreshItem::dispatch($recipe->item_id, $server);
 
-                error_log('Sleeping for 5 seconds');
+                // error_log('Sleeping for 5 seconds');
                 sleep(5);
             }
 
