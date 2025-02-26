@@ -15,6 +15,7 @@ use App\Models\Sale;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FFXIVService
@@ -427,11 +428,14 @@ class FFXIVService
             }
         );
 
-        Sale::lockForUpdate()->upsert(
-            $sales->toArray(),
-            ['item_id', 'timestamp', 'buyer_name'],
-            ['quantity', 'price_per_unit', 'hq']
-        );
+        DB::transaction(function () use ($sales) {
+            Sale::lockForUpdate()->upsert(
+                $sales->toArray(),
+                ['item_id', 'timestamp', 'buyer_name'],
+                ['quantity', 'price_per_unit', 'hq']
+            );
+        }, 3);
+
     }
 
     /**
