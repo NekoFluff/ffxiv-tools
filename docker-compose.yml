@@ -1,98 +1,99 @@
 services:
-  # # Application
-  app:
-    image: ffxivtools/app:dev
-    container_name: ffxivtools
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    working_dir: /var/www/
-    volumes:
-      - .:/var/www
-    networks:
-      - ffxivnet
-    depends_on:
-      # - pgsql
-      - mysql
-      - redis
+    # # Application
+    app:
+        image: ffxivtools/app:dev
+        container_name: ffxivtools
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        ports:
+            - "8000:8000"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        working_dir: /var/www/
+        volumes:
+            - .:/var/www
+        networks:
+            - ffxivnet
+        depends_on:
+            # - pgsql
+            - mysql
+            - redis
 
-  # npm:
-  #   image: ffxivtools/app:dev
-  #   container_name: ffxivtools-npm
-  #   # restart: unless-stopped
-  #   working_dir: /var/www/
-  #   volumes:
-  #     - .:/var/www
-  #   networks:
-  #     - ffxivnet
-  #   command: "npm run dev"
-  #   depends_on:
-  #     - app
+    # Node
+    npm:
+        image: ffxivtools/app:dev
+        container_name: ffxivtools-npm
+        restart: unless-stopped
+        ports:
+            - "5173:5173"
+        working_dir: /var/www/
+        volumes:
+            - .:/var/www
+        networks:
+            - ffxivnet
+        command: "npm run dev"
 
-  # Horizon
-  horizon:
-    image: ffxivtools/app:dev
-    container_name: ffxivtools-horizon
-    # restart: unless-stopped
-    # working_dir: /var/www/
-    volumes:
-      - .:/var/www/html
-    networks:
-      - ffxivnet
-    command: "php artisan horizon"
-    depends_on:
-      - redis
+    # Horizon
+    horizon:
+        image: ffxivtools/app:dev
+        container_name: ffxivtools-horizon
+        # restart: unless-stopped
+        # working_dir: /var/www/
+        volumes:
+            - .:/var/www/html
+        networks:
+            - ffxivnet
+        command: "php artisan horizon"
+        depends_on:
+            - redis
 
-  # Database
-  # pgsql:
-  #   image: postgres:13
-  #   container_name: ffxivtools-pgsql
-  #   restart: always
-  #   environment:
-  #     POSTGRES_DB: "forge"
-  #     POSTGRES_USER: "forge"
-  #     POSTGRES_PASSWORD: "supersecret"
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres-data:/var/lib/postgresql/data
-  #   networks:
-  #     - ffxivnet
+    # Database
+    # pgsql:
+    #   image: postgres:13
+    #   container_name: ffxivtools-pgsql
+    #   restart: always
+    #   environment:
+    #     POSTGRES_DB: "forge"
+    #     POSTGRES_USER: "forge"
+    #     POSTGRES_PASSWORD: "supersecret"
+    #   ports:
+    #     - "5432:5432"
+    #   volumes:
+    #     - postgres-data:/var/lib/postgresql/data
+    #   networks:
+    #     - ffxivnet
 
-  mysql:
-    image: mysql:8.3
-    container_name: ffxivtools-mysql
-    restart: always
-    environment:
-      MYSQL_DATABASE: "forge"
-      MYSQL_USER: "ffxiv"
-      MYSQL_PASSWORD: "supersecret"
-      MYSQL_ROOT_PASSWORD: "supersecret"
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - ffxivnet
+    mysql:
+        image: mysql:8.3
+        container_name: ffxivtools-mysql
+        restart: always
+        environment:
+            MYSQL_DATABASE: "forge"
+            MYSQL_USER: "ffxiv"
+            MYSQL_PASSWORD: "supersecret"
+            MYSQL_ROOT_PASSWORD: "supersecret"
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        networks:
+            - ffxivnet
 
-  # Redis
-  redis:
-    image: redis:6
-    container_name: ffxivtools-redis
-    restart: always
-    ports:
-      - "6379:6379"
-    networks:
-      - ffxivnet
+    # Redis
+    redis:
+        image: redis:6
+        container_name: ffxivtools-redis
+        restart: always
+        ports:
+            - "6379:6379"
+        networks:
+            - ffxivnet
 
 volumes:
-  postgres-data: {}
-  mysql-data: {}
+    postgres-data: {}
+    mysql-data: {}
 networks:
-  ffxivnet:
-    driver: bridge
+    ffxivnet:
+        driver: bridge
