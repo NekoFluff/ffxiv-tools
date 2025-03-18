@@ -39,10 +39,10 @@ services:
     horizon:
         image: ffxivtools/app:dev
         container_name: ffxivtools-horizon
-        # restart: unless-stopped
-        # working_dir: /var/www/
+        restart: unless-stopped
+        working_dir: /var/www/
         volumes:
-            - .:/var/www/html
+            - .:/var/www
         networks:
             - ffxivnet
         command: "php artisan horizon"
