@@ -25,6 +25,8 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
 
     public int $maxExceptions = 3;
 
+    public int $uniqueFor = 300; // 5 minutes
+
     public function __construct(public int $itemID, public Server $server = Server::GOBLIN)
     {
     }
@@ -65,7 +67,7 @@ class RefreshItem implements ShouldBeUnique, ShouldQueue
 
     public function uniqueId(): string
     {
-        return 'refresh-item-'.$this->itemID.
+        return 'new-refresh-item-'.$this->itemID.
             '-'.$this->server->name;
     }
 }
