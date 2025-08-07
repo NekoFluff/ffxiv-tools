@@ -34,9 +34,7 @@ new class extends Component {
             'search' => ['required', 'string', 'max:255'],
         ]);
 
-        $item = Item::where('id', $this->selectedItemID)
-            ->orWhere('name', $this->search)
-            ->first();
+        $item = Item::where('id', $this->selectedItemID)->orWhere('name', $this->search)->first();
 
         if ($item === null) {
             $this->addError('search', 'Item not found.');
@@ -93,7 +91,8 @@ new class extends Component {
                     <template x-for="item in $wire.selectableItems" :key="item.id">
                         <button x-on:click="selectItem(item); open = false"
                             class="flex flex-row items-center w-full p-2 rounded-md hover:bg-zinc-100">
-                            <img class="inline w-6 h-6" :src="'https://xivapi.com/' + item.icon" />
+                            <img class="inline w-6 h-6"
+                                :src="'https://v2.xivapi.com/api/asset?format=png&path=' + item.icon" />
                             <span class="ml-2 text-sm text-black" x-text="item.name"></span>
                         </button>
                     </template>

@@ -2,24 +2,30 @@
 
 namespace App\Http\Clients\XIV;
 
+use Illuminate\Support\Collection;
+
 class XIVItem
 {
-    public string $ID;
+    /**
+     * @var Collection<int, XIVRecipe>
+     */
+    public Collection $Recipes;
 
-    public string $Name;
-
-    public string $Icon;
-
-    public array $Recipes;
-
-    public static function hydrate(array $data): self
+    public function __construct(public int $ID, public string $Name, public string $Icon)
     {
-        $item = new self();
+        $this->Recipes = new Collection();
+    }
 
-        $item->ID = $data['ID'];
-        $item->Name = $data['Name'];
-        $item->Icon = $data['Icon'];
-        $item->Recipes = $data['Recipes'] ?? [];
+    /**
+     * @param array<string,mixed> $data
+     */
+    public static function hydrateFromItemFetchResponse(array $data): self
+    {
+        $item = new self(
+            $data['row_id'],
+            $data['fields']['Name'],
+            $data['fields']['Icon']['path']
+        );
 
         return $item;
     }

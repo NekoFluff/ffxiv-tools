@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Clients\Universalis\UniversalisClientInterface;
 use App\Http\Clients\XIV\XIVClientInterface;
+use App\Http\Clients\XIV\XIVRecipe;
 use App\Models\CraftingCost;
 use App\Models\Enums\Server;
 use App\Models\Ingredient;
@@ -33,9 +34,10 @@ class FFXIVService
     public function getRecipeByItemID(int $itemID): ?Recipe
     {
         $recipe = Recipe::with('ingredients', 'craftingCosts')->where('item_id', $itemID)->first();
-        if ($recipe) {
-            return $recipe;
-        }
+        // TODO: Uncomment once I finish filling in all the recipes
+        // if ($recipe) {
+        //     return $recipe;
+        // }
 
         // TODO: Uncomment once I finish filling in all the recipes
         // $item = Item::find($itemID);
@@ -53,12 +55,17 @@ class FFXIVService
             'name' => $item->Name,
             'icon' => $item->Icon,
         ]);
-        $recipeObj = collect($item->Recipes)->first();
-        if (! $recipeObj) {
+
+        // TODO: Delete once I finish filling in all the recipes since it's covered by the above
+        if ($recipe) {
+            return $recipe;
+        }
+        $xivRecipe = collect($item->Recipes)->first();
+        if (! $xivRecipe) {
             return null;
         }
 
-        $recipe = $this->getRecipe($recipeObj['ID']);
+        $this->saveRecipe($xivRecipe);
 
         Log::debug('Recipe: '.json_encode($recipe));
 
@@ -79,47 +86,42 @@ class FFXIVService
             return null;
         }
 
-        if (! isset($recipeData['ItemResult'])) {
-            return null;
-        }
-
-        $recipe = $this->parseRecipeJson($recipeData);
+        $recipe = $this->saveRecipe($recipeData);
         $this->updateVendorPrices($recipe);
 
         return $recipe;
     }
 
-    /** @param array<mixed,mixed> $json */
-    private function parseRecipeJson(array $json): Recipe
+    private function saveRecipe(XIVRecipe $xivRecipe): Recipe
     {
         $item = Item::updateOrCreate([
-            'id' => intval($json['ItemResult']['ID']),
+            'id' => $xivRecipe->ResultItem->ID,
         ], [
-            'name' => $json['Name'],
-            'icon' => $json['Icon'],
+            'name' => $xivRecipe->ResultItem->Name,
+            'icon' => $xivRecipe->ResultItem->Icon,
         ]);
 
         $recipe = Recipe::updateOrCreate([
-            'id' => $json['ID'],
+            'id' => $xivRecipe->ID,
         ], [
-            'amount_result' => $json['AmountResult'],
-            'class_job' => $json['ClassJob']['NameEnglish'],
-            'class_job_level' => $json['RecipeLevelTable']['ClassJobLevel'],
-            'class_job_icon' => $json['ClassJob']['Icon'],
+            'amount_result' => $xivRecipe->AmountResult,
+            'class_job' => $xivRecipe->ClassJobName,
+            'class_job_level' => $xivRecipe->ClassJobLevel,
+            'class_job_icon' => '',
             'item_id' => $item->id,
         ]);
 
-        for ($i = 0; $i <= 9; $i++) {
-            $amount = $json["AmountIngredient{$i}"] ?? 0;
+        foreach ($xivRecipe->Ingredients as $ingredient) {
+            $amount = $ingredient->Amount;
             if ($amount === 0) {
                 continue;
             }
 
             $ingredient_item = Item::updateOrCreate([
-                'id' => $json["ItemIngredient{$i}"]['ID'],
+                'id' => $ingredient->ItemID,
             ], [
-                'name' => $json["ItemIngredient{$i}"]['Name'],
-                'icon' => $json["ItemIngredient{$i}"]['Icon'],
+                'name' => $ingredient->ItemName,
+                'icon' => $ingredient->ItemIcon,
             ]);
 
             Ingredient::updateOrCreate([
@@ -129,13 +131,7 @@ class FFXIVService
                 'amount' => $amount,
             ]);
 
-            $ingredient_recipe_id = $json["ItemIngredientRecipe{$i}"][0]['ID'] ?? null;
-            if ($ingredient_recipe_id !== null) {
-                $ingredient_recipe = Recipe::where('id', $ingredient_recipe_id)->first();
-                if ($ingredient_recipe === null) {
-                    $this->getRecipe($ingredient_recipe_id);
-                }
-            }
+            $this->getRecipeByItemID($ingredient->ItemID);
         }
 
         return $recipe;
@@ -435,66 +431,6 @@ class FFXIVService
                 ['quantity', 'price_per_unit', 'hq']
             );
         }, 3);
-
-    }
-
-    /**
-     * TODO: Remove this function
-     *
-     * @deprecated Use AggregatedSalesByDay Action
-     *
-     * Returns Sales aggregated daily for the last week
-     *
-     * @param  Collection<int, Sale>  $sales
-     * @return Collection<int, array{date: (int|string), quantity: mixed, avg_price: float|int|null, median_price: float|int|null, min_price: mixed, max_price: mixed}>
-     */
-    public function aggregateSales(Collection $sales): Collection
-    {
-        $aggregatedSales = collect($sales)->groupBy(
-            function ($entry) {
-                return $entry['timestamp']->format('Y-m-d');
-            }
-        )->map(
-            function ($entries, $date) {
-                return [
-                    'date' => $date,
-                    'quantity' => collect($entries)->sum('quantity'),
-                    'avg_price' => collect($entries)->avg('price_per_unit'),
-                    'median_price' => collect($entries)->median('price_per_unit'),
-                    'min_price' => collect($entries)->min('price_per_unit'),
-                    'max_price' => collect($entries)->max('price_per_unit'),
-                ];
-            }
-        )->reverse()->values();
-
-        // Add missing days in the last week without quantity
-        $lastWeekDates = [
-            date('Y-m-d', intval(now()->subDays(0)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(1)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(2)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(3)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(4)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(5)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(6)->timestamp)),
-            date('Y-m-d', intval(now()->subDays(7)->timestamp)),
-        ];
-        $missingDates = collect($lastWeekDates)->diff($aggregatedSales->pluck('date'));
-        $missingDates->each(
-            function ($date) use (&$aggregatedSales) {
-                $aggregatedSales->push(
-                    [
-                        'date' => $date,
-                        'quantity' => 0,
-                        'median_price' => 0,
-                        'avg_price' => 0,
-                        'min_price' => 0,
-                        'max_price' => 0,
-                    ]
-                );
-            }
-        );
-
-        return $aggregatedSales->sortBy('date')->values();
     }
 
     public function getLastWeekSaleCount(Server $server, int $itemID): int

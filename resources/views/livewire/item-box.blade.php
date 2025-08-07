@@ -2,7 +2,8 @@
     class="py-3 pl-3 pr-1 mt-2 ml-5 border border-dashed rounded-sm shadow-lg sm:rounded-lg border-slate-500 dark:border-slate-100">
     {{-- Icon and Title --}}
     <div class="flex flex-row items-center">
-        <img src="{{ 'https://xivapi.com/' . $craftableItem->icon }}" class="w-6 h-6" />&nbsp;
+        <img src="{{ 'https://v2.xivapi.com/api/asset?format=png&path=' . $craftableItem->icon }}"
+            class="w-6 h-6" />&nbsp;
         <a href="{{ route('item.show', $craftableItem->item_id) }}" target="_blank">
             <span class="font-bold text-md dark:text-white">
                 {{ $craftableItem->name }}

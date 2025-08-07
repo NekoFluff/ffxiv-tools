@@ -8,9 +8,9 @@ interface XIVClientInterface
      * Fetches a recipe by its ID.
      *
      * @param  int  $recipeID  The ID of the recipe to fetch.
-     * @return array The fetched recipe.
+     * @return ?XIVRecipe The fetched recipe.
      */
-    public function fetchRecipe(int $recipeID): array;
+    public function fetchRecipe(int $recipeID): ?XIVRecipe;
 
     /**
      * Fetches the vendor cost of an item.

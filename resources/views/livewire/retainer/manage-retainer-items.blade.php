@@ -47,7 +47,8 @@ new class extends Component {
             <li>
                 <div class="flex items-center justify-between">
                     <div class="flex">
-                        <img class="w-6 h-6" src="{{ 'https://xivapi.com/' . $item->icon }}" />
+                        <img class="w-6 h-6"
+                            src="{{ 'https://v2.xivapi.com/api/asset?format=png&path=' . $item->icon }}" />
                         <span class="ml-2 dark:text-white">{{ $item->name }}</span>
                     </div>
                     <div>
