@@ -34,6 +34,15 @@ class XIVRecipe
         return $recipes;
     }
 
+    public static function hydrateFromRecipeListResponse(array $data): Collection
+    {
+        $recipes = new Collection();
+        foreach ($data['rows'] as $recipeData) {
+            $recipes->push(self::hydrateFromRecipeFetchResponse($recipeData));
+        }
+        return $recipes;
+    }
+
     /**
      * @param array<string,mixed> $data
      */

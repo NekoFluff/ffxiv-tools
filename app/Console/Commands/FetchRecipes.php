@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Clients\XIV\XIVClient;
 use App\Jobs\RefreshItem;
 use App\Models\Enums\Server;
 use App\Models\Recipe;
@@ -17,7 +18,7 @@ class FetchRecipes extends Command
      *
      * @var string
      */
-    protected $signature = 'recipes:fetch {--page=1}';
+    protected $signature = 'recipes:fetch {--after=1337}';
 
     /**
      * The console command description.
@@ -47,41 +48,39 @@ class FetchRecipes extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(XIVClient $xivClient): void
     {
         // Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
-        $page = intval($this->option('page'));
-        $recipesStr = '';
+        $after = intval($this->option('after'));
+        $limit = 100;
         $server = Server::GOBLIN;
         do {
-            error_log("Fetching recipes page ".$page);
+            error_log("Fetching recipes after ID ".$after);
 
-            $recipesStr = file_get_contents('https://xivapi.com/recipe?page='.$page) ?: '';
+            $xivRecipes = $xivClient->fetchRecipes($after, $limit);
 
-            $recipeJsonObjs = json_decode($recipesStr, true)['Results'] ?? [];
-            foreach ($recipeJsonObjs as $recipeObj) {
-                if (empty($recipeObj['ID'])) {
-                    continue;
-                }
-
-                // error_log('Processing recipe '.$recipeObj['Name'].' ('.$recipeObj['ID'].')');
-                $recipe = Recipe::where('id', $recipeObj['ID'])->first();
+            foreach ($xivRecipes as $xivRecipe) {
+                // error_log('Processing recipe '.$xivRecipe->ResultItem->Name.' ('.$xivRecipe->ID.')');
+                $recipe = Recipe::where('id', $xivRecipe->ID)->first();
 
                 if ($recipe === null) {
-                    $recipe = $this->ffxivService->getRecipe($recipeObj['ID']);
+                    $recipe = $this->ffxivService->getRecipe($xivRecipe->ID);
+                    // error_log('Recipe not found in database, creating new one: '.$xivRecipe->ResultItem->Name);
                 } else {
                     continue;
+                    // error_log('Recipe found in database, updating: '.$xivRecipe->ResultItem->Name);
                 }
 
+                // error_log('Dispatching job to refresh item for recipe '.$recipe->id.' ('.$xivRecipe->ResultItem->Name.')');
                 RefreshItem::dispatch($recipe->item_id, $server);
 
                 // error_log('Sleeping for 5 seconds');
                 sleep(5);
             }
 
-            $page += 1;
+            $after = $xivRecipes->last()?->ID ?? $after + $limit;
             sleep(5);
-        } while (! empty($recipeJsonObjs));
+        } while (! empty($xivRecipes));
     }
 }

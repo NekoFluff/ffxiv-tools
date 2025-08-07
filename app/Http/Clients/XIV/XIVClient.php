@@ -84,6 +84,35 @@ class XIVClient implements XIVClientInterface
         return new Collection();
     }
 
+    /**
+     * Fetch recipes in a paginated manner.
+     *
+     * @param int $after The ID after which to fetch recipes.
+     * @param int $limit The maximum number of recipes to fetch.
+     * @return Collection<int, XIVRecipe> A collection of XIVRecipe objects.
+     */
+    public function fetchRecipes(int $after, int $limit): Collection
+    {
+        Log::debug("Fetching recipes after {$after} limit {$limit}");
+        try {
+            $response = $this->request()->get('/sheet/Recipe', [
+                'after' => $after,
+                'limit' => $limit,
+                'fields' => implode(',', self::FILTER_RECIPE_FIELDS),
+            ]);
+            Log::debug("Retrieved recipe data {$response->body()}");
+
+            /** @var array<mixed> $recipeData */
+            $recipeData = $response->json();
+
+            return XIVRecipe::hydrateFromRecipeListResponse($recipeData);
+        } catch (Exception $ex) {
+            Log::error("Failed to retrieve recipes after {$after} limit {$limit}", ['exception' => $ex, 'after' => $after, 'limit' => $limit]);
+        }
+
+        return new Collection();
+    }
+
     public function fetchItem(int $itemID): ?XIVItem
     {
         Log::debug("Fetching item data for item {$itemID}");

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Clients\XIV\XIVClient;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Laravel\Telescope\Telescope;
@@ -34,36 +35,32 @@ class RefreshJobsForRecipes extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(XIVClient $xivClient): void
     {
         Telescope::tag(fn () => ['command:'.$this->signature, 'start:'.$this->startTime]);
 
         $recipes = Recipe::all();
         $recipes->each(
-            function (Recipe $recipe) {
-                $id = $recipe->id;
-                /** @var string|false $recipeData */
-                $recipeData = cache()->remember('recipe_'.$id, now()->addMinutes(30), function () use ($id) {
-                    logger("Fetching recipe {$id}");
+            function (Recipe $recipe) use ($xivClient) {
+                $xivRecipe = cache()->remember('recipe_'.$recipe->id, now()->addMinutes(30), function () use ($xivClient, $recipe) {
+                    logger("Fetching recipe {$recipe->id}");
 
-                    return file_get_contents("https://xivapi.com/recipe/{$id}");
+                    return $xivClient->fetchRecipe($recipe->id);
                 });
 
-                if ($recipeData === false) {
+                if (! $xivRecipe) {
                     return;
                 }
 
-                $recipeData = json_decode($recipeData, true);
-
                 $recipe->update([
-                    'class_job' => $recipeData['ClassJob']['NameEnglish'],
-                    'class_job_level' => $recipeData['RecipeLevelTable']['ClassJobLevel'],
-                    'class_job_icon' => $recipeData['ClassJob']['Icon'],
+                    'class_job' => $xivRecipe->ClassJobName,
+                    'class_job_level' => $xivRecipe->ClassJobLevel,
+                    // 'class_job_icon' => $xivRecipe->ClassJobIcon,
                 ]);
 
                 sleep(1);
             }
-        );
+        ) ;
 
     }
 }
