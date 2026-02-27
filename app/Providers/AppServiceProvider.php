@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Nightwatch::rejectQueuedJobs(function (QueuedJob $job) {
-            return $job->name === \Laravel\Telescope\Jobs\ProcessPendingUpdates::class;
+            return $job->name === 'Laravel\Telescope\Jobs\ProcessPendingUpdates';
         });
 
         Telescope::tag(function ($entry) {
