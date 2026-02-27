@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Services\FFXIVService;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Nightwatch\Facades\Nightwatch;
+use Laravel\Nightwatch\Records\QueuedJob;
 use Laravel\Telescope\Telescope;
 use UnitEnum;
 
@@ -22,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Nightwatch::rejectQueuedJobs(function (QueuedJob $job) {
+            return $job->name === \Laravel\Telescope\Jobs\ProcessPendingUpdates::class;
+        });
+
         Telescope::tag(function ($entry) {
             if ($entry->type === 'job') {
                 return array_filter([
