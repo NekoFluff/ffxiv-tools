@@ -2,7 +2,7 @@
 
 use App\Models\Item;
 use App\Models\User;
-use Livewire\Volt\Volt;
+use Livewire\Livewire;
 
 // test('profile page is displayed', function () {
 //     $user = User::factory()->create();
@@ -13,9 +13,9 @@ use Livewire\Volt\Volt;
 
 //     $response
 //         ->assertOk()
-//         ->assertSeeVolt('profile.update-profile-information-form')
-//         ->assertSeeVolt('profile.update-password-form')
-//         ->assertSeeVolt('profile.delete-user-form');
+//         ->assertSeeLivewire('profile.update-profile-information-form')
+//         ->assertSeeLivewire('profile.update-password-form')
+//         ->assertSeeLivewire('profile.delete-user-form');
 // });
 
 // test('profile information can be updated', function () {
@@ -23,7 +23,7 @@ use Livewire\Volt\Volt;
 
 //     $this->actingAs($user);
 
-//     $component = Volt::test('profile.update-profile-information-form')
+//     $component = Livewire::test('profile.update-profile-information-form')
 //         ->set('name', 'Test User')
 //         ->set('email', 'test@example.com')
 //         ->call('updateProfileInformation');
@@ -44,7 +44,7 @@ use Livewire\Volt\Volt;
 
 //     $this->actingAs($user);
 
-//     $component = Volt::test('profile.update-profile-information-form')
+//     $component = Livewire::test('profile.update-profile-information-form')
 //         ->set('name', 'Test User')
 //         ->set('email', $user->email)
 //         ->call('updateProfileInformation');
@@ -69,7 +69,7 @@ test('user must own retainer to add an item to it', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('selectedItemID', $item->id)
@@ -90,7 +90,7 @@ test('it should save a new item for a retainer', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('selectedItemID', $item->id)
@@ -117,7 +117,7 @@ test('there is an error when the search input field is empty', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('search', '')
@@ -137,7 +137,7 @@ test('there is an error when no item can be found', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('search', 'asdf')
@@ -161,7 +161,7 @@ test('there is an error when an item is already attached to a retainer', functio
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('selectedItemID', $item->id)
@@ -193,7 +193,7 @@ test('no additional items can be added if the retainer has 20 items', function (
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.add-retainer-item-form', [
+    $component = Livewire::test('retainer.add-retainer-item-form', [
         'retainer' => $retainer,
     ])
         ->set('selectedItemID', $item->id)
@@ -224,7 +224,7 @@ test('user must own retainer to remove an item from it', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.manage-retainer-items', [
+    $component = Livewire::test('retainer.manage-retainer-items', [
         'retainer' => $retainer,
     ])
         ->call('removeItem', $item->id);
@@ -246,7 +246,7 @@ test('it should remove an item from a retainer', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.manage-retainer-items', [
+    $component = Livewire::test('retainer.manage-retainer-items', [
         'retainer' => $retainer,
     ])
         ->call('removeItem', $item->id);
@@ -272,7 +272,7 @@ test('user must own retainer to delete it', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.delete-retainer-form', [
+    $component = Livewire::test('retainer.delete-retainer-form', [
         'retainer' => $retainer,
     ])
         ->set('name', $retainer->name)
@@ -292,7 +292,7 @@ test('user can delete their retainer', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.delete-retainer-form', [
+    $component = Livewire::test('retainer.delete-retainer-form', [
         'retainer' => $retainer,
     ])
         ->set('name', $retainer->name)
@@ -315,7 +315,7 @@ test('correct name must be provided to delete the retainer', function () {
 
     $this->actingAs($user);
 
-    $component = Volt::test('retainer.delete-retainer-form', [
+    $component = Livewire::test('retainer.delete-retainer-form', [
         'retainer' => $retainer,
     ])
         ->set('name', 'asdf')

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Retainer;
-use Livewire\Volt\Component;
+use Livewire\Component;
 
 new class extends Component {
     public Retainer $retainer;

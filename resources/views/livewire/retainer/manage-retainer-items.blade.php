@@ -2,7 +2,7 @@
 
 use App\Models\Retainer;
 use Livewire\Attributes\On;
-use Livewire\Volt\Component;
+use Livewire\Component;
 
 new class extends Component {
     public Retainer $retainer;
