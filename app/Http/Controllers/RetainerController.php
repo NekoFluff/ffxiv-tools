@@ -16,11 +16,25 @@ class RetainerController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
+        $server = Server::from(session('server', Server::GOBLIN->value));
+
+        $retainers = $user->retainers()->with(['listings', 'items.marketPrices'])->get()
+            ->map(function (Retainer $retainer) use ($server) {
+                return array_merge($retainer->toArray(), [
+                    'items' => $retainer->items->map(fn ($item) => [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => $item->icon,
+                        'market_price' => $item->marketPrice($server)?->price,
+                        'listing_price' => $retainer->getListingPrice($item),
+                    ]),
+                ]);
+            });
 
         return Inertia::render('Retainers/Index', [
-            'retainers' => $user->retainers()->with('listings', 'items')->get(),
+            'retainers' => $retainers,
             'servers' => Server::all(),
-            'currentServer' => session('server', Server::GOBLIN->value),
+            'currentServer' => $server->value,
         ]);
     }
 
@@ -29,7 +43,7 @@ class RetainerController extends Controller
         $this->authorize('view', $retainer);
 
         return Inertia::render('Retainers/Edit', [
-            'retainer' => $retainer,
+            'retainer' => $retainer->load('items'),
             'servers' => Server::all(),
         ]);
     }

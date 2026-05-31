@@ -7,7 +7,9 @@
           <h1 class="text-2xl font-bold text-zinc-900 dark:text-white">Edit Retainer</h1>
         </div>
 
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+        <!-- Retainer details -->
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 mb-6">
+          <h2 class="text-base font-semibold text-zinc-800 dark:text-zinc-200 mb-4">Details</h2>
           <form @submit.prevent="update">
             <div class="mb-4">
               <label class="block text-sm text-zinc-700 dark:text-zinc-300 mb-1">Name</label>
@@ -27,13 +29,54 @@
             </div>
           </form>
         </div>
+
+        <!-- Tracked items -->
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+          <h2 class="text-base font-semibold text-zinc-800 dark:text-zinc-200 mb-4">Tracked Items</h2>
+
+          <!-- Item search -->
+          <div class="relative mb-4">
+            <input
+              v-model="itemQuery"
+              @input="searchItems"
+              type="text"
+              placeholder="Search for an item to add..."
+              class="w-full border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-2 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white text-sm"
+            />
+            <ul v-if="searchResults.length" class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <li
+                v-for="item in searchResults"
+                :key="item.id"
+                @click="addItem(item)"
+                class="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 text-sm text-zinc-900 dark:text-white"
+              >
+                <img v-if="item.icon" :src="item.icon" class="w-6 h-6 rounded" />
+                <span>{{ item.name }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Current items -->
+          <ul v-if="trackedItems.length" class="divide-y divide-zinc-100 dark:divide-zinc-700">
+            <li v-for="item in trackedItems" :key="item.id" class="flex items-center justify-between py-2">
+              <div class="flex items-center gap-3">
+                <img v-if="item.icon" :src="item.icon" class="w-7 h-7 rounded" />
+                <Link :href="route('item.show', item.id)" class="text-sm text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400">{{ item.name }}</Link>
+              </div>
+              <button @click="removeItem(item)" class="text-xs text-red-500 hover:underline">Remove</button>
+            </li>
+          </ul>
+          <p v-else class="text-sm text-zinc-500 dark:text-zinc-400">No items tracked yet.</p>
+        </div>
       </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { Link, useForm, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
@@ -48,5 +91,50 @@ const form = useForm({
 
 function update() {
   form.put(route('retainer.update', props.retainer.id));
+}
+
+// Item tracking
+const trackedItems = ref([...(props.retainer.items ?? [])]);
+const itemQuery = ref('');
+const searchResults = ref([]);
+let debounceTimer = null;
+
+function searchItems() {
+  clearTimeout(debounceTimer);
+  if (!itemQuery.value.trim()) {
+    searchResults.value = [];
+    return;
+  }
+  debounceTimer = setTimeout(async () => {
+    const { data } = await axios.get(route('api.items.search'), { params: { q: itemQuery.value } });
+    searchResults.value = data.filter(i => !trackedItems.value.find(t => t.id === i.id));
+  }, 300);
+}
+
+function addItem(item) {
+  router.post(
+    route('retainer.items.store', props.retainer.id),
+    { item_id: item.id },
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        trackedItems.value.push(item);
+        itemQuery.value = '';
+        searchResults.value = [];
+      },
+    }
+  );
+}
+
+function removeItem(item) {
+  router.delete(
+    route('retainer.items.destroy', { retainer: props.retainer.id, item: item.id }),
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        trackedItems.value = trackedItems.value.filter(i => i.id !== item.id);
+      },
+    }
+  );
 }
 </script>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemRetainerController;
 use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RetainerController;
@@ -22,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/retainers', [RetainerController::class, 'store'])->name('retainer.store');
     Route::put('/retainers/{retainer}', [RetainerController::class, 'update'])->where('retainer', '\d+')->name('retainer.update');
     Route::delete('/retainers/{retainer}', [RetainerController::class, 'destroy'])->where('retainer', '\d+')->name('retainer.destroy');
+    Route::post('/retainers/{retainer}/items', [ItemRetainerController::class, 'store'])->where('retainer', '\d+')->name('retainer.items.store');
+    Route::delete('/retainers/{retainer}/items/{item}', [ItemRetainerController::class, 'destroy'])->where(['retainer' => '\d+', 'item' => '\d+'])->name('retainer.items.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {

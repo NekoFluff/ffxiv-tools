@@ -35,17 +35,37 @@
         <!-- Retainer cards -->
         <div v-if="retainers.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div v-for="retainer in retainers" :key="retainer.id" class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
-            <div class="flex items-start justify-between">
+            <div class="flex items-start justify-between mb-3">
               <div>
                 <h3 class="font-semibold text-zinc-900 dark:text-white">{{ retainer.name }}</h3>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ retainer.server }}</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">[{{ retainer.server }}]</p>
               </div>
               <div class="flex gap-2">
                 <Link :href="route('retainer.edit', retainer.id)" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Edit</Link>
                 <button @click="deleteRetainer(retainer)" class="text-xs text-red-500 hover:underline">Delete</button>
               </div>
             </div>
-            <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-2">{{ retainer.listings?.length ?? 0 }} active listings</p>
+
+            <!-- Tracked items with market vs listing price -->
+            <template v-if="retainer.items?.length">
+              <div class="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1 px-1">
+                <span>Item</span>
+                <span class="flex gap-4">
+                  <span>Market</span>
+                  <span>Listed</span>
+                </span>
+              </div>
+              <div v-for="item in retainer.items" :key="item.id" class="flex justify-between items-center text-sm py-1 border-t border-zinc-100 dark:border-zinc-700">
+                <Link :href="route('item.show', item.id)" class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 truncate max-w-[55%]">
+                  {{ item.name }}
+                </Link>
+                <span class="flex gap-4 text-xs shrink-0">
+                  <span class="text-zinc-500 dark:text-zinc-400">{{ item.market_price ? item.market_price.toLocaleString() : '—' }}</span>
+                  <span :class="priceColor(item)">{{ item.listing_price ? item.listing_price.toLocaleString() : '—' }}</span>
+                </span>
+              </div>
+            </template>
+            <p v-else class="text-sm text-zinc-400 dark:text-zinc-500">{{ retainer.listings?.length ?? 0 }} active listings</p>
           </div>
         </div>
 
@@ -88,5 +108,14 @@ function deleteRetainer(retainer) {
   if (confirm(`Delete retainer "${retainer.name}"?`)) {
     router.delete(route('retainer.destroy', retainer.id));
   }
+}
+
+// Green if retainer is listing at or below market (competitive), red if overpriced or no listing
+function priceColor(item) {
+  if (!item.listing_price) return 'text-zinc-400 dark:text-zinc-500';
+  if (!item.market_price) return 'text-zinc-700 dark:text-zinc-300';
+  return item.listing_price <= item.market_price
+    ? 'text-green-600 dark:text-green-400'
+    : 'text-red-500';
 }
 </script>

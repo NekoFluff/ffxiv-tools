@@ -39,26 +39,12 @@
           <!-- Crafting info -->
           <div v-if="craftableItem" class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 mb-6">
             <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4">Crafting Analysis</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">Market Price</p>
-                <p class="font-semibold text-zinc-900 dark:text-white">{{ craftableItem.market_price.toLocaleString() }} gil</p>
-              </div>
-              <div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">Optimal Craft Cost</p>
-                <p class="font-semibold text-zinc-900 dark:text-white">{{ craftableItem.optimal_craft_cost.toLocaleString() }} gil</p>
-              </div>
-              <div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">Profit</p>
-                <p class="font-semibold" :class="profit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'">
-                  {{ profit.toLocaleString() }} gil
-                </p>
-              </div>
-              <div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">Job</p>
-                <p class="font-semibold text-zinc-900 dark:text-white">{{ craftableItem.class_job }} (Lv {{ craftableItem.class_job_level }})</p>
-              </div>
-            </div>
+            <CraftableItemBox :item="craftableItem" />
+          </div>
+
+          <div v-else class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 mb-6 text-zinc-500 dark:text-zinc-400">
+            <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Crafting Analysis</h2>
+            <p class="text-sm">{{ item?.name }} cannot be crafted.</p>
           </div>
 
           <!-- Price History Chart -->
@@ -83,10 +69,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ServerDropdown from '@/Components/ServerDropdown.vue';
+import CraftableItemBox from '@/Components/CraftableItemBox.vue';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -103,11 +90,6 @@ const props = defineProps({
 
 const priceChartRef = ref(null);
 const qtyChartRef = ref(null);
-
-const profit = computed(() => {
-  if (!props.craftableItem) return 0;
-  return props.craftableItem.market_price * props.craftableItem.crafting_output_count - props.craftableItem.optimal_craft_cost;
-});
 
 function onServerChanged(server) {
   router.get(route('item.show', props.item.id), { server }, { preserveState: false });
