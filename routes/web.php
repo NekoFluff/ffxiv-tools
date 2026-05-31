@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::get('/items/{id}', [ItemController::class, 'show'])->where('id', '\d+')->name('item.show');
