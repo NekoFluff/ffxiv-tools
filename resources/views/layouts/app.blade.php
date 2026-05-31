@@ -4,45 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'FFXIV Tools') }}</title>
 
-    <!-- Fonts -->
-    {{-- <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /> --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
+    @routes
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    @stack('scripts')
+    @inertiaHead
 </head>
 
 <body class="font-sans antialiased bg-zinc-100 dark:bg-zinc-900">
-    <div class="min-h-screen ">
-        @if (auth()->user())
-            <livewire:layout.navigation />
-        @else
-            <livewire:welcome.navigation />
-        @endif
-
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="bg-white shadow dark:bg-zinc-800">
-                <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
-
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
-    </div>
-    @fluxScripts
+    @inertia
 </body>
 
 </html>

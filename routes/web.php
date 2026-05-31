@@ -1,22 +1,37 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemSearchController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RetainerController;
+use App\Http\Controllers\ServerController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
 
-Route::view('dashboard', 'dashboard')
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('/items/{id}', App\Livewire\ItemDashboard::class)->where('id', '\d*')->name('item.show');
+Route::get('/items/{id}', [ItemController::class, 'show'])->where('id', '\d+')->name('item.show');
 
-Route::get('/retainers', App\Livewire\RetainersDashboard::class)
-    ->middleware(['auth', 'verified'])
-    ->name('retainers');
-Route::get('/retainers/{retainer}/edit', App\Livewire\EditRetainer::class)->where('retainer', '\d*')->name('retainer.edit');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/retainers', [RetainerController::class, 'index'])->name('retainers');
+    Route::get('/retainers/{retainer}/edit', [RetainerController::class, 'edit'])->where('retainer', '\d+')->name('retainer.edit');
+    Route::post('/retainers', [RetainerController::class, 'store'])->name('retainer.store');
+    Route::put('/retainers/{retainer}', [RetainerController::class, 'update'])->where('retainer', '\d+')->name('retainer.update');
+    Route::delete('/retainers/{retainer}', [RetainerController::class, 'destroy'])->where('retainer', '\d+')->name('retainer.destroy');
+});
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// API helpers (session-based, web middleware)
+Route::get('/api/items/search', [ItemSearchController::class, 'index'])->name('api.items.search');
+Route::post('/api/server', [ServerController::class, 'update'])->name('api.server');
 
 require __DIR__.'/auth.php';

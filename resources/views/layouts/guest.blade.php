@@ -4,40 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'FFXIV Tools') }}</title>
 
-    <!-- Fonts -->
-    {{-- <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /> --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
+    @routes
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @inertiaHead
 </head>
 
-<body class="font-sans antialiased text-zinc-900 bg-zinc-100 sm:pt-0 dark:bg-zinc-900">
-    <div class="flex flex-col min-h-screen pt-6 ">
-        <div class="flex justify-end p-4 dark:bg-zinc-900">
-            <x-dark-mode-toggle />
-        </div>
-
-        <div class="flex flex-col items-center flex-1 sm:justify-center">
-            <div>
-                <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 fill-current text-zinc-500" />
-                </a>
-            </div>
-
-            <div
-                class="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md dark:bg-zinc-800 sm:rounded-lg">
-                {{ $slot }}
-            </div>
-        </div>
-    </div>
-    @fluxScripts
+<body class="font-sans antialiased bg-zinc-100 dark:bg-zinc-900">
+    @inertia
 </body>
 
 </html>

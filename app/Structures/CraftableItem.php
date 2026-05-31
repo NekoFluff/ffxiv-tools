@@ -6,9 +6,8 @@ use App\Models\Enums\Server;
 use App\Models\Ingredient;
 use App\Models\MarketPrice;
 use App\Models\Recipe;
-use Livewire\Wireable;
 
-class CraftableItem implements Wireable
+class CraftableItem
 {
     public string $name;
 
@@ -101,13 +100,13 @@ class CraftableItem implements Wireable
     /**
      * @return array<string, mixed>
      */
-    public function toLivewire(): array
+    public function toArray(): array
     {
         return [
             'name' => $this->name,
             'item_id' => $this->item_id,
             'icon' => $this->icon,
-            'crafting_materials' => collect($this->crafting_materials)->map(fn ($item) => $item->toLivewire())->all(),
+            'crafting_materials' => collect($this->crafting_materials)->map(fn ($item) => $item->toArray())->all(),
             'crafting_output_count' => $this->crafting_output_count,
             'number_needed_per_craft' => $this->number_needed_per_craft,
             'class_job' => $this->class_job,
@@ -121,28 +120,5 @@ class CraftableItem implements Wireable
             'vendor_price' => $this->vendor_price,
             'server' => $this->server,
         ];
-    }
-
-    public static function fromLivewire(mixed $value): CraftableItem
-    {
-        $item = new CraftableItem();
-        $item->name = $value['name'];
-        $item->item_id = $value['item_id'];
-        $item->icon = $value['icon'];
-        $item->crafting_materials = array_map(fn (mixed $item) => CraftableItem::fromLivewire($item), $value['crafting_materials']);
-        $item->crafting_output_count = $value['crafting_output_count'];
-        $item->number_needed_per_craft = $value['number_needed_per_craft'];
-        $item->class_job = $value['class_job'];
-        $item->class_job_level = $value['class_job_level'];
-        $item->class_job_icon = $value['class_job_icon'];
-        $item->purchase_cost = $value['purchase_cost'];
-        $item->market_craft_cost = $value['market_craft_cost'];
-        $item->optimal_craft_cost = $value['optimal_craft_cost'];
-        $item->market_price = $value['market_price'];
-        $item->market_price_updated_at = $value['market_price_updated_at'];
-        $item->vendor_price = $value['vendor_price'];
-        $item->server = $value['server'];
-
-        return $item;
     }
 }
