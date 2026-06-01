@@ -50,7 +50,7 @@
                 @click="addItem(item)"
                 class="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600 text-sm text-zinc-900 dark:text-white"
               >
-                <img v-if="item.icon" :src="item.icon" class="w-6 h-6 rounded" />
+                <img v-if="item.icon" :src="'https://v2.xivapi.com/api/asset?format=png&path=' + item.icon" class="w-6 h-6 rounded" />
                 <span>{{ item.name }}</span>
               </li>
             </ul>
@@ -60,7 +60,7 @@
           <ul v-if="trackedItems.length" class="divide-y divide-zinc-100 dark:divide-zinc-700">
             <li v-for="item in trackedItems" :key="item.id" class="flex items-center justify-between py-2">
               <div class="flex items-center gap-3">
-                <img v-if="item.icon" :src="item.icon" class="w-7 h-7 rounded" />
+                <img v-if="item.icon" :src="'https://v2.xivapi.com/api/asset?format=png&path=' + item.icon" class="w-7 h-7 rounded" />
                 <Link :href="route('item.show', item.id)" class="text-sm text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400">{{ item.name }}</Link>
               </div>
               <button @click="removeItem(item)" class="text-xs text-red-500 hover:underline">Remove</button>

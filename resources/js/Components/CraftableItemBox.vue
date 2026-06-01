@@ -2,8 +2,8 @@
   <section class="py-3 pl-3 pr-1 mt-2 ml-5 border border-dashed rounded shadow-lg border-slate-500 dark:border-slate-100">
     <!-- Icon, name, output count, badges -->
     <div class="flex flex-wrap items-center gap-2">
-      <img v-if="item.icon" :src="item.icon" class="w-6 h-6 rounded" />
-      <a :href="route('item.show', item.item_id)" class="font-bold text-sm dark:text-white hover:underline">
+      <img v-if="item.icon" :src="'https://v2.xivapi.com/api/asset?format=png&path=' + item.icon" class="w-6 h-6 rounded" />
+      <a :href="route('item.show', item.item_id)" class="text-sm font-bold dark:text-white hover:underline">
         {{ item.name }}
       </a>
       <span class="text-sm text-zinc-600 dark:text-zinc-300">(x{{ item.crafting_output_count }})</span>
@@ -30,7 +30,7 @@
     <!-- Cost breakdown + profit -->
     <div v-if="item.optimal_craft_cost > 0" class="flex gap-3 mt-2">
       <!-- Costs -->
-      <div class="flex-1 p-2 space-y-1 border rounded dark:border-slate-600 text-xs font-medium">
+      <div class="flex-1 p-2 space-y-1 text-xs font-medium border rounded dark:border-slate-600">
         <div :class="costColor('purchase')">
           Purchase Cost: {{ item.purchase_cost.toLocaleString() }} gil
           <span v-if="item.crafting_output_count > 1"> ({{ perUnit(item.purchase_cost) }} ea.)</span>
@@ -46,7 +46,7 @@
       </div>
 
       <!-- Profit -->
-      <div class="flex flex-col justify-center flex-1 p-2 space-y-2 border rounded dark:border-slate-600 text-xs font-medium dark:text-white">
+      <div class="flex flex-col justify-center flex-1 p-2 space-y-2 text-xs font-medium border rounded dark:border-slate-600 dark:text-white">
         <div>
           Profit if Crafted:
           <span :class="profit >= 0 ? 'text-green-500' : 'text-red-500'">

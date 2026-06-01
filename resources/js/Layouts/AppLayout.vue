@@ -3,7 +3,7 @@
     <nav class="bg-white dark:bg-zinc-800 shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4 h-16">
         <Link :href="route('dashboard')" class="text-xl font-bold text-zinc-900 dark:text-white shrink-0">FFXIV Tools</Link>
-        <div class="flex-1 max-w-sm">
+        <div class="flex-1">
           <ItemSearchBar />
         </div>
         <div class="flex items-center gap-4 ml-auto">
