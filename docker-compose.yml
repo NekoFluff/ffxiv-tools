@@ -6,7 +6,6 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        restart: unless-stopped
         ports:
             - "8000:8000"
         extra_hosts:
@@ -25,7 +24,6 @@ services:
     npm:
         image: ffxivtools/app:dev
         container_name: ffxivtools-npm
-        restart: unless-stopped
         ports:
             - "5173:5173"
         working_dir: /var/www/
@@ -39,7 +37,6 @@ services:
     horizon:
         image: ffxivtools/app:dev
         container_name: ffxivtools-horizon
-        restart: unless-stopped
         working_dir: /var/www/
         volumes:
             - .:/var/www
@@ -53,7 +50,6 @@ services:
     # pgsql:
     #   image: postgres:13
     #   container_name: ffxivtools-pgsql
-    #   restart: always
     #   environment:
     #     POSTGRES_DB: "forge"
     #     POSTGRES_USER: "forge"
@@ -68,7 +64,6 @@ services:
     mysql:
         image: mysql:8.3
         container_name: ffxivtools-mysql
-        restart: always
         environment:
             MYSQL_DATABASE: "forge"
             MYSQL_USER: "ffxiv"
@@ -85,7 +80,6 @@ services:
     redis:
         image: redis:6
         container_name: ffxivtools-redis
-        restart: always
         ports:
             - "6379:6379"
         networks:
